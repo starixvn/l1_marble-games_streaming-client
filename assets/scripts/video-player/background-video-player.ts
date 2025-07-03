@@ -1,0 +1,149 @@
+import { _decorator, Component } from "cc";
+import Hls from "hls.js";
+import Observer from "observer";
+import { DOMBackgroundVideo } from "./dom-background-video";
+import { VideoStore } from "./video-store";
+
+const { ccclass } = _decorator;
+const { observer, render } = Observer;
+
+@ccclass("BackgroundVideoPlayer")
+@observer
+export class BackgroundVideoPlayer extends Component {
+  private hls: Hls = null;
+  private native: HTMLVideoElement = null;
+
+  private _url: string = "";
+  private _muted = true;
+
+  private get initialized() {
+    return !!this.native && !!this.hls;
+  }
+
+  currentTime = 0;
+
+  @render(VideoStore, (store) => store.url)
+  load(url: string, currentTime: number = 0) {
+    if (this._url !== url) {
+      if (!this.initialized) {
+        this.initialize();
+      }
+
+      this._url = url;
+
+      this.hls.loadSource(this._url);
+      this.play();
+      this.currentTime = currentTime;
+    }
+  }
+
+  private get bandwidthEstimate() {
+    return this.hls?.bandwidthEstimate ?? 0;
+  }
+
+  setNativeMuted() {
+    if (this.native) {
+      this.native.muted = this._muted;
+    }
+  }
+
+  play(retry = 0, maxRetry = 3) {
+    // Fix for iOS 17, video element is not playing immediately
+    this.native.play().catch(() => {
+      if (retry < maxRetry) {
+        this.play(retry + 1, maxRetry);
+      }
+    });
+  }
+
+  pause() {
+    if (this.initialized) {
+      this.native.pause();
+    }
+  }
+
+  set muted(value: boolean) {
+    this._muted = value;
+  }
+
+  get level() {
+    return this.hls?.currentLevel ?? 0;
+  }
+
+  protected lateUpdate(dt: number): void {
+    this.currentTime += dt;
+  }
+
+  onLoad() {
+    this.initialize();
+  }
+
+  protected onDestroy(): void {
+    this.stop();
+  }
+
+  stop() {
+    if (this.initialized) {
+      this.native.removeEventListener(
+        "timeupdate",
+        this.syncCurrentTime.bind(this),
+      );
+
+      this.hls.off(Hls.Events.ERROR);
+      this.hls.detachMedia();
+      this.hls.destroy();
+    }
+  }
+
+  private syncCurrentTime() {
+    this.node.emit("syncNativeCurrentTime", this.native.currentTime);
+
+    const needSync =
+      this.currentTime >= 0 &&
+      Math.abs(this.currentTime - this.native.currentTime) > 1;
+
+    if (this.initialized && needSync) {
+      this.native.currentTime = this.currentTime;
+    }
+  }
+
+  private initialize() {
+    const video = DOMBackgroundVideo.createOrLoadVideoElement();
+
+    if (!Hls.isSupported()) {
+      this.node.emit("hlsNotSupported");
+      throw new Error("Hls.js is not supported.");
+    }
+
+    const hls = new Hls({
+      startLevel: -1,
+      capLevelToPlayerSize: true,
+      lowLatencyMode: true,
+      liveSyncDuration: 0.9,
+      liveMaxLatencyDuration: 1,
+      enableWorker: false,
+    });
+
+    video.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
+    hls.attachMedia(video);
+
+    hls.on(Hls.Events.LEVEL_SWITCHED, this.node.emit.bind(this.node));
+    hls.on(Hls.Events.MANIFEST_LOADING, this.node.emit.bind(this.node));
+    hls.on(Hls.Events.MANIFEST_PARSED, this.node.emit.bind(this.node));
+    hls.on(Hls.Events.FRAG_BUFFERED, this.node.emit.bind(this.node));
+    hls.on(Hls.Events.FRAG_CHANGED, this.node.emit.bind(this.node));
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      this.node.emit(event, {
+        ...data,
+        video: this._url,
+        bandwidth: this.bandwidthEstimate,
+      });
+      this.syncCurrentTime();
+      console.log("error", event, data);
+    });
+
+    this.hls = hls;
+    this.native = video;
+  }
+}
