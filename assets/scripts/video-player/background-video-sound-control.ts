@@ -1,42 +1,43 @@
 import { _decorator, Component, game } from "cc";
 import Observer from "observer";
 import { BackgroundVideoPlayer } from "./background-video-player";
+import { canPlayAudio, initializeAudio } from "./dom-audio-checker";
+import { VideoStore } from "./video-store";
 
 const { ccclass, requireComponent } = _decorator;
-const { observer } = Observer;
+const { observer, render } = Observer;
 
 @ccclass("BackgroundVideoSoundControl")
 @requireComponent(BackgroundVideoPlayer)
 @observer
 export class BackgroundVideoSoundControl extends Component {
   private videoPlayer: BackgroundVideoPlayer;
-  private touched = false;
+  private muted = false;
+
+  @render(VideoStore, (store) => ({ muted: store.muted, video: store.url }))
+  private async setMuted({ muted }: { muted: boolean }) {
+    this.muted = muted;
+
+    const canPlay = await canPlayAudio();
+
+    if (canPlay) {
+      this.videoPlayer.muted = this.muted;
+    }
+  }
+
   onLoad(): void {
+    initializeAudio(() => {
+      this.videoPlayer.muted = this.muted;
+    });
+
     this.videoPlayer = this.node.getComponent(BackgroundVideoPlayer);
 
     const canvas = game.canvas;
     canvas.addEventListener("touchstart", this.onTouch.bind(this));
-    canvas.addEventListener("mousedown", this.onMouse.bind(this));
-  }
-
-  private updateMusicStatus(musicEnable: boolean) {
-    this.syncMuted(!musicEnable);
-    if (this.touched) {
-      this.videoPlayer.setNativeMuted();
-    }
-  }
-
-  onMouse() {
-    this.touched = true;
-    this.videoPlayer.setNativeMuted();
+    canvas.addEventListener("mousedown", this.onTouch.bind(this));
   }
 
   onTouch() {
-    this.touched = true;
-    this.videoPlayer.setNativeMuted();
-  }
-
-  private syncMuted(isMute = false) {
-    this.videoPlayer.muted = isMute;
+    this.videoPlayer.muted = this.muted;
   }
 }

@@ -14,7 +14,6 @@ export class BackgroundVideoPlayer extends Component {
   private native: HTMLVideoElement = null;
 
   private _url: string = "";
-  private _muted = true;
 
   private get initialized() {
     return !!this.native && !!this.hls;
@@ -41,12 +40,6 @@ export class BackgroundVideoPlayer extends Component {
     return this.hls?.bandwidthEstimate ?? 0;
   }
 
-  setNativeMuted() {
-    if (this.native) {
-      this.native.muted = this._muted;
-    }
-  }
-
   play(retry = 0, maxRetry = 3) {
     // Fix for iOS 17, video element is not playing immediately
     this.native.play().catch(() => {
@@ -63,7 +56,8 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   set muted(value: boolean) {
-    this._muted = value;
+    console.log("set muted", value);
+    this.native.muted = value;
   }
 
   get level() {
