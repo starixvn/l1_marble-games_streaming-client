@@ -7,13 +7,12 @@ import {
   Prefab,
   resources,
 } from "cc";
+import { Container } from "inversify";
 import mobx from "mobx";
 import Observer from "observer";
-import { Container } from "inversify";
-import { VideoStore } from "./video-player/video-store";
 
 const { ccclass, property } = _decorator;
-const { observer, handle } = Observer;
+const { observer } = Observer;
 
 const container = new Container({
   autobind: true,
@@ -30,17 +29,8 @@ export class Startup extends Component {
   @property(Node)
   private infoLayer: Node = null;
 
-  @handle(VideoStore, (store, url: string) => store.setUrl(url))
-  private setDemoVideo() {
-    return "https://d1aof1lwumql9k.cloudfront.net/114_STAGING/0027ce5a8da81ea405b551ccaa7521432ea283ca495dacdcb41f4fd13136ce1b.m3u8";
-  }
-
   protected start(): void {
     this.loadInfoLayer();
-
-    setTimeout(() => {
-      this.setDemoVideo();
-    }, 5000);
   }
 
   private loadInfoLayer() {
