@@ -56,7 +56,6 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   set muted(value: boolean) {
-    console.log("set muted", value);
     this.native.muted = value;
   }
 

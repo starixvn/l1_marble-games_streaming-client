@@ -10,6 +10,10 @@ import {
 import { Container } from "inversify";
 import mobx from "mobx";
 import Observer from "observer";
+import { IconManager } from "./team/icon-manager";
+import { Team } from "./team/team";
+import { NameManager } from "./team/name-manager";
+import { StageManager } from "./stages/stage-manager";
 
 const { ccclass, property } = _decorator;
 const { observer } = Observer;
@@ -31,37 +35,24 @@ export class Startup extends Component {
 
   protected start(): void {
     this.loadInfoLayer();
+
+    setInterval(() => {
+      this.test();
+    }, 1000);
   }
 
   private loadInfoLayer() {
     const params = new URLSearchParams(window.location.search);
-    const gameId = params.get("game");
-    const loadDefault = () =>
-      resources.load(
-        "games/default",
-        Prefab,
-        this.onLoadedInfoLayer(loadDefault),
-      );
+    const theme = params.get("theme");
+    const path = `themes/${theme || "default"}`;
 
-    if (!gameId) {
-      loadDefault();
-
-      return;
-    }
-
-    resources.load(
-      `games/${gameId}`,
-      Prefab,
-      this.onLoadedInfoLayer(loadDefault),
-    );
+    resources.load(path, Prefab, this.onLoadedInfoLayer());
   }
 
-  private onLoadedInfoLayer(fallback: () => void = undefined) {
+  private onLoadedInfoLayer() {
     return (err: Error, prefab: Prefab) => {
       if (err) {
         error(err);
-
-        fallback && fallback();
 
         return;
       }
@@ -71,5 +62,31 @@ export class Startup extends Component {
       this.infoLayer.removeAllChildren();
       this.infoLayer.addChild(info);
     };
+  }
+
+  private index = 0;
+
+  private test() {
+    this.team(Team.HOME, "Atletico Madrid", "ATM", "clb_atm");
+    this.team(Team.AWAY, "Benfica", "BEN", "clb_ben");
+
+    const manager = this.infoLayer.getComponentInChildren(StageManager);
+
+    manager.index = this.index;
+
+    this.index++;
+  }
+
+  private team(team: Team, name: string, shortName: string, icon: string) {
+    const nameManager = this.infoLayer
+      .getComponentsInChildren(NameManager)
+      .find((manager) => manager.team === team);
+    const iconManager = this.infoLayer
+      .getComponentsInChildren(IconManager)
+      .find((manager) => manager.team === team);
+
+    nameManager.name = name;
+    nameManager.shortName = shortName;
+    iconManager.name = icon;
   }
 }
