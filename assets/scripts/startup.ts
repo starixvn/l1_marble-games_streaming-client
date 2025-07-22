@@ -72,6 +72,10 @@ export class Startup extends Component {
 
     const manager = this.infoLayer.getComponentInChildren(StageManager);
 
+    if (!manager) {
+      return;
+    }
+
     manager.index = this.index;
 
     this.index++;
@@ -84,6 +88,10 @@ export class Startup extends Component {
     const iconManager = this.infoLayer
       .getComponentsInChildren(IconManager)
       .find((manager) => manager.team === team);
+
+    if (!nameManager || !iconManager) {
+      return;
+    }
 
     nameManager.name = name;
     nameManager.shortName = shortName;

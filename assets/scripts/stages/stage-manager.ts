@@ -38,6 +38,8 @@ export class StageManager extends Component {
   }
 
   onFocusInEditor(): void {
-    this.targets = this.node.getComponentsInChildren(Stage);
+    this.targets = this.node.children
+      .map((child) => child.components.find((c) => c instanceof Stage))
+      .filter(Boolean);
   }
 }
