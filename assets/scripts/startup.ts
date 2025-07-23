@@ -14,14 +14,21 @@ import { IconManager } from "./team/icon-manager";
 import { Team } from "./team/team";
 import { NameManager } from "./team/name-manager";
 import { StageManager } from "./stages/stage-manager";
+import { StreamingHandler } from "./streaming/streaming-handler";
+import { StreamingStore } from "./streaming/streaming-store";
+import "reflect-metadata";
 
 const { ccclass, property } = _decorator;
-const { observer } = Observer;
+const { observer, handle } = Observer;
 
 const container = new Container({
   autobind: true,
   defaultScope: "Singleton",
 });
+
+container
+  .bind(StreamingHandler)
+  .toDynamicValue((ctx) => new StreamingHandler(ctx.get(StreamingStore)));
 
 Observer.configure({
   default: { mobx, container: { resolve: (ctor) => container.get(ctor) } },
@@ -47,6 +54,12 @@ export class Startup extends Component {
     const path = `themes/${theme || "default"}`;
 
     resources.load(path, Prefab, this.onLoadedInfoLayer());
+    this.loadStreaming(theme);
+  }
+
+  @handle(StreamingHandler, (handler, theme: string) => handler.connect(theme))
+  private loadStreaming(theme: string) {
+    return theme;
   }
 
   private onLoadedInfoLayer() {

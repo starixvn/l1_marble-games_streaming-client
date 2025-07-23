@@ -5,6 +5,8 @@
   /* Add your custom configuration here. */
   "compilerOptions": {
     "strict": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": ["node"]
