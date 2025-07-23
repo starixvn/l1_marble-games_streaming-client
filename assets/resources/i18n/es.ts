@@ -1,6 +1,8 @@
 const win = window || {} as any;
 export const languages = {
-    "Common": {}
+    "Common": {
+        "halftime": "HALFTIME"
+    }
 };
 
 if (!win.languages) {

@@ -15,6 +15,7 @@ import { NameManager } from "./team/name-manager";
 import { StageManager } from "./stages/stage-manager";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import Observer from "observer";
+import { init } from "db://i18n/LanguageData";
 
 const { ccclass, property } = _decorator;
 const { observer, handle } = Observer;
@@ -45,7 +46,10 @@ export class Startup extends Component {
   private loadInfoLayer() {
     const params = new URLSearchParams(window.location.search);
     const theme = params.get("theme");
+    const language = params.get("language");
     const path = `themes/${theme || "default"}`;
+
+    init(language || "en");
 
     resources.load(path, Prefab, this.onLoadedInfoLayer());
     this.loadStreaming(theme);
