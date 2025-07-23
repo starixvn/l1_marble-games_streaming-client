@@ -455,7 +455,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 200.7599334716797,
+      "width": 0,
       "height": 44.1
     },
     "_anchorPoint": {
@@ -491,7 +491,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "Common.all",
+    "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 35,
@@ -588,7 +588,7 @@
     "__prefab": {
       "__id__": 20
     },
-    "key": "Common.all",
+    "key": "Common.loading",
     "_id": ""
   },
   {
@@ -4055,7 +4055,9 @@
     "__prefab": {
       "__id__": 177
     },
-    "label": null,
+    "label": {
+      "__id__": 166
+    },
     "_id": ""
   },
   {
