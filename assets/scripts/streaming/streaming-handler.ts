@@ -1,5 +1,11 @@
 import { injectable, inject } from "inversify";
-import { StreamingStore, VideoPayload, GameData } from "./streaming-store";
+import { StreamingStore } from "./streaming-store";
+import {
+  VideoPayload,
+  EventData,
+  ThemeProductCodeMapping,
+  Theme,
+} from "./streaming-type";
 
 @injectable()
 export class StreamingHandler {
@@ -17,9 +23,7 @@ export class StreamingHandler {
       this.disconnect();
     }
 
-    const url = `https://streaming-service.lumigame.com/live/${
-      theme === "2001" ? "SM_CLUB_WC_25" : "SM_SPINNER_GALAXY"
-    }`;
+    const url = `https://streaming-service.lumigame.com/live/${ThemeProductCodeMapping[theme]}`;
 
     try {
       this.eventSource = new EventSource(url);
@@ -68,52 +72,15 @@ export class StreamingHandler {
   private handleVideoPayload(payload: VideoPayload): void {
     console.log("StreamingHandler: Received video payload:", payload);
 
-    // Update store with new payload
-    this.streamingStore.setCurrentPayload(payload);
+    // Process payload
+    this.processGameData(payload);
 
-    // Process game data if available
-    if (payload.result) {
-      this.processGameData(payload.result);
-    }
-
-    // Handle any messages
-    if (payload.message) {
-      console.log("StreamingHandler: Server message:", payload.message);
-    }
-
-    // Emit custom event for other components to listen to
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(
-        new CustomEvent("videoPayloadReceived", {
-          detail: payload,
-        })
-      );
-    }
+    console.log("StreamingHandler: Server message:", payload.message);
   }
 
-  private processGameData(gameData: any): void {
-    // Update teams data
-    if (gameData.teams) {
-      if (gameData.teams.home) {
-        this.streamingStore.updateTeamData("home", gameData.teams.home);
-      }
-      if (gameData.teams.away) {
-        this.streamingStore.updateTeamData("away", gameData.teams.away);
-      }
-    }
-
-    // Update score data
-    if (gameData.score) {
-      this.streamingStore.updateScore(gameData.score);
-    }
-
-    // Update events data
-    if (gameData.events) {
-      this.streamingStore.updateEvents(gameData.events);
-    }
-
-    // Update the complete game data in store
-    this.streamingStore.setGameData(gameData);
+  private processGameData(payload: VideoPayload): void {
+    this.streamingStore.setCurrentPayload(payload);
+    this.streamingStore.updateEventDataWithPayload(payload);
   }
 
   private attemptReconnect(): void {
@@ -156,49 +123,6 @@ export class StreamingHandler {
     }
 
     // Reset store state
-    this.streamingStore.setConnected(false);
-    this.streamingStore.setCurrentPayload(null);
-    this.streamingStore.setError(null);
-  }
-
-  // Public methods for external access
-  getConnectionStatus(): { isConnected: boolean; error: string | null } {
-    return this.streamingStore.connectionStatus;
-  }
-
-  getCurrentPayload(): VideoPayload | null {
-    return this.streamingStore.currentPayload;
-  }
-
-  getGameData(): GameData | null {
-    return this.streamingStore.gameData;
-  }
-
-  getCurrentTheme(): string {
-    return this.streamingStore.currentTheme;
-  }
-
-  // Method to manually trigger a test payload (for development)
-  simulatePayload(): void {
-    const testPayload: VideoPayload = {
-      eventId: 1,
-      eventDetailIndex: 0,
-      videoUrl: "https://example.com/test-video.mp4",
-      videoStartTime: new Date().toISOString(),
-      videoPlayingTime: 0,
-      videoLength: 90,
-      result: {
-        teams: {
-          home: { name: "Home Team", shortName: "HOME", icon: "clb_home" },
-          away: { name: "Away Team", shortName: "AWAY", icon: "clb_away" },
-        },
-        score: { home: 1, away: 0 },
-        events: [],
-      },
-      message: "Test payload for development",
-      gameId: "test-game",
-    };
-
-    this.handleVideoPayload(testPayload);
+    this.streamingStore.reset();
   }
 }

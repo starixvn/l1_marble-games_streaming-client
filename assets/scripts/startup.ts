@@ -14,11 +14,12 @@ import { Team } from "./team/team";
 import { NameManager } from "./team/name-manager";
 import { StageManager } from "./stages/stage-manager";
 import { StreamingHandler } from "./streaming/streaming-handler";
+import { StreamingStore } from "./streaming/streaming-store";
 import Observer from "observer";
 import { init } from "db://i18n/LanguageData";
 
 const { ccclass, property } = _decorator;
-const { observer, handle } = Observer;
+const { observer, handle, render } = Observer;
 
 const container = new Container({
   autoBindInjectable: true,
@@ -90,6 +91,23 @@ export class Startup extends Component {
     manager.index = this.index;
 
     this.index++;
+  }
+
+  @render(StreamingStore, (store) => ({
+    currentPhase: store.eventData?.currentPhase,
+    currentHalf: store.eventData?.currentHalf,
+    eventID: store.eventData?.eventID,
+  }))
+  private renderEventData({
+    currentPhase,
+    currentHalf,
+    eventID,
+  }: {
+    currentPhase: string;
+    currentHalf: number;
+    eventID: number;
+  }) {
+    console.log("render event data", currentPhase, currentHalf, eventID);
   }
 
   private team(team: Team, name: string, shortName: string, icon: string) {
