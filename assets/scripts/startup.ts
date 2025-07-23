@@ -7,28 +7,22 @@ import {
   Prefab,
   resources,
 } from "cc";
-import { Container } from "inversify";
 import mobx from "mobx";
-import Observer from "observer";
+import { Container } from "inversify";
 import { IconManager } from "./team/icon-manager";
 import { Team } from "./team/team";
 import { NameManager } from "./team/name-manager";
 import { StageManager } from "./stages/stage-manager";
 import { StreamingHandler } from "./streaming/streaming-handler";
-import { StreamingStore } from "./streaming/streaming-store";
-import "reflect-metadata";
+import Observer from "observer";
 
 const { ccclass, property } = _decorator;
 const { observer, handle } = Observer;
 
 const container = new Container({
-  autobind: true,
+  autoBindInjectable: true,
   defaultScope: "Singleton",
 });
-
-container
-  .bind(StreamingHandler)
-  .toDynamicValue((ctx) => new StreamingHandler(ctx.get(StreamingStore)));
 
 Observer.configure({
   default: { mobx, container: { resolve: (ctor) => container.get(ctor) } },

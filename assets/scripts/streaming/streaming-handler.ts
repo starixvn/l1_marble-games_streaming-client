@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { injectable, inject } from "inversify";
 import { StreamingStore, VideoPayload, GameData } from "./streaming-store";
 
 @injectable()
@@ -8,9 +8,7 @@ export class StreamingHandler {
   private reconnectDelay = 1000; // 1 second
   private reconnectTimeout: number | null = null;
 
-  constructor(private readonly streamingStore: StreamingStore) {
-    console.log("StreamingHandler: Constructor");
-  }
+  @inject(StreamingStore) private readonly streamingStore: StreamingStore;
 
   connect(theme: string): void {
     console.log("StreamingHandler: Connecting to server");
@@ -19,7 +17,9 @@ export class StreamingHandler {
       this.disconnect();
     }
 
-    const url = `https://streaming-service.lumigame.com/live/${theme === "2001" ? "SM_CLUB_WC_25" : "SM_SPINNER_GALAXY"}`;
+    const url = `https://streaming-service.lumigame.com/live/${
+      theme === "2001" ? "SM_CLUB_WC_25" : "SM_SPINNER_GALAXY"
+    }`;
 
     try {
       this.eventSource = new EventSource(url);
@@ -29,7 +29,9 @@ export class StreamingHandler {
       this.streamingStore.resetReconnectAttempts();
       this.streamingStore.setCurrentTheme(theme);
     } catch (err) {
-      this.streamingStore.setError(`Failed to connect to streaming service: ${err.message}`);
+      this.streamingStore.setError(
+        `Failed to connect to streaming service: ${err.message}`
+      );
       console.error("StreamingHandler connection error:", err);
     }
   }
