@@ -17,6 +17,7 @@ import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
 import Observer from "observer";
 import { init } from "db://i18n/LanguageData";
+import { Store } from "./store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -37,22 +38,20 @@ export class Startup extends Component {
   private infoLayer: Node = null;
 
   protected start(): void {
-    this.loadInfoLayer();
-
     setInterval(() => {
       this.test();
     }, 1000);
   }
 
-  private loadInfoLayer() {
-    const params = new URLSearchParams(window.location.search);
-    const game = params.get("game");
-    const language = params.get("language");
-    const path = `games/${game || "default"}`;
+  @render(Store, (store) => store.language)
+  private initLanguage(language: string) {
+    init(language);
+  }
 
-    init(language || "en");
+  @render(Store, (store) => store.game)
+  private loadGame(game: string) {
+    resources.load(`games/${game}`, Prefab, this.onLoadedInfoLayer());
 
-    resources.load(path, Prefab, this.onLoadedInfoLayer());
     this.loadStreaming(game);
   }
 
