@@ -46,14 +46,14 @@ export class Startup extends Component {
 
   private loadInfoLayer() {
     const params = new URLSearchParams(window.location.search);
-    const theme = params.get("theme");
+    const game = params.get("game");
     const language = params.get("language");
-    const path = `themes/${theme || "default"}`;
+    const path = `games/${game || "default"}`;
 
     init(language || "en");
 
     resources.load(path, Prefab, this.onLoadedInfoLayer());
-    this.loadStreaming(theme);
+    this.loadStreaming(game);
   }
 
   @handle(StreamingHandler, (handler, theme: string) => handler.connect(theme))
