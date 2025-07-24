@@ -1,15 +1,24 @@
-import { _decorator, Component, Enum, Sprite, SpriteAtlas } from "cc";
+import {
+  _decorator,
+  Component,
+  Enum,
+  resources,
+  Sprite,
+  SpriteAtlas,
+  SpriteFrame,
+} from "cc";
 import { Icon } from "./icon";
 import { Team } from "./team";
+import Observer from "observer";
+import { Store } from "../store";
 
 const { ccclass, property, menu } = _decorator;
+const { render, observer } = Observer;
 
 @ccclass
 @menu("Team/IconManager")
+@observer
 export class IconManager extends Component {
-  @property(SpriteAtlas)
-  private atlas: SpriteAtlas = null;
-
   @property({ type: Enum(Team) })
   team: Team = Team.HOME;
 
@@ -17,25 +26,51 @@ export class IconManager extends Component {
   private targets: Icon[] = [];
 
   private sprites: Sprite[] = [];
+  private operator = "";
 
   start() {
     this.sprites = this.targets.map((target) => target.getComponent(Sprite));
   }
 
-  set name(value: string) {
-    const spriteFrame = this.atlas.getSpriteFrame(value);
+  @render(Store, (store) => store.operator)
+  private syncOperator(operator: string) {
+    this.operator = operator;
+  }
 
-    if (spriteFrame) {
-      this.sprites.forEach((sprite) => {
-        sprite.spriteFrame = spriteFrame;
-      });
+  set name(value: string) {
+    if (this.operator === "") {
+      return;
     }
+
+    const path = `icons/${this.operator}/${value}/spriteFrame`;
+
+    const onError = () => {
+      const fallbackPath = `icons/common/${value}/spriteFrame`;
+
+      resources.load(fallbackPath, SpriteFrame, this.onLoadedSpriteFrame());
+    };
+
+    resources.load(path, SpriteFrame, this.onLoadedSpriteFrame(onError));
   }
 
   get name() {
     const first = this.sprites[0];
 
     return first ? first.spriteFrame.name : "";
+  }
+
+  private onLoadedSpriteFrame(onError?: () => void) {
+    return (err: Error, spriteFrame: SpriteFrame) => {
+      if (err || !spriteFrame) {
+        onError?.();
+
+        return;
+      }
+
+      this.sprites.forEach((sprite) => {
+        sprite.spriteFrame = spriteFrame;
+      });
+    };
   }
 
   onFocusInEditor(): void {

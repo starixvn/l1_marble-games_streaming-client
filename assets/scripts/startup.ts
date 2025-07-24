@@ -78,8 +78,26 @@ export class Startup extends Component {
   private index = 0;
 
   private test() {
-    this.team(Team.HOME, "Atletico Madrid", "ATM", "clb_atm");
-    this.team(Team.AWAY, "Benfica", "BEN", "clb_ben");
+    const teams = [
+      "clb_atm",
+      "clb_boc",
+      "clb_bvb",
+      "clb_che",
+      "clb_fcb",
+      "clb_int",
+      "clb_juv",
+      "clb_mci",
+      "clb_mty",
+      "clb_pal",
+      "clb_por",
+      "clb_psg",
+      "clb_riv",
+      "clb_rma",
+      "clb_slb",
+    ];
+
+    this.team(Team.HOME, teams[this.index % teams.length]);
+    this.team(Team.AWAY, teams[(this.index + 1) % teams.length]);
 
     const manager = this.infoLayer.getComponentInChildren(StageManager);
 
@@ -109,7 +127,7 @@ export class Startup extends Component {
     console.log("render event data", currentPhase, currentHalf, eventID);
   }
 
-  private team(team: Team, name: string, shortName: string, icon: string) {
+  private team(team: Team, name: string) {
     const nameManager = this.infoLayer
       .getComponentsInChildren(NameManager)
       .find((manager) => manager.team === team);
@@ -122,7 +140,6 @@ export class Startup extends Component {
     }
 
     nameManager.name = name;
-    nameManager.shortName = shortName;
-    iconManager.name = icon;
+    iconManager.name = name;
   }
 }

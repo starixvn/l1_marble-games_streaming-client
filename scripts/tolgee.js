@@ -4,7 +4,6 @@ const path = require("path");
 
 const CONFIG = {
   languageFolder: "./assets/resources/i18n/",
-  namespaces: ["Common"],
   tolgee: {
     defaultLanguage: "en",
     apiKey: "tgpat_aemqprqg41pcic4h0h5gkarfid2lepvaru4nqmmgjv85sfn9vlg",
@@ -48,6 +47,41 @@ async function fetchAvailableLanguages() {
   }
 }
 
+async function fetchNamespaces() {
+  console.log("🔍 Fetching available namespaces from Tolgee...");
+
+  try {
+    const response = await fetch(
+      `${CONFIG.tolgee.apiUrl}/v2/projects/${CONFIG.tolgee.projectId}/used-namespaces`,
+      {
+        method: "GET",
+        headers: {
+          "X-API-Key": CONFIG.tolgee.apiKey,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const namespaces = data._embedded.namespaces.map((ns) => ns.name);
+
+    console.log(
+      `✅ Found ${namespaces.length} available namespaces: ${namespaces.join(
+        ", ",
+      )}`,
+    );
+
+    return namespaces;
+  } catch (error) {
+    console.error("❌ Failed to fetch available namespaces:", error.message);
+    return [];
+  }
+}
+
 function writeLanguageFile(fileName, content) {
   const filePath = path.join(fileName + ".ts");
 
@@ -84,13 +118,13 @@ function extractNamespaceTranslations(records, namespace) {
   return translations;
 }
 
-async function processLanguage(tg, languageId) {
+async function processLanguage(tg, languageId, namespaces) {
   console.log(`🔄 Processing language: ${languageId}`);
 
   await tg.changeLanguage(languageId);
   const languageData = {};
 
-  CONFIG.namespaces.forEach((namespace) => {
+  namespaces.forEach((namespace) => {
     const translations = extractNamespaceTranslations(
       tg.getAllRecords(),
       namespace,
@@ -119,6 +153,7 @@ async function generateLanguages() {
   console.log(`📂 Output folder: ${CONFIG.languageFolder}\n`);
 
   const languageCodes = await fetchAvailableLanguages();
+  const namespaces = await fetchNamespaces();
   console.log(`📋 Languages to process: ${languageCodes.join(", ")}\n`);
 
   const tg = Tolgee()
@@ -126,7 +161,7 @@ async function generateLanguages() {
     .init({
       ...CONFIG.tolgee,
       availableLanguages: languageCodes,
-      ns: CONFIG.namespaces,
+      ns: namespaces,
     });
 
   return new Promise((resolve, reject) => {
@@ -137,7 +172,11 @@ async function generateLanguages() {
         const allLanguages = {};
 
         for (const languageId of languageCodes) {
-          const languageData = await processLanguage(tg, languageId);
+          const languageData = await processLanguage(
+            tg,
+            languageId,
+            namespaces,
+          );
           allLanguages[languageId] = languageData;
         }
 

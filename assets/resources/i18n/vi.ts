@@ -22,6 +22,9 @@ export const languages = {
         "draw": "Draw",
         "fulltime": "FULL TIME",
         "halftime": "GIỮA HIỆP"
+    },
+    "testing": {
+        "clb_atm": "ATM"
     }
 };
 

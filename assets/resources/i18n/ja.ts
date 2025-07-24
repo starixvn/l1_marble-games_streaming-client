@@ -22,6 +22,9 @@ export const languages = {
         "draw": "Draw",
         "fulltime": "FULL TIME",
         "halftime": "HALFTIME"
+    },
+    "testing": {
+        "clb_atm": "ATM"
     }
 };
 
