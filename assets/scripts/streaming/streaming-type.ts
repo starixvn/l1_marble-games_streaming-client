@@ -1,69 +1,49 @@
-export enum Theme {
-  "default" = "default",
-  "clb_wc_2001" = "2001",
-  "galaxy" = "galaxy",
-  "epl_mun" = "epl_mun",
-  "epl_mci" = "epl_mci",
-  "epl_che" = "epl_che",
-  "epl_liv" = "epl_liv",
-  "epl_ars" = "epl_ars",
-  "epl_tot" = "epl_tot",
-}
-
-export enum ProductCode {
-  "SM_CLUB_WC_25" = "SM_CLUB_WC_25",
-  "SM_SPINNER_EPL" = "SM_SPINNER_EPL",
-  "SM_SPINNER_GALAXY" = "SM_SPINNER_GALAXY",
-}
-
-export const ThemeProductCodeMapping = {
-  [Theme.default]: ProductCode.SM_SPINNER_GALAXY,
-  [Theme.clb_wc_2001]: ProductCode.SM_CLUB_WC_25,
-  [Theme.galaxy]: ProductCode.SM_SPINNER_GALAXY,
-  [Theme.epl_mun]: ProductCode.SM_SPINNER_EPL,
-  [Theme.epl_mci]: ProductCode.SM_SPINNER_EPL,
-  [Theme.epl_che]: ProductCode.SM_SPINNER_EPL,
-  [Theme.epl_liv]: ProductCode.SM_SPINNER_EPL,
-  [Theme.epl_ars]: ProductCode.SM_SPINNER_EPL,
-  [Theme.epl_tot]: ProductCode.SM_SPINNER_EPL,
+export type EventDetail = {
+  playlist: string;
+  videoLiveTimeMs: number;
+  videoLength: number;
+  result: string;
 };
 
-export interface VideoPayload {
+export type EventStreamPayload = {
+  gameId: string;
   eventId: number;
-  eventDetailIndex: number;
-  videoUrl: string;
-  videoStartTime: string;
-  videoPlayingTime: number;
-  videoLength: number;
-  result: any;
-  message?: string;
-  gameId?: string;
-}
-
-export enum Phase {
-  "OddsAvailable",
-  "VideoInfoAvailable",
-  "ResultAvailable",
-}
-
-export interface EventData {
-  theme: Theme;
-  productCode: ProductCode;
   homeTeam: string;
   awayTeam: string;
-  eventID: number;
-  currentHalf: number;
-  currentVideoTime: number;
-  homeScore: number;
-  awayScore: number;
+  currentIndex: number;
+  updatedIndex: number;
+  eventDetails: EventDetail[];
+  liveScores: string[];
+  goalInfos: any[];
+  matchLiveTimeMs: number;
   currentPhase: Phase;
+  message: string;
+};
+
+export enum Phase {
+  ScheduleEvent = "ScheduleEvent",
+  UpdateOdds = "UpdateOdds",
+  UpdateVideoInfo = "UpdateVideoInfo",
+  UpdateGoalInfo = "UpdateGoalInfo",
+  UpdateResult = "UpdateResult",
 }
 
-export interface StreamingState {
+export type EventData = {
+  homeTeam: string;
+  awayTeam: string;
+  eventId: number;
+  currentEventIndex: number;
+  liveScores: string[];
+  goalInfos: any[];
+  currentPhase: Phase;
+  eventDetails: EventDetail[];
+  matchLiveTimeMs: number;
+};
+
+export type StreamingState = {
   isConnected: boolean;
   error?: string;
-  currentPayload?: VideoPayload;
   eventData?: EventData;
   reconnectAttempts: number;
-  currentTheme: Theme;
-}
+  currentGame: string;
+};

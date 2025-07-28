@@ -1,12 +1,4 @@
-import {
-  _decorator,
-  Component,
-  error,
-  instantiate,
-  Node,
-  Prefab,
-  resources,
-} from "cc";
+import { _decorator, Component, error, instantiate, Node, Prefab, resources } from "cc";
 import mobx from "mobx";
 import { Container } from "inversify";
 import { IconManager } from "./team/icon-manager";
@@ -18,6 +10,7 @@ import { StreamingStore } from "./streaming/streaming-store";
 import Observer from "observer";
 import { init } from "db://i18n/LanguageData";
 import { Store } from "./store";
+import type { EventData } from "./streaming/streaming-type";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -55,9 +48,9 @@ export class Startup extends Component {
     this.loadStreaming(game);
   }
 
-  @handle(StreamingHandler, (handler, theme: string) => handler.connect(theme))
-  private loadStreaming(theme: string) {
-    return theme;
+  @handle(StreamingHandler, (handler, game: string) => handler.connect(game))
+  private loadStreaming(game: string) {
+    return game;
   }
 
   private onLoadedInfoLayer() {
@@ -110,30 +103,34 @@ export class Startup extends Component {
     this.index++;
   }
 
-  @render(StreamingStore, (store) => ({
-    currentPhase: store.eventData?.currentPhase,
-    currentHalf: store.eventData?.currentHalf,
-    eventID: store.eventData?.eventID,
-  }))
-  private renderEventData({
-    currentPhase,
-    currentHalf,
-    eventID,
-  }: {
-    currentPhase: string;
-    currentHalf: number;
-    eventID: number;
-  }) {
-    console.log("render event data", currentPhase, currentHalf, eventID);
+  @render(StreamingStore, (store) => store.eventData)
+  private renderEventData(eventData: EventData) {
+    if (!eventData?.eventId) {
+      return;
+    }
+
+    let homeScore = 0;
+    let awayScore = 0;
+
+    eventData.liveScores.forEach((score) => {
+      const [home, away] = score.split(":");
+      homeScore += parseInt(home);
+      awayScore += parseInt(away);
+    });
+
+    const results = eventData.eventDetails.map((detail) => detail.result);
+
+    console.log(`home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`);
+    console.log(`event id: ${eventData.eventId}, current half: ${eventData.currentEventIndex + 1}`);
+    console.log(`live scores: ${homeScore}:${awayScore}`);
+    console.log(`results: ${JSON.stringify(results)}`);
+    console.log(`match live time ms: ${eventData.matchLiveTimeMs}`);
+    console.log(`current phase: ${eventData.currentPhase}`);
   }
 
   private team(team: Team, name: string) {
-    const nameManager = this.infoLayer
-      .getComponentsInChildren(NameManager)
-      .find((manager) => manager.team === team);
-    const iconManager = this.infoLayer
-      .getComponentsInChildren(IconManager)
-      .find((manager) => manager.team === team);
+    const nameManager = this.infoLayer.getComponentsInChildren(NameManager).find((manager) => manager.team === team);
+    const iconManager = this.infoLayer.getComponentsInChildren(IconManager).find((manager) => manager.team === team);
 
     if (!nameManager || !iconManager) {
       return;

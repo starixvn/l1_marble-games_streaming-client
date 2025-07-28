@@ -1,11 +1,6 @@
 import { injectable, inject } from "inversify";
 import { StreamingStore } from "./streaming-store";
-import {
-  VideoPayload,
-  EventData,
-  ThemeProductCodeMapping,
-  Theme,
-} from "./streaming-type";
+import { EventStreamPayload, Phase } from "./streaming-type";
 
 @injectable()
 export class StreamingHandler {
@@ -16,14 +11,14 @@ export class StreamingHandler {
 
   @inject(StreamingStore) private readonly streamingStore: StreamingStore;
 
-  connect(theme: string): void {
+  connect(game: string): void {
     console.log("StreamingHandler: Connecting to server");
 
     if (this.eventSource) {
       this.disconnect();
     }
 
-    const url = `https://streaming-service.lumigame.com/live/${ThemeProductCodeMapping[theme]}`;
+    const url = `https://streaming-service.lumigame.com/live/${game}`;
 
     try {
       this.eventSource = new EventSource(url);
@@ -31,11 +26,9 @@ export class StreamingHandler {
       this.streamingStore.setConnected(true);
       this.streamingStore.setError(null);
       this.streamingStore.resetReconnectAttempts();
-      this.streamingStore.setCurrentTheme(theme);
+      this.streamingStore.setCurrentGame(game);
     } catch (err) {
-      this.streamingStore.setError(
-        `Failed to connect to streaming service: ${err.message}`
-      );
+      this.streamingStore.setError(`Failed to connect to streaming service: ${err.message}`);
       console.error("StreamingHandler connection error:", err);
     }
   }
@@ -51,8 +44,8 @@ export class StreamingHandler {
 
     this.eventSource.onmessage = (event) => {
       try {
-        const payload: VideoPayload = JSON.parse(event.data);
-        this.handleVideoPayload(payload);
+        const payload: EventStreamPayload = JSON.parse(event.data);
+        this.handleEventStreamStateWithPayload(payload);
       } catch (err) {
         console.error("StreamingHandler: Failed to parse message:", err);
         this.streamingStore.setError("Failed to parse server message");
@@ -69,18 +62,8 @@ export class StreamingHandler {
     };
   }
 
-  private handleVideoPayload(payload: VideoPayload): void {
-    console.log("StreamingHandler: Received video payload:", payload);
-
-    // Process payload
-    this.processGameData(payload);
-
-    console.log("StreamingHandler: Server message:", payload.message);
-  }
-
-  private processGameData(payload: VideoPayload): void {
-    this.streamingStore.setCurrentPayload(payload);
-    this.streamingStore.updateEventDataWithPayload(payload);
+  private handleEventStreamStateWithPayload(payload: EventStreamPayload): void {
+    this.streamingStore.updateStateWithPayload(payload);
   }
 
   private attemptReconnect(): void {
@@ -101,10 +84,9 @@ export class StreamingHandler {
 
     this.reconnectTimeout = setTimeout(() => {
       if (this.eventSource?.readyState === EventSource.CLOSED) {
-        // Get the current theme from the URL to reconnect
         const params = new URLSearchParams(window.location.search);
-        const theme = params.get("theme") || "default";
-        this.connect(theme);
+        const game = params.get("game") || "default";
+        this.connect(game);
       }
     }, this.reconnectDelay * this.streamingStore.reconnectAttempts);
   }

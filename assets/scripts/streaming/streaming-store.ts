@@ -1,13 +1,6 @@
 import { injectable } from "inversify";
 import mobx from "mobx";
-import {
-  EventData,
-  Phase,
-  ProductCode,
-  StreamingState,
-  Theme,
-  VideoPayload,
-} from "./streaming-type";
+import { EventData, EventStreamPayload, Phase, StreamingState } from "./streaming-type";
 
 @injectable()
 export class StreamingStore {
@@ -18,10 +11,9 @@ export class StreamingStore {
   private state: StreamingState = {
     isConnected: false,
     error: null,
-    currentPayload: null,
     eventData: null,
     reconnectAttempts: 0,
-    currentTheme: Theme.default,
+    currentGame: "default",
   };
 
   get isConnected(): boolean {
@@ -32,10 +24,6 @@ export class StreamingStore {
     return this.state.error;
   }
 
-  get currentPayload(): VideoPayload | null {
-    return this.state.currentPayload;
-  }
-
   get eventData(): EventData | null {
     return this.state.eventData;
   }
@@ -44,8 +32,8 @@ export class StreamingStore {
     return this.state.reconnectAttempts;
   }
 
-  get currentTheme(): string {
-    return this.state.currentTheme;
+  get currentGame(): string {
+    return this.state.currentGame;
   }
 
   get connectionStatus(): { isConnected: boolean; error: string | null } {
@@ -55,20 +43,18 @@ export class StreamingStore {
     };
   }
 
-  updateEventDataWithPayload(payload: VideoPayload): void {
+  updateStateWithPayload(payload: EventStreamPayload): void {
     this.state.eventData = {
-      ...this.state.eventData,
-      currentPhase: payload.message as unknown as Phase,
-      currentVideoTime: payload.videoPlayingTime,
-      currentHalf: payload.eventDetailIndex + 1,
-      homeScore: payload.result[0],
-      awayScore: payload.result[2],
-      eventID: payload.eventId,
+      homeTeam: payload.homeTeam,
+      awayTeam: payload.awayTeam,
+      eventId: payload.eventId,
+      currentEventIndex: payload.currentIndex,
+      liveScores: payload.liveScores,
+      goalInfos: payload.goalInfos,
+      currentPhase: payload.currentPhase,
+      eventDetails: payload.eventDetails,
+      matchLiveTimeMs: payload.matchLiveTimeMs,
     };
-  }
-
-  setCurrentPayload(payload: VideoPayload): void {
-    this.state.currentPayload = payload;
   }
 
   setConnected(connected: boolean): void {
@@ -82,20 +68,12 @@ export class StreamingStore {
     this.state.error = error;
   }
 
-  setEventData(eventData: EventData | null): void {
-    this.state.eventData = eventData;
-  }
-
   setReconnectAttempts(attempts: number): void {
     this.state.reconnectAttempts = attempts;
   }
 
-  setCurrentTheme(theme: string): void {
-    if (theme in Theme) {
-      this.state.currentTheme = theme as Theme;
-    } else {
-      console.error(`Invalid theme: ${theme}`);
-    }
+  setCurrentGame(game: string): void {
+    this.state.currentGame = game;
   }
 
   incrementReconnectAttempts(): void {
@@ -110,10 +88,9 @@ export class StreamingStore {
     this.state = {
       isConnected: false,
       error: null,
-      currentPayload: null,
       eventData: null,
       reconnectAttempts: 0,
-      currentTheme: Theme.default,
+      currentGame: "default",
     };
   }
 }
