@@ -32,4 +32,4 @@ if (!win.languages) {
     win.languages = {};
 }
                           
-win.languages["en"] = languages;
+win.languages["es-ES"] = languages;

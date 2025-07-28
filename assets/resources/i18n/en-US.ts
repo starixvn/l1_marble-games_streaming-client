@@ -21,7 +21,7 @@ export const languages = {
         "clb_slb": "Sporting Benfica",
         "draw": "Draw",
         "fulltime": "FULL TIME",
-        "halftime": "GIỮA HIỆP"
+        "halftime": "HALFTIME"
     },
     "testing": {
         "clb_atm": "ATM"
@@ -32,4 +32,4 @@ if (!win.languages) {
     win.languages = {};
 }
                           
-win.languages["zh-Hans"] = languages;
+win.languages["en-US"] = languages;

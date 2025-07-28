@@ -32,4 +32,4 @@ if (!win.languages) {
     win.languages = {};
 }
                           
-win.languages["vi"] = languages;
+win.languages["vi-VN"] = languages;

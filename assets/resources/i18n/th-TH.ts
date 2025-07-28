@@ -32,4 +32,4 @@ if (!win.languages) {
     win.languages = {};
 }
                           
-win.languages["fil-PH"] = languages;
+win.languages["th-TH"] = languages;
