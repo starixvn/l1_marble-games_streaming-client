@@ -7,18 +7,16 @@ import {
   Prefab,
   resources,
 } from "cc";
+import { init } from "db://i18n/LanguageData";
+import { Container, inject } from "inversify";
 import mobx from "mobx";
-import { Container } from "inversify";
-import { IconManager } from "./team/icon-manager";
-import { Team } from "./team/team";
-import { NameManager } from "./team/name-manager";
-import { StageManager } from "./stages/stage-manager";
+import Observer from "observer";
+import { Store } from "./store";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
-import Observer from "observer";
-import { init } from "db://i18n/LanguageData";
-import { Store } from "./store";
 import type { EventData } from "./streaming/streaming-type";
+import { TeamStore } from "./team/team-store";
+import { ScoreStore } from "./scores/score-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -37,6 +35,9 @@ Observer.configure({
 export class Startup extends Component {
   @property(Node)
   private infoLayer: Node = null;
+
+  @inject(TeamStore)
+  private readonly teamStore: TeamStore;
 
   @render(Store, (store) => store.language)
   private initLanguage(language: string) {
@@ -68,24 +69,44 @@ export class Startup extends Component {
     };
   }
 
-  private index = 0;
-
   @render(StreamingStore, (store) => store.eventData)
   private renderEventData(eventData: EventData) {
     if (!eventData?.eventId) {
       return;
     }
 
-    let homeScore = 0;
-    let awayScore = 0;
+    const [firstHalfHomeScore, firstHalfAwayScore] = eventData.liveScores[0]
+      .split(":")
+      .map(Number);
 
-    eventData.liveScores.forEach((score) => {
-      const [home, away] = score.split(":");
-      homeScore += parseInt(home);
-      awayScore += parseInt(away);
-    });
+    const [homeScore, awayScore] = eventData.liveScores.reduce(
+      (result, score) => {
+        const [home, away] = score.split(":");
+
+        result[0] += parseInt(home);
+        result[1] += parseInt(away);
+
+        return result;
+      },
+      [0, 0],
+    );
 
     const results = eventData.eventDetails.map((detail) => detail.result);
+
+    this.updateTeamName({
+      home: eventData.homeTeam,
+      away: eventData.awayTeam,
+    });
+
+    this.updateScore({
+      home: homeScore,
+      away: awayScore,
+    });
+
+    this.update1HalfScore({
+      home: firstHalfHomeScore,
+      away: firstHalfAwayScore,
+    });
 
     console.log(
       `home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`,
@@ -99,5 +120,20 @@ export class Startup extends Component {
     console.log(`results: ${JSON.stringify(results)}`);
     console.log(`match live time ms: ${eventData.matchLiveTimeMs}`);
     console.log(`current phase: ${eventData.currentPhase}`);
+  }
+
+  @handle(TeamStore, (store, data: TeamStore) => store.update(data))
+  private updateTeamName(data: { home: string; away: string }) {
+    return data;
+  }
+
+  @handle(ScoreStore, (store, data: ScoreStore) => store.update(data))
+  private updateScore(data: { home: number; away: number }) {
+    return data;
+  }
+
+  @handle(ScoreStore, (store, data: ScoreStore) => store.updatePrevious(data))
+  private update1HalfScore(data: { home: number; away: number }) {
+    return data;
   }
 }

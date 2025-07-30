@@ -8,4 +8,9 @@ export class TeamStore {
   home = "";
 
   away = "";
+
+  update(data: { home: string; away: string }) {
+    this.home = data.home;
+    this.away = data.away;
+  }
 }

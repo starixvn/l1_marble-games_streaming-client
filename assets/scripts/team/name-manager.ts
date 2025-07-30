@@ -31,9 +31,9 @@ export class NameManager extends Component {
 
   @render(TeamStore, (store) => ({ home: store.home, away: store.away }))
   private syncTeamName({ home, away }: TeamStore) {
-    if (this.team === Team.HOME) {
+    if (this.team === Team.HOME && home) {
       this.name = home;
-    } else {
+    } else if (this.team === Team.AWAY && away) {
       this.name = away;
     }
   }

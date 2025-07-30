@@ -26,14 +26,18 @@ export class Score extends Component {
   @render(ScoreStore, (store) => store.scoreInText)
   private syncScore(text: string) {
     this.score = text;
+
+    this.render();
   }
 
   @render(ScoreStore, (store) => store.previousScoreInText)
   private syncPreviousScore(text: string) {
     this.previousScore = text;
+
+    this.render();
   }
 
-  protected start(): void {
+  protected render(): void {
     const score = this.isPreviousScore ? this.previousScore : this.score;
 
     if (this.prefix) {

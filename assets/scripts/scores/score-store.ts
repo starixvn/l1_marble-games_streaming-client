@@ -18,4 +18,14 @@ export class ScoreStore {
   get previousScoreInText() {
     return `${this.previousHome} - ${this.previousAway}`;
   }
+
+  update(data: { home: number; away: number }) {
+    this.home = data.home;
+    this.away = data.away;
+  }
+
+  updatePrevious(data: { home: number; away: number }) {
+    this.previousHome = data.home;
+    this.previousAway = data.away;
+  }
 }
