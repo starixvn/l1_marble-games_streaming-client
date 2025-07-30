@@ -38,7 +38,7 @@ export class NameManager extends Component {
     }
   }
 
-  start() {
+  onLoad() {
     this.longLabels = this.targets
       .filter((target) => !target.short)
       .map((target) => target.getComponent(LocalizedLabel));
@@ -50,7 +50,7 @@ export class NameManager extends Component {
   set name(value: string) {
     const name = value.split("_")[1].toUpperCase();
 
-    this.longLabels.forEach((label) => {
+    for (const label of this.longLabels) {
       const key = `${this.operator}.${value}`;
 
       if (t(key) === "") {
@@ -58,11 +58,11 @@ export class NameManager extends Component {
       } else {
         label.key = key;
       }
-    });
+    }
 
-    this.shortLabels.forEach((label) => {
+    for (const label of this.shortLabels) {
       label.string = name;
-    });
+    }
   }
 
   onFocusInEditor(): void {
