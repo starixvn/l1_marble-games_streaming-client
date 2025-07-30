@@ -1,34 +1,35 @@
-import { injectable, inject } from "inversify";
+import { inject, injectable } from "inversify";
+import { Store } from "../store";
 import { StreamingStore } from "./streaming-store";
-import { EventStreamPayload, Phase } from "./streaming-type";
+import { EventStreamPayload } from "./streaming-type";
 
 @injectable()
 export class StreamingHandler {
   private eventSource: EventSource | null = null;
   private maxReconnectAttempts = 5;
   private reconnectDelay = 1000; // 1 second
-  private reconnectTimeout: number | null = null;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
 
   @inject(StreamingStore) private readonly streamingStore: StreamingStore;
 
-  connect(game: string): void {
-    console.log("StreamingHandler: Connecting to server");
+  @inject(Store) private readonly store: Store;
 
+  connect(): void {
     if (this.eventSource) {
       this.disconnect();
     }
 
-    const url = `https://streaming-service.lumigame.com/live/${game}`;
-
     try {
-      this.eventSource = new EventSource(url);
+      this.eventSource = new EventSource(this.store.serverUrl);
       this.setupEventListeners();
       this.streamingStore.setConnected(true);
       this.streamingStore.setError(null);
       this.streamingStore.resetReconnectAttempts();
-      this.streamingStore.setCurrentGame(game);
+      this.streamingStore.setCurrentGame(this.store.game);
     } catch (err) {
-      this.streamingStore.setError(`Failed to connect to streaming service: ${err.message}`);
+      this.streamingStore.setError(
+        `Failed to connect to streaming service: ${err.message}`,
+      );
       console.error("StreamingHandler connection error:", err);
     }
   }
@@ -74,7 +75,7 @@ export class StreamingHandler {
 
     this.streamingStore.incrementReconnectAttempts();
     console.log(
-      `StreamingHandler: Attempting to reconnect (${this.streamingStore.reconnectAttempts}/${this.maxReconnectAttempts})`
+      `StreamingHandler: Attempting to reconnect (${this.streamingStore.reconnectAttempts}/${this.maxReconnectAttempts})`,
     );
 
     // Clear any existing timeout
@@ -84,9 +85,7 @@ export class StreamingHandler {
 
     this.reconnectTimeout = setTimeout(() => {
       if (this.eventSource?.readyState === EventSource.CLOSED) {
-        const params = new URLSearchParams(window.location.search);
-        const game = params.get("game") || "default";
-        this.connect(game);
+        this.connect();
       }
     }, this.reconnectDelay * this.streamingStore.reconnectAttempts);
   }

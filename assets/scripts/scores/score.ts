@@ -1,4 +1,4 @@
-import { _decorator, CCString, Component, Label } from "cc";
+import { _decorator, CCBoolean, CCString, Component, Label } from "cc";
 import { t } from "db://i18n/LanguageData";
 import Observer from "observer";
 import { ScoreStore } from "./score-store";
@@ -16,7 +16,7 @@ export class Score extends Component {
   @property(CCString)
   private prefix: string = "";
 
-  @property(Boolean)
+  @property(CCBoolean)
   private isPreviousScore = false;
 
   private score = "";

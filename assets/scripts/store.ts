@@ -16,4 +16,17 @@ export class Store {
   language = "en-US";
 
   operator = "common";
+
+  get serverUrl() {
+    const host = window.location.host;
+
+    if (host.includes("localhost")) {
+      return `https://streaming-service.lumigame.com/live/${this.game}`;
+    }
+
+    const root = host.split(".").slice(1).join(".");
+    const domain = `streaming-service.${root}`;
+
+    return `https://${domain}/live/${this.game}`;
+  }
 }

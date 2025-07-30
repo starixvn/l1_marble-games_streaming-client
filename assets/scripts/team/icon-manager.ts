@@ -10,6 +10,7 @@ import Observer from "observer";
 import { Store } from "../store";
 import { Icon } from "./icon";
 import { Team } from "./team";
+import { TeamStore } from "./team-store";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
@@ -34,6 +35,15 @@ export class IconManager extends Component {
   @render(Store, (store) => store.operator)
   private syncOperator(operator: string) {
     this.operator = operator;
+  }
+
+  @render(TeamStore, (store) => ({ home: store.home, away: store.away }))
+  private syncTeamName({ home, away }: TeamStore) {
+    if (this.team === Team.HOME) {
+      this.name = home;
+    } else {
+      this.name = away;
+    }
   }
 
   set name(value: string) {
