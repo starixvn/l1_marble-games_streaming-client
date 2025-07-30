@@ -79,13 +79,19 @@ export class BackgroundVideoPlayer extends Component {
     if (this.initialized) {
       this.native.removeEventListener(
         "timeupdate",
-        this.syncCurrentTime.bind(this),
+        this.syncCurrentTime.bind(this)
       );
 
       this.hls.off(Hls.Events.ERROR);
       this.hls.detachMedia();
       this.hls.destroy();
     }
+  }
+
+  @render(VideoStore, (store) => store.videoLiveTime)
+  updateCurrentTime(videoLiveTime: number) {
+    this.currentTime = videoLiveTime;
+    this.syncCurrentTime();
   }
 
   private syncCurrentTime() {
@@ -96,6 +102,11 @@ export class BackgroundVideoPlayer extends Component {
       Math.abs(this.currentTime - this.native.currentTime) > 1;
 
     if (this.initialized && needSync) {
+      console.warn(
+        "BackgroundVideoPlayer: syncCurrentTime",
+        this.currentTime,
+        this.native.currentTime
+      );
       this.native.currentTime = this.currentTime;
     }
   }

@@ -17,9 +17,18 @@ export class VideoStore {
         }
       }
     );
+
+    mobx.reaction(
+      () => this.streamingStore?.eventData?.liveScores,
+      (liveScores) => {
+        this.updateTimeWhenScoreChanged();
+      }
+    );
   }
 
   url: string = "";
+
+  videoLiveTime = 0;
 
   muted: boolean = false;
 
@@ -29,9 +38,26 @@ export class VideoStore {
 
   updateUrlFromEventData() {
     const currentEvent = this.streamingStore.eventData;
-    const currentEventDetail = currentEvent.eventDetails[currentEvent.currentEventIndex];
-    const videoName = currentEventDetail.playlist.split(`/2001/`)[1].replace(".mp4", ".m3u8");
+    const currentEventDetail =
+      currentEvent.eventDetails[currentEvent.currentEventIndex];
+    const videoName = currentEventDetail.playlist
+      .split(`/2001/`)[1]
+      .replace(".mp4", ".m3u8");
     this.url = `https://d1aof1lwumql9k.cloudfront.net/114_STAGING/${videoName}`;
+    this.videoLiveTime = Math.min(
+      currentEventDetail.videoLiveTimeMs / 1000,
+      32
+    );
+  }
+
+  updateTimeWhenScoreChanged() {
+    const currentEvent = this.streamingStore.eventData;
+    const currentEventDetail =
+      currentEvent.eventDetails[currentEvent.currentEventIndex];
+    this.videoLiveTime = Math.min(
+      currentEventDetail.videoLiveTimeMs / 1000,
+      32
+    );
   }
 
   setMuted(muted: boolean) {
