@@ -44,6 +44,5 @@ export type StreamingState = {
   isConnected: boolean;
   error?: string;
   eventData?: EventData;
-  reconnectAttempts: number;
   currentGame: string;
 };

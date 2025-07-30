@@ -12,7 +12,6 @@ export class StreamingStore {
     isConnected: false,
     error: null,
     eventData: null,
-    reconnectAttempts: 0,
     currentGame: "default",
   };
 
@@ -26,10 +25,6 @@ export class StreamingStore {
 
   get eventData(): EventData | null {
     return this.state.eventData;
-  }
-
-  get reconnectAttempts(): number {
-    return this.state.reconnectAttempts;
   }
 
   get currentGame(): string {
@@ -68,20 +63,8 @@ export class StreamingStore {
     this.state.error = error;
   }
 
-  setReconnectAttempts(attempts: number): void {
-    this.state.reconnectAttempts = attempts;
-  }
-
   setCurrentGame(game: string): void {
     this.state.currentGame = game;
-  }
-
-  incrementReconnectAttempts(): void {
-    this.state.reconnectAttempts++;
-  }
-
-  resetReconnectAttempts(): void {
-    this.state.reconnectAttempts = 0;
   }
 
   reset(): void {
@@ -89,7 +72,6 @@ export class StreamingStore {
       isConnected: false,
       error: null,
       eventData: null,
-      reconnectAttempts: 0,
       currentGame: "default",
     };
   }

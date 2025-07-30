@@ -7,8 +7,9 @@ import { EventStreamPayload } from "./streaming-type";
 export class StreamingHandler {
   private eventSource: EventSource | null = null;
   private maxReconnectAttempts = 5;
+  private reconnectAttempts = 0;
   private reconnectDelay = 1000; // 1 second
-  private reconnectTimeout: NodeJS.Timeout | null = null;
+  private reconnectTimeout: number | null = null;
 
   @inject(StreamingStore) private readonly streamingStore: StreamingStore;
 
@@ -22,14 +23,8 @@ export class StreamingHandler {
     try {
       this.eventSource = new EventSource(this.store.serverUrl);
       this.setupEventListeners();
-      this.streamingStore.setConnected(true);
-      this.streamingStore.setError(null);
-      this.streamingStore.resetReconnectAttempts();
-      this.streamingStore.setCurrentGame(this.store.game);
     } catch (err) {
-      this.streamingStore.setError(
-        `Failed to connect to streaming service: ${err.message}`,
-      );
+      this.streamingStore.setError(`Failed to connect to streaming service: ${err.message}`);
       console.error("StreamingHandler connection error:", err);
     }
   }
@@ -61,6 +56,8 @@ export class StreamingHandler {
       // Attempt to reconnect
       this.attemptReconnect();
     };
+
+    this.streamingStore.setCurrentGame(this.store.game);
   }
 
   private handleEventStreamStateWithPayload(payload: EventStreamPayload): void {
@@ -68,15 +65,15 @@ export class StreamingHandler {
   }
 
   private attemptReconnect(): void {
-    if (this.streamingStore.reconnectAttempts >= this.maxReconnectAttempts) {
-      this.streamingStore.setError("Max reconnection attempts reached");
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.log("StreamingHandler: Max reconnection attempts reached");
+      this.disconnect();
       return;
     }
 
-    this.streamingStore.incrementReconnectAttempts();
-    console.log(
-      `StreamingHandler: Attempting to reconnect (${this.streamingStore.reconnectAttempts}/${this.maxReconnectAttempts})`,
-    );
+    this.reconnectAttempts++;
+
+    console.log(`StreamingHandler: Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
     // Clear any existing timeout
     if (this.reconnectTimeout) {
@@ -87,7 +84,7 @@ export class StreamingHandler {
       if (this.eventSource?.readyState === EventSource.CLOSED) {
         this.connect();
       }
-    }, this.reconnectDelay * this.streamingStore.reconnectAttempts);
+    }, this.reconnectDelay);
   }
 
   disconnect(): void {
