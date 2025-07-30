@@ -4,13 +4,12 @@ import {
   Enum,
   resources,
   Sprite,
-  SpriteAtlas,
   SpriteFrame,
 } from "cc";
-import { Icon } from "./icon";
-import { Team } from "./team";
 import Observer from "observer";
 import { Store } from "../store";
+import { Icon } from "./icon";
+import { Team } from "./team";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
