@@ -199,6 +199,36 @@
                 <key>textureRotated</key>
                 <false/>
             </dict>
+            <key>time_bg_a.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{41,36}</string>
+                <key>spriteSourceSize</key>
+                <string>{41,36}</string>
+                <key>textureRect</key>
+                <string>{{859,821},{41,36}}</string>
+                <key>textureRotated</key>
+                <true/>
+            </dict>
+            <key>time_bg_b.png</key>
+            <dict>
+                <key>aliases</key>
+                <array/>
+                <key>spriteOffset</key>
+                <string>{0,0}</string>
+                <key>spriteSize</key>
+                <string>{41,36}</string>
+                <key>spriteSourceSize</key>
+                <string>{41,36}</string>
+                <key>textureRect</key>
+                <string>{{897,821},{41,36}}</string>
+                <key>textureRotated</key>
+                <false/>
+            </dict>
         </dict>
         <key>metadata</key>
         <dict>
@@ -213,7 +243,7 @@
             <key>size</key>
             <string>{1024,2048}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:eaa79be88484255e8154cae4941e6293:e0100095e2bac8e0d066587e147fd437:d7b1b299caa6e61ceece729dfea2906b$</string>
+            <string>$TexturePacker:SmartUpdate:42de7793984556ce1f042758e2406bcb:0aa0f18a6921dbf2b2019c798e5d6b04:d7b1b299caa6e61ceece729dfea2906b$</string>
             <key>textureFileName</key>
             <string>2001.webp</string>
         </dict>

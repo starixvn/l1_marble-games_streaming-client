@@ -11,7 +11,8 @@
   },
   "devDependencies": {
     "@tolgee/web": "6.2.6",
-    "reflect-metadata": "^0.2.2"
+    "reflect-metadata": "^0.2.2",
+    "typescript": "^5.8.3"
   },
   "creator": {
     "version": "3.8.6"

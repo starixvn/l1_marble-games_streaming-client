@@ -18,6 +18,7 @@ import type { EventData } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { ScoreStore } from "./scores/score-store";
 import { VideoStore } from "./video-player/video-store";
+import { TimeStore } from "./time/time-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -118,6 +119,11 @@ export class Startup extends Component {
 
     this.updateVideoTime(currentEventDetail.videoLiveTimeMs);
 
+    this.updateTimeAndHalf({
+      matchLiveTime: eventData.matchLiveTimeMs,
+      halfIndex: eventData.currentEventIndex,
+    });
+
     console.log(
       `home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`
     );
@@ -157,5 +163,13 @@ export class Startup extends Component {
   )
   private updateVideoTime(videoLiveTimeMs: number) {
     return videoLiveTimeMs;
+  }
+
+  @handle(TimeStore, (store, data: TimeStore) => store.update(data))
+  private updateTimeAndHalf(data: {
+    matchLiveTime: number;
+    halfIndex: number;
+  }) {
+    return data;
   }
 }
