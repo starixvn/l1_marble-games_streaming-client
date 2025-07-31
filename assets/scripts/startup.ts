@@ -8,17 +8,17 @@ import {
   resources,
 } from "cc";
 import { init } from "db://i18n/LanguageData";
-import { Container, inject } from "inversify";
+import { Container } from "inversify";
 import mobx from "mobx";
 import Observer from "observer";
+import { ScoreStore } from "./scores/score-store";
 import { Store } from "./store";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
 import type { EventData } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
-import { ScoreStore } from "./scores/score-store";
-import { VideoStore } from "./video-player/video-store";
 import { TimeStore } from "./time/time-store";
+import { VideoStore } from "./video-player/video-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -37,12 +37,6 @@ Observer.configure({
 export class Startup extends Component {
   @property(Node)
   private infoLayer: Node = null;
-
-  @inject(TeamStore)
-  private readonly teamStore: TeamStore;
-
-  @inject(VideoStore)
-  private readonly videoStore: VideoStore;
 
   @render(Store, (store) => store.language)
   private initLanguage(language: string) {
@@ -93,7 +87,7 @@ export class Startup extends Component {
 
         return result;
       },
-      [0, 0]
+      [0, 0],
     );
 
     const results = eventData.eventDetails.map((detail) => detail.result);
@@ -123,19 +117,6 @@ export class Startup extends Component {
       matchLiveTime: eventData.matchLiveTimeMs,
       halfIndex: eventData.currentEventIndex,
     });
-
-    console.log(
-      `home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`
-    );
-    console.log(
-      `event id: ${eventData.eventId}, current half: ${
-        eventData.currentEventIndex + 1
-      }`
-    );
-    console.log(`live scores: ${homeScore}:${awayScore}`);
-    console.log(`results: ${JSON.stringify(results)}`);
-    console.log(`match live time ms: ${eventData.matchLiveTimeMs}`);
-    console.log(`current phase: ${eventData.currentPhase}`);
   }
 
   @handle(TeamStore, (store, data: TeamStore) => store.update(data))
@@ -159,7 +140,7 @@ export class Startup extends Component {
   }
 
   @handle(VideoStore, (store, videoLiveTimeMs: number) =>
-    store.updateVideoTime(videoLiveTimeMs)
+    store.updateVideoTime(videoLiveTimeMs),
   )
   private updateVideoTime(videoLiveTimeMs: number) {
     return videoLiveTimeMs;

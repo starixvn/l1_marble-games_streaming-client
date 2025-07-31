@@ -1,10 +1,15 @@
 import { _decorator, CCString, Component } from "cc";
 import { Stage } from "./stage";
+import Observer from "observer";
+import { StreamingStore } from "../streaming/streaming-store";
+import { Phase } from "../streaming/streaming-type";
 
 const { ccclass, menu, property } = _decorator;
+const { observer, render } = Observer;
 
 @ccclass
 @menu("Stages/StageManager")
+@observer
 export class StageManager extends Component {
   @property(Stage)
   private targets: Stage[] = [];
@@ -35,6 +40,31 @@ export class StageManager extends Component {
     this.targets.forEach((target, index) => {
       target.node.active = index === value % size;
     });
+  }
+
+  get stages() {
+    return this.targets.map((target) => target.node.name);
+  }
+
+  @render(StreamingStore, (store) => ({
+    phase: store.eventData.currentPhase,
+    eventIndex: store.eventData.currentEventIndex,
+  }))
+  private updateStage(data: { phase: string; eventIndex: number }) {
+    const mapping = {
+      [Phase.ScheduleEvent]: "prebetting",
+      [Phase.UpdateOdds]: "splash",
+      [Phase.UpdateVideoInfo]: "streaming",
+      [Phase.UpdateResult]: data.eventIndex === 0 ? "halftime" : "fulltime",
+    };
+
+    const stage = mapping[data.phase];
+
+    if (!stage) {
+      return;
+    }
+
+    this.current = stage;
   }
 
   onFocusInEditor(): void {
