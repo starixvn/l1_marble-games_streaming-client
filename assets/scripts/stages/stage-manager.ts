@@ -48,7 +48,7 @@ export class StageManager extends Component {
 
   @render(StreamingStore, (store) => ({
     phase: store.eventData.currentPhase,
-    eventIndex: store.eventData.currentEventIndex,
+    eventIndex: store.eventData.updatedEventIndex,
   }))
   private updateStage(data: { phase: string; eventIndex: number }) {
     const mapping = {

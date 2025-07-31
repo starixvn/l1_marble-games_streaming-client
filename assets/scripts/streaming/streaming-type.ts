@@ -33,6 +33,7 @@ export type EventData = {
   awayTeam: string;
   eventId: number;
   currentEventIndex: number;
+  updatedEventIndex: number;
   liveScores: string[];
   goalInfos: any[];
   currentPhase: Phase;

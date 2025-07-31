@@ -1,6 +1,11 @@
 import { injectable } from "inversify";
 import mobx from "mobx";
-import { EventData, EventStreamPayload, Phase, StreamingState } from "./streaming-type";
+import {
+  EventData,
+  EventStreamPayload,
+  Phase,
+  StreamingState,
+} from "./streaming-type";
 
 @injectable()
 export class StreamingStore {
@@ -44,6 +49,7 @@ export class StreamingStore {
       awayTeam: payload.awayTeam,
       eventId: payload.eventId,
       currentEventIndex: payload.currentIndex,
+      updatedEventIndex: payload.updatedIndex,
       liveScores: payload.liveScores,
       goalInfos: payload.goalInfos,
       currentPhase: payload.currentPhase,
