@@ -8,22 +8,6 @@ export class VideoStore {
 
   constructor() {
     mobx.makeAutoObservable(this);
-
-    mobx.reaction(
-      () => this.streamingStore?.eventData?.currentPhase,
-      (currentPhase) => {
-        if (currentPhase === Phase.UpdateVideoInfo) {
-          this.updateUrlFromEventData();
-        }
-      }
-    );
-
-    mobx.reaction(
-      () => this.streamingStore?.eventData?.liveScores,
-      (liveScores) => {
-        this.updateTimeWhenScoreChanged();
-      }
-    );
   }
 
   url: string = "";
@@ -36,28 +20,18 @@ export class VideoStore {
     this.url = url;
   }
 
-  updateUrlFromEventData() {
-    const currentEvent = this.streamingStore.eventData;
-    const currentEventDetail =
-      currentEvent.eventDetails[currentEvent.currentEventIndex];
-    const videoName = currentEventDetail.playlist
-      .split(`/2001/`)[1]
-      .replace(".mp4", ".m3u8");
+  updateUrlFromEventData(url: string) {
+    if (!url) {
+      this.url = "";
+      return;
+    }
+
+    const videoName = url.split(`/2001/`)[1].replace(".mp4", ".m3u8");
     this.url = `https://d1aof1lwumql9k.cloudfront.net/114_STAGING/${videoName}`;
-    this.videoLiveTime = Math.min(
-      currentEventDetail.videoLiveTimeMs / 1000,
-      32
-    );
   }
 
-  updateTimeWhenScoreChanged() {
-    const currentEvent = this.streamingStore.eventData;
-    const currentEventDetail =
-      currentEvent.eventDetails[currentEvent.currentEventIndex];
-    this.videoLiveTime = Math.min(
-      currentEventDetail.videoLiveTimeMs / 1000,
-      32
-    );
+  updateVideoTime(videoLiveTimeMs: number) {
+    this.videoLiveTime = videoLiveTimeMs / 1000;
   }
 
   setMuted(muted: boolean) {

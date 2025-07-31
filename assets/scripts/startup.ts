@@ -17,6 +17,7 @@ import { StreamingStore } from "./streaming/streaming-store";
 import type { EventData } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { ScoreStore } from "./scores/score-store";
+import { VideoStore } from "./video-player/video-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -38,6 +39,9 @@ export class Startup extends Component {
 
   @inject(TeamStore)
   private readonly teamStore: TeamStore;
+
+  @inject(VideoStore)
+  private readonly videoStore: VideoStore;
 
   @render(Store, (store) => store.language)
   private initLanguage(language: string) {
@@ -88,7 +92,7 @@ export class Startup extends Component {
 
         return result;
       },
-      [0, 0],
+      [0, 0]
     );
 
     const results = eventData.eventDetails.map((detail) => detail.result);
@@ -108,13 +112,19 @@ export class Startup extends Component {
       away: firstHalfAwayScore,
     });
 
+    const currentEventDetail =
+      eventData.eventDetails[eventData.currentEventIndex];
+    this.updateVideoUrl(currentEventDetail.playlist);
+
+    this.updateVideoTime(currentEventDetail.videoLiveTimeMs);
+
     console.log(
-      `home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`,
+      `home team: ${eventData.homeTeam}, away team: ${eventData.awayTeam}`
     );
     console.log(
       `event id: ${eventData.eventId}, current half: ${
         eventData.currentEventIndex + 1
-      }`,
+      }`
     );
     console.log(`live scores: ${homeScore}:${awayScore}`);
     console.log(`results: ${JSON.stringify(results)}`);
@@ -135,5 +145,17 @@ export class Startup extends Component {
   @handle(ScoreStore, (store, data: ScoreStore) => store.updatePrevious(data))
   private update1HalfScore(data: { home: number; away: number }) {
     return data;
+  }
+
+  @handle(VideoStore, (store, url: string) => store.updateUrlFromEventData(url))
+  private updateVideoUrl(url: string) {
+    return url;
+  }
+
+  @handle(VideoStore, (store, videoLiveTimeMs: number) =>
+    store.updateVideoTime(videoLiveTimeMs)
+  )
+  private updateVideoTime(videoLiveTimeMs: number) {
+    return videoLiveTimeMs;
   }
 }

@@ -21,9 +21,14 @@ export class BackgroundVideoPlayer extends Component {
 
   currentTime = 0;
 
-  @render(VideoStore, (store) => store.url)
-  load(url: string, currentTime: number = 0) {
-    if (this._url !== url) {
+  @render(VideoStore, (store) => ({
+    url: store.url,
+    currentTime: store.videoLiveTime,
+  }))
+  load({ url, currentTime }: { url: string; currentTime: number }) {
+    this.currentTime = currentTime;
+
+    if (url && this._url !== url) {
       if (!this.initialized) {
         this.initialize();
       }
@@ -32,7 +37,6 @@ export class BackgroundVideoPlayer extends Component {
 
       this.hls.loadSource(this._url);
       this.play();
-      this.currentTime = currentTime;
     }
   }
 
@@ -102,11 +106,6 @@ export class BackgroundVideoPlayer extends Component {
       Math.abs(this.currentTime - this.native.currentTime) > 1;
 
     if (this.initialized && needSync) {
-      console.warn(
-        "BackgroundVideoPlayer: syncCurrentTime",
-        this.currentTime,
-        this.native.currentTime
-      );
       this.native.currentTime = this.currentTime;
     }
   }
