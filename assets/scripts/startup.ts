@@ -16,6 +16,7 @@ import { Store } from "./store";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
 import type { EventData } from "./streaming/streaming-type";
+import { Phase } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { TimeStore } from "./time/time-store";
 import { VideoStore } from "./video-player/video-store";
@@ -87,7 +88,7 @@ export class Startup extends Component {
 
         return result;
       },
-      [0, 0],
+      [0, 0]
     );
 
     const results = eventData.eventDetails.map((detail) => detail.result);
@@ -109,13 +110,15 @@ export class Startup extends Component {
 
     const currentEventDetail =
       eventData.eventDetails[eventData.currentEventIndex];
+
     this.updateVideoUrl(currentEventDetail.playlist);
 
     this.updateVideoTime(currentEventDetail.videoLiveTimeMs);
 
-    this.updateTimeAndHalf({
+    this.updateTimeStore({
       matchLiveTime: eventData.matchLiveTimeMs,
       halfIndex: eventData.currentEventIndex,
+      currentPhase: eventData.currentPhase,
     });
   }
 
@@ -140,16 +143,17 @@ export class Startup extends Component {
   }
 
   @handle(VideoStore, (store, videoLiveTimeMs: number) =>
-    store.updateVideoTime(videoLiveTimeMs),
+    store.updateVideoTime(videoLiveTimeMs)
   )
   private updateVideoTime(videoLiveTimeMs: number) {
     return videoLiveTimeMs;
   }
 
   @handle(TimeStore, (store, data: TimeStore) => store.update(data))
-  private updateTimeAndHalf(data: {
+  private updateTimeStore(data: {
     matchLiveTime: number;
     halfIndex: number;
+    currentPhase: Phase;
   }) {
     return data;
   }
