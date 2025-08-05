@@ -26,8 +26,7 @@ export class VideoStore {
       return;
     }
 
-    const videoName = url.split(`/2001/`)[1].replace(".mp4", ".m3u8");
-    this.url = `https://d1aof1lwumql9k.cloudfront.net/114_STAGING/${videoName}`;
+    this.url = url;
   }
 
   updateVideoTime(videoLiveTimeMs: number) {

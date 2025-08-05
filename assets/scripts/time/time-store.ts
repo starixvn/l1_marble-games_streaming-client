@@ -10,7 +10,7 @@ export class TimeStore {
   halfIndex = 0;
   currentPhase: Phase;
   paused = true;
-  runnerId: number;
+  runnerId: NodeJS.Timeout;
 
   update(data: {
     matchLiveTime: number;
