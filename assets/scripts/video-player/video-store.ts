@@ -1,11 +1,8 @@
-import { inject, injectable } from "inversify";
+import { injectable } from "inversify";
 import mobx from "mobx";
-import { StreamingStore } from "../streaming/streaming-store";
-import { Phase } from "../streaming/streaming-type";
+
 @injectable()
 export class VideoStore {
-  @inject(StreamingStore) private readonly streamingStore: StreamingStore;
-
   constructor() {
     mobx.makeAutoObservable(this);
   }
@@ -15,6 +12,12 @@ export class VideoStore {
   videoLiveTime = 0;
 
   muted: boolean = false;
+
+  defaultBackgroundEnabled: boolean = false;
+
+  enableDefaultBackground(enable: boolean) {
+    this.defaultBackgroundEnabled = enable;
+  }
 
   setUrl(url: string) {
     this.url = url;

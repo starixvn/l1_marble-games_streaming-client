@@ -83,7 +83,7 @@ export class BackgroundVideoPlayer extends Component {
     if (this.initialized) {
       this.native.removeEventListener(
         "timeupdate",
-        this.syncCurrentTime.bind(this)
+        this.syncCurrentTime.bind(this),
       );
 
       this.hls.off(Hls.Events.ERROR);
@@ -130,11 +130,9 @@ export class BackgroundVideoPlayer extends Component {
     video.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
     hls.attachMedia(video);
 
-    hls.on(Hls.Events.LEVEL_SWITCHED, this.node.emit.bind(this.node));
-    hls.on(Hls.Events.MANIFEST_LOADING, this.node.emit.bind(this.node));
-    hls.on(Hls.Events.MANIFEST_PARSED, this.node.emit.bind(this.node));
-    hls.on(Hls.Events.FRAG_BUFFERED, this.node.emit.bind(this.node));
-    hls.on(Hls.Events.FRAG_CHANGED, this.node.emit.bind(this.node));
+    Object.values(Hls.Events).forEach((event) => {
+      hls.on(event, this.node.emit.bind(this.node));
+    });
 
     hls.on(Hls.Events.ERROR, (event, data) => {
       this.node.emit(event, {
