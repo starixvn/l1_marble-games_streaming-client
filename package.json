@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "tolgee": "node scripts/tolgee.js",
-    "obfuscator-config": "node ./site-configs/obfuscator.js",
+    "obfuscator-config-file": "node ./site-configs/obfuscator.js",
     "install-dependencies": "npm install"
   },
   "dependencies": {
