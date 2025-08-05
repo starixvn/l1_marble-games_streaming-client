@@ -25,7 +25,6 @@
   },
   "builder-options": {
     "configID": "d3e7ab",
-    "services": [],
-    "__version__": "3.0.9"
+    "services": []
   }
 }

@@ -3,7 +3,8 @@
   "type": "module",
   "scripts": {
     "tolgee": "node scripts/tolgee.js",
-    "obfuscator-config": "node ./site-configs/obfuscator.js"
+    "obfuscator-config": "node ./site-configs/obfuscator.js",
+    "install-dependencies": "npm install"
   },
   "dependencies": {
     "hls.js": "1.5.20",
