@@ -2,14 +2,15 @@ import { inject, injectable } from "inversify";
 import { Store } from "../store";
 import { StreamingStore } from "./streaming-store";
 import { EventStreamPayload } from "./streaming-type";
+import { gameSettings } from "../game-settings";
 
 @injectable()
 export class StreamingHandler {
   private eventSource: EventSource | null = null;
-  private maxReconnectAttempts = 5;
+  private maxReconnectAttempts = gameSettings.maxReconnectAttempts;
   private reconnectAttempts = 0;
-  private reconnectDelay = 1000; // 1 second
-  private reconnectTimeout: number | null = null;
+  private reconnectDelay = gameSettings.reconnectDelay;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
 
   @inject(StreamingStore) private readonly streamingStore: StreamingStore;
 
@@ -24,7 +25,9 @@ export class StreamingHandler {
       this.eventSource = new EventSource(this.store.serverUrl);
       this.setupEventListeners();
     } catch (err) {
-      this.streamingStore.setError(`Failed to connect to streaming service: ${err.message}`);
+      this.streamingStore.setError(
+        `Failed to connect to streaming service: ${err.message}`
+      );
       console.error("StreamingHandler connection error:", err);
     }
   }
@@ -73,7 +76,9 @@ export class StreamingHandler {
 
     this.reconnectAttempts++;
 
-    console.log(`StreamingHandler: Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    console.log(
+      `StreamingHandler: Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
+    );
 
     // Clear any existing timeout
     if (this.reconnectTimeout) {

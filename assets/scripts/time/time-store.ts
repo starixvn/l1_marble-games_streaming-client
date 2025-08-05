@@ -1,5 +1,6 @@
 import mobx from "mobx";
 import { Phase } from "../streaming/streaming-type";
+import { gameSettings } from "../game-settings";
 
 export class TimeStore {
   constructor() {
@@ -28,10 +29,6 @@ export class TimeStore {
       this.matchLiveTime = matchLiveTime;
     }
 
-    if (data.currentPhase === Phase.UpdateResult) {
-      this.pause();
-    }
-
     if (data.currentPhase === Phase.UpdateVideoInfo) {
       this.play();
 
@@ -45,20 +42,33 @@ export class TimeStore {
     }
 
     this.halfIndex = data.halfIndex;
+
+    if (this.isTimerPaused()) {
+      this.pause();
+    }
   }
 
   countUp() {
     if (!this.paused) {
-      {
-        this.matchLiveTime += 1;
+      this.increaseMatchLiveTime();
 
-        if (
-          (this.halfIndex === 0 && this.matchLiveTime === 30) ||
-          this.matchLiveTime === 60
-        ) {
-          this.pause();
-        }
+      if (this.isTimerPaused()) {
+        this.pause();
       }
+    }
+  }
+
+  isTimerPaused() {
+    return (
+      (this.halfIndex === 0 &&
+        this.matchLiveTime === gameSettings.halfDuration) ||
+      this.matchLiveTime === gameSettings.halfDuration * 2
+    );
+  }
+
+  increaseMatchLiveTime() {
+    if (!this.isTimerPaused()) {
+      this.matchLiveTime += 1;
     }
   }
 
