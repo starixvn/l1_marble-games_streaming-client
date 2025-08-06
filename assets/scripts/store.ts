@@ -25,7 +25,7 @@ export class Store {
     }
 
     const root = host.split(".").slice(1).join(".");
-    const domain = `streaming-service.${root}`;
+    const domain = `mgstreaming.${root}`;
 
     return `https://${domain}/live/${this.game}`;
   }
