@@ -18,10 +18,10 @@ export class Store {
   operator = "common";
 
   get serverUrl() {
-    const host = window.location.host;
+    let host = window.location.host;
 
     if (host.includes("localhost")) {
-      return `https://streaming-service.lumigame.com/live/${this.game}`;
+      host = "mgtv.lumigame.com";
     }
 
     const root = host.split(".").slice(1).join(".");
