@@ -49,8 +49,13 @@ export class StageManager extends Component {
   @render(StreamingStore, (store) => ({
     phase: store.eventData.currentPhase,
     eventIndex: store.eventData.updatedEventIndex,
+    result: store.result,
   }))
-  private updateStage(data: { phase: string; eventIndex: number }) {
+  private updateStage(data: {
+    phase: string;
+    eventIndex: number;
+    result: "H" | "A" | "D" | null;
+  }) {
     const mapping = {
       [Phase.ScheduleEvent]: "prebetting",
       [Phase.UpdateOdds]: "splash",
@@ -64,7 +69,19 @@ export class StageManager extends Component {
       return;
     }
 
-    this.current = stage;
+    if (data.phase === Phase.UpdateResult) {
+      this.current = stage;
+
+      this.scheduleOnce(() => {
+        if (data.result === "D") {
+          this.current = "draw";
+        } else {
+          this.current = "result";
+        }
+      }, 5);
+    } else {
+      this.current = stage;
+    }
   }
 
   onFocusInEditor(): void {

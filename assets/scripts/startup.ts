@@ -79,28 +79,14 @@ export class Startup extends Component {
       .split(":")
       .map(Number);
 
-    const [homeScore, awayScore] = eventData.liveScores.reduce(
-      (result, score) => {
-        const [home, away] = score.split(":");
-
-        result[0] += parseInt(home);
-        result[1] += parseInt(away);
-
-        return result;
-      },
-      [0, 0]
-    );
-
-    const results = eventData.eventDetails.map((detail) => detail.result);
-
     this.updateTeamName({
       home: eventData.homeTeam,
       away: eventData.awayTeam,
     });
 
     this.updateScore({
-      home: homeScore,
-      away: awayScore,
+      home: eventData.homeScore,
+      away: eventData.awayScore,
     });
 
     this.update1HalfScore({
@@ -143,7 +129,7 @@ export class Startup extends Component {
   }
 
   @handle(VideoStore, (store, videoLiveTimeMs: number) =>
-    store.updateVideoTime(videoLiveTimeMs)
+    store.updateVideoTime(videoLiveTimeMs),
   )
   private updateVideoTime(videoLiveTimeMs: number) {
     return videoLiveTimeMs;

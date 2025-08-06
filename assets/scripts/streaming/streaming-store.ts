@@ -43,7 +43,31 @@ export class StreamingStore {
     };
   }
 
+  get result(): "H" | "A" | "D" | null {
+    if (!this.state.eventData) {
+      return null;
+    }
+
+    return this.state.eventData?.homeScore > this.state.eventData?.awayScore
+      ? "H"
+      : this.state.eventData?.homeScore < this.state.eventData?.awayScore
+      ? "A"
+      : "D";
+  }
+
   updateStateWithPayload(payload: EventStreamPayload): void {
+    const [homeScore, awayScore] = payload.liveScores.reduce(
+      (result, score) => {
+        const [home, away] = score.split(":");
+
+        result[0] += parseInt(home);
+        result[1] += parseInt(away);
+
+        return result;
+      },
+      [0, 0],
+    );
+
     this.state.eventData = {
       homeTeam: payload.homeTeam,
       awayTeam: payload.awayTeam,
@@ -55,6 +79,8 @@ export class StreamingStore {
       currentPhase: payload.currentPhase,
       eventDetails: payload.eventDetails,
       matchLiveTimeMs: payload.matchLiveTimeMs,
+      homeScore,
+      awayScore,
     };
   }
 

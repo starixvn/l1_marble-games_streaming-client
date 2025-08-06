@@ -29,6 +29,8 @@ export enum Phase {
 }
 
 export type EventData = {
+  homeScore: number;
+  awayScore: number;
   homeTeam: string;
   awayTeam: string;
   eventId: number;
