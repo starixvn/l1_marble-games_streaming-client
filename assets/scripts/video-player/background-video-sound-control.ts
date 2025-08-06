@@ -1,33 +1,21 @@
 import { _decorator, Component, game } from "cc";
 import Observer from "observer";
 import { BackgroundVideoPlayer } from "./background-video-player";
-import { canPlayAudio, initializeAudio } from "./dom-audio-checker";
-import { VideoStore } from "./video-store";
+import { initializeAudio } from "./dom-audio-checker";
+import { AudioStore } from "../audios/audio-store";
 
 const { ccclass, requireComponent } = _decorator;
-const { observer, render } = Observer;
+const { observer, render, handle } = Observer;
 
 @ccclass("BackgroundVideoSoundControl")
 @requireComponent(BackgroundVideoPlayer)
 @observer
 export class BackgroundVideoSoundControl extends Component {
   private videoPlayer: BackgroundVideoPlayer;
-  private muted = false;
-
-  @render(VideoStore, (store) => ({ muted: store.muted, video: store.url }))
-  private async setMuted({ muted }: { muted: boolean }) {
-    this.muted = muted;
-
-    const canPlay = await canPlayAudio();
-
-    if (canPlay) {
-      this.videoPlayer.muted = this.muted;
-    }
-  }
 
   onLoad(): void {
     initializeAudio(() => {
-      this.videoPlayer.muted = this.muted;
+      this.setBrowserBlocked(false);
     });
 
     this.videoPlayer = this.node.getComponent(BackgroundVideoPlayer);
@@ -38,6 +26,27 @@ export class BackgroundVideoSoundControl extends Component {
   }
 
   onTouch() {
-    this.videoPlayer.muted = this.muted;
+    this.setBrowserBlocked(false);
+  }
+
+  @handle(AudioStore, (store, browserBlocked: boolean) =>
+    store.setBrowserBlocked(browserBlocked)
+  )
+  private setBrowserBlocked(browserBlocked: boolean) {
+    return browserBlocked;
+  }
+
+  @render(AudioStore, (store) => ({
+    muted: store.muted,
+    browserBlocked: store.browserBlocked,
+  }))
+  private syncAudioMuted({
+    muted,
+    browserBlocked,
+  }: {
+    muted: boolean;
+    browserBlocked: boolean;
+  }) {
+    this.videoPlayer.muted = muted || browserBlocked;
   }
 }
