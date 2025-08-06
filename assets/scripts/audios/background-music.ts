@@ -14,10 +14,11 @@ export class BackgroundMusic extends Component {
   @property(AudioSource)
   audioSource: AudioSource = null;
 
-  isPlaying = false;
+  playing = false;
+  muted = true;
 
   play() {
-    if (this.isPlaying && !this.audioSource.playing) {
+    if (!this.muted && this.playing && !this.audioSource.playing) {
       this.audioSource.play();
     }
   }
@@ -37,7 +38,9 @@ export class BackgroundMusic extends Component {
     muted: boolean;
     browserBlocked: boolean;
   }) {
-    if (muted || browserBlocked) {
+    this.muted = muted || browserBlocked;
+
+    if (this.muted) {
       this.pause();
     } else {
       this.play();
@@ -48,15 +51,15 @@ export class BackgroundMusic extends Component {
   private renderEventData(eventData: EventData) {
     switch (eventData.currentPhase) {
       case Phase.ScheduleEvent:
-        this.isPlaying = true;
+        this.playing = true;
         this.play();
         break;
       case Phase.UpdateVideoInfo:
-        this.isPlaying = false;
+        this.playing = false;
         this.pause();
         break;
       case Phase.UpdateResult:
-        this.isPlaying = true;
+        this.playing = true;
         this.play();
         break;
     }
