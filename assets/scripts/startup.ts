@@ -71,6 +71,8 @@ export class Startup extends Component {
 
   @render(StreamingStore, (store) => store.eventData)
   private renderEventData(eventData: EventData) {
+    console.log("eventData currentPhase", eventData.currentPhase);
+
     if (!eventData?.eventId) {
       return;
     }
