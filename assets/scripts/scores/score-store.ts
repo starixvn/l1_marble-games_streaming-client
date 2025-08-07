@@ -1,5 +1,7 @@
 import mobx from "mobx";
+import { store } from "../store-decorator";
 
+@store("ScoreStore")
 export class ScoreStore {
   constructor() {
     mobx.makeAutoObservable(this);

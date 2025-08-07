@@ -1,7 +1,9 @@
 import mobx from "mobx";
 import { Phase } from "../streaming/streaming-type";
 import { gameSettings } from "../game-settings";
+import { store } from "../store-decorator";
 
+@store("TimeStore")
 export class TimeStore {
   constructor() {
     mobx.makeAutoObservable(this);
@@ -24,7 +26,7 @@ export class TimeStore {
 
     if (matchLiveTime - this.matchLiveTime > 1) {
       console.log(
-        `sync matchLiveTime from ${this.matchLiveTime} to ${matchLiveTime}`
+        `sync matchLiveTime from ${this.matchLiveTime} to ${matchLiveTime}`,
       );
       this.matchLiveTime = matchLiveTime;
     }

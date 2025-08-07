@@ -1,7 +1,9 @@
 import { injectable } from "inversify";
 import mobx from "mobx";
+import { store } from "../store-decorator";
 
 @injectable()
+@store("VideoStore")
 export class VideoStore {
   constructor() {
     mobx.makeAutoObservable(this);

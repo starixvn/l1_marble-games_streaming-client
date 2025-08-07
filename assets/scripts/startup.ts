@@ -11,11 +11,13 @@ import { init } from "db://i18n/LanguageData";
 import { Container } from "inversify";
 import mobx from "mobx";
 import Observer from "observer";
+import type { EventData } from "./streaming/streaming-type";
+
 import { ScoreStore } from "./scores/score-store";
 import { Store } from "./store";
+import { handleWindowMessage } from "./store-decorator";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
-import type { EventData } from "./streaming/streaming-type";
 import { Phase } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { TimeStore } from "./time/time-store";
@@ -32,6 +34,8 @@ const container = new Container({
 Observer.configure({
   default: { mobx, container: { resolve: (ctor) => container.get(ctor) } },
 });
+
+window.addEventListener("message", handleWindowMessage(container));
 
 @ccclass
 @observer

@@ -1,13 +1,14 @@
 import { injectable } from "inversify";
 import mobx from "mobx";
+import { store } from "../store-decorator";
 import {
   EventData,
   EventStreamPayload,
-  Phase,
   StreamingState,
 } from "./streaming-type";
 
 @injectable()
+@store("StreamingStore")
 export class StreamingStore {
   constructor() {
     mobx.makeAutoObservable(this);

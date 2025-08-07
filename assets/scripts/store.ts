@@ -1,5 +1,7 @@
 import mobx from "mobx";
+import { store } from "./store-decorator";
 
+@store("Store")
 export class Store {
   constructor() {
     const params = new URLSearchParams(window.location.search);

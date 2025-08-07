@@ -1,5 +1,7 @@
 import mobx from "mobx";
+import { store } from "../store-decorator";
 
+@store("TeamStore")
 export class TeamStore {
   constructor() {
     mobx.makeAutoObservable(this);
