@@ -27,7 +27,7 @@ export function handleWindowMessage(container: Container) {
     const [name, value] = data;
 
     if (name === "click") {
-      const element = document.querySelector("GameCanvas");
+      const element = document.getElementById("GameCanvas");
       const data = Object.assign(
         {},
         {
