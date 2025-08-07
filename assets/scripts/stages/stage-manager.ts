@@ -69,7 +69,7 @@ export class StageManager extends Component {
       return;
     }
 
-    if (data.phase === Phase.UpdateResult && stage === "fulltime") {
+    if (stage === "fulltime") {
       this.current = stage;
 
       this.scheduleOnce(() => {
