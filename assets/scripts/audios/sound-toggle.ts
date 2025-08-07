@@ -21,4 +21,9 @@ export class SoundToggle extends Component {
   private setMuted(muted: boolean) {
     return muted;
   }
+
+  @render(AudioStore, (store) => store.muted)
+  private renderMuted(muted: boolean) {
+    this.soundToggle.isChecked = !muted;
+  }
 }
