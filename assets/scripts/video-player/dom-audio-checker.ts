@@ -65,4 +65,6 @@ export function initializeAudio(onEnable: () => void = () => {}): void {
   document.addEventListener("mousedown", enableAudio, { once: true });
   document.addEventListener("touchstart", enableAudio, { once: true });
   document.addEventListener("keydown", enableAudio, { once: true });
+
+  enableAudio();
 }

@@ -21,7 +21,9 @@ export class BackgroundVideoSoundControl extends Component {
     this.videoPlayer = this.node.getComponent(BackgroundVideoPlayer);
 
     const canvas = game.canvas;
-    canvas.addEventListener("touchstart", this.onTouch.bind(this));
+    canvas.addEventListener("touchstart", this.onTouch.bind(this), {
+      passive: true,
+    });
     canvas.addEventListener("mousedown", this.onTouch.bind(this));
   }
 
