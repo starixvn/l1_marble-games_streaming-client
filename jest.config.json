@@ -1,21 +1,11 @@
 {
   "testEnvironment": "jsdom",
   "collectCoverage": true,
-  "coverageDirectory": "../coverage",
-  "coveragePathIgnorePatterns": [
-    "node_modules",
-    "preview-template",
-    "build-templates",
-    "profiles"
-  ],
+  "coverageDirectory": "coverage",
+  "collectCoverageFrom": ["assets/scripts/**/*.ts"],
   "transform": {
     "^.+\\.tsx?$": ["ts-jest", { "tsconfig": "tsconfig.test.json" }]
   },
-  "testPathIgnorePatterns": [
-    "/node_modules/",
-    "/integration-tests/",
-    "/game/color-game/test/"
-  ],
   "testMatch": ["**/?(*.)+(spec|test).+(ts)"],
   "testResultsProcessor": "jest-sonar-reporter",
   "coverageReporters": ["cobertura", "text-summary", "text", "lcov"],
@@ -28,7 +18,7 @@
     [
       "jest-junit",
       {
-        "outputDirectory": "../reports"
+        "outputDirectory": "reports"
       }
     ]
   ],
