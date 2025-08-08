@@ -5,7 +5,8 @@
     "tolgee": "node scripts/tolgee.js",
     "obfuscator-config-file": "node ./site-configs/obfuscator.js",
     "install-dependencies": "npm install",
-    "test": "jest"
+    "test": "jest",
+    "test-coverage": "jest --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "hls.js": "1.5.20",

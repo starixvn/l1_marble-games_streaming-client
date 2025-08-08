@@ -7,3 +7,15 @@ variables:
   COCOS_PROJECT_DIR: .
   INTEGRATION_IMAGE: pentagon/l1_spaceflight_client
   INTEGRATION_WS_PATH: spaceflight
+
+unit_test_js:
+  before_script:
+    - npm set registry http://npm.lumigame.com
+    - npm run install-dependencies
+
+.sonar_js:
+  before_script:
+    - - echo "===========Start Sonar Scanner============="
+    - echo $SRC_PATH
+    - echo $TEST_PATH
+    - cp ./tsconfig.sonar.json ./tsconfig.json
