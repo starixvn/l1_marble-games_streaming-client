@@ -22,11 +22,11 @@ export class TimeStore {
   }) {
     this.currentPhase = data.currentPhase;
 
-    const matchLiveTime = Math.floor(data.matchLiveTime / 1000);
+    const matchLiveTime = Math.floor(((data.matchLiveTime / 1000) * 3) / 2);
 
     if (matchLiveTime - this.matchLiveTime > 1) {
       console.log(
-        `sync matchLiveTime from ${this.matchLiveTime} to ${matchLiveTime}`,
+        `sync matchLiveTime from ${this.matchLiveTime} to ${matchLiveTime}`
       );
       this.matchLiveTime = matchLiveTime;
     }
@@ -77,7 +77,7 @@ export class TimeStore {
   start() {
     this.runnerId = setInterval(() => {
       this.countUp();
-    }, 1000);
+    }, 666);
   }
 
   stop() {
