@@ -58,6 +58,8 @@ export class NameManager extends Component {
       } else {
         label.key = key;
       }
+
+      label.updateLabel();
     }
 
     for (const label of this.shortLabels) {
