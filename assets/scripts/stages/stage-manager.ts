@@ -15,6 +15,8 @@ export class StageManager extends Component {
   @property(Stage)
   private targets: Stage[] = [];
 
+  private scheduledCallback: any = null;
+
   @property({ type: CCString })
   get current() {
     return this.targets.find((target) => target.node.active)?.node.name;
@@ -76,19 +78,37 @@ export class StageManager extends Component {
       return;
     }
 
+    this.cancelScheduledCallback();
+
     if (stage === "fulltime") {
       this.current = stage;
 
-      this.scheduleOnce(() => {
+      this.scheduledCallback = () => {
+        console.log("scheduled callback");
         if (data.result === "D") {
           this.current = "draw";
         } else {
           this.current = "result";
         }
-      }, 5);
+
+        this.scheduledCallback = null;
+      };
+
+      this.scheduleOnce(this.scheduledCallback, 5);
     } else {
       this.current = stage;
     }
+  }
+
+  private cancelScheduledCallback(): void {
+    if (this.scheduledCallback) {
+      this.unschedule(this.scheduledCallback);
+      this.scheduledCallback = null;
+    }
+  }
+
+  protected onDestroy(): void {
+    this.cancelScheduledCallback();
   }
 
   onFocusInEditor(): void {
