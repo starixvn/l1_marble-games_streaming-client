@@ -3,6 +3,7 @@ import { Stage } from "./stage";
 import Observer from "observer";
 import { StreamingStore } from "../streaming/streaming-store";
 import { Phase } from "../streaming/streaming-type";
+import { gameSettings } from "../game-settings";
 
 const { ccclass, menu, property } = _decorator;
 const { observer, render } = Observer;
@@ -50,17 +51,23 @@ export class StageManager extends Component {
     phase: store.eventData.currentPhase,
     eventIndex: store.eventData.updatedEventIndex,
     result: store.result,
+    matchLiveTime: store.eventData.matchLiveTimeMs,
   }))
   private updateStage(data: {
     phase: string;
     eventIndex: number;
     result: "H" | "A" | "D" | null;
+    matchLiveTime: number;
   }) {
+    const matchLiveTime = data.matchLiveTime / 1000;
+    const isHalfTime =
+      data.eventIndex === 0 || matchLiveTime <= gameSettings.videoDuration;
+
     const mapping = {
       [Phase.ScheduleEvent]: "prebetting",
       [Phase.UpdateOdds]: data.eventIndex === 0 ? "prebetting" : "streaming",
       [Phase.UpdateVideoInfo]: "streaming",
-      [Phase.UpdateResult]: data.eventIndex === 0 ? "halftime" : "fulltime",
+      [Phase.UpdateResult]: isHalfTime ? "halftime" : "fulltime",
     };
 
     const stage = mapping[data.phase];
