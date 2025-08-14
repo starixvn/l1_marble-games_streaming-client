@@ -5,6 +5,10 @@ import { store } from "../store-decorator";
 
 @store("TimeStore")
 export class TimeStore {
+  private readonly countUpInterval = Math.floor(
+    (gameSettings.videoDuration / gameSettings.halfDuration) * 1000
+  );
+
   constructor() {
     mobx.makeAutoObservable(this);
   }
@@ -22,7 +26,11 @@ export class TimeStore {
   }) {
     this.currentPhase = data.currentPhase;
 
-    const matchLiveTime = Math.floor(((data.matchLiveTime / 1000) * 3) / 2);
+    const matchLiveTime = Math.floor(
+      ((data.matchLiveTime / gameSettings.videoDuration) *
+        gameSettings.halfDuration) /
+        1000
+    );
 
     if (matchLiveTime - this.matchLiveTime > 1) {
       console.log(
@@ -77,7 +85,7 @@ export class TimeStore {
   start() {
     this.runnerId = setInterval(() => {
       this.countUp();
-    }, 666);
+    }, this.countUpInterval);
   }
 
   stop() {
