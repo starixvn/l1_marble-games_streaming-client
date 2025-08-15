@@ -9,8 +9,8 @@ export class AudioStore {
     mobx.makeAutoObservable(this);
   }
 
-  muted: boolean = false;
-  browserBlocked: boolean = true;
+  muted = false;
+  browserBlocked = true;
 
   setMuted(muted: boolean) {
     this.muted = muted;

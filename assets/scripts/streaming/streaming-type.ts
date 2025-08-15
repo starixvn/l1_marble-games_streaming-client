@@ -49,3 +49,5 @@ export type StreamingState = {
   eventData?: EventData;
   currentGame: string;
 };
+
+export type Result = "H" | "A" | "D" | null;

@@ -13,7 +13,7 @@ export class BackgroundVideoPlayer extends Component {
   private hls: Hls = null;
   private native: HTMLVideoElement = null;
 
-  private _url: string = "";
+  private _url = "";
 
   private get initialized() {
     return !!this.native && !!this.hls;
@@ -83,7 +83,7 @@ export class BackgroundVideoPlayer extends Component {
     if (this.initialized) {
       this.native.removeEventListener(
         "timeupdate",
-        this.syncCurrentTime.bind(this),
+        this.syncCurrentTime.bind(this)
       );
 
       this.hls.off(Hls.Events.ERROR);

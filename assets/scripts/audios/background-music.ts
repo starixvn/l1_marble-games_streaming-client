@@ -51,16 +51,13 @@ export class BackgroundMusic extends Component {
   private renderEventData(eventData: EventData) {
     switch (eventData.currentPhase) {
       case Phase.ScheduleEvent:
+      case Phase.UpdateResult:
         this.playing = true;
         this.play();
         break;
       case Phase.UpdateVideoInfo:
         this.playing = false;
         this.pause();
-        break;
-      case Phase.UpdateResult:
-        this.playing = true;
-        this.play();
         break;
     }
   }

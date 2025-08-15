@@ -4,6 +4,7 @@ import { store } from "../store-decorator";
 import {
   EventData,
   EventStreamPayload,
+  Result,
   StreamingState,
 } from "./streaming-type";
 
@@ -44,7 +45,7 @@ export class StreamingStore {
     };
   }
 
-  get result(): "H" | "A" | "D" | null {
+  get result(): Result {
     if (!this.state.eventData) {
       return null;
     }
@@ -66,7 +67,7 @@ export class StreamingStore {
 
         return result;
       },
-      [0, 0],
+      [0, 0]
     );
 
     this.state.eventData = {

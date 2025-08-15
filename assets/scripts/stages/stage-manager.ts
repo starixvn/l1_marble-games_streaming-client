@@ -4,6 +4,7 @@ import Observer from "observer";
 import { StreamingStore } from "../streaming/streaming-store";
 import { Phase } from "../streaming/streaming-type";
 import { gameSettings } from "../game-settings";
+import type { Result } from "../streaming/streaming-type";
 
 const { ccclass, menu, property } = _decorator;
 const { observer, render } = Observer;
@@ -58,7 +59,7 @@ export class StageManager extends Component {
   private updateStage(data: {
     phase: string;
     eventIndex: number;
-    result: "H" | "A" | "D" | null;
+    result: Result;
     matchLiveTime: number;
   }) {
     const matchLiveTime = data.matchLiveTime / 1000;

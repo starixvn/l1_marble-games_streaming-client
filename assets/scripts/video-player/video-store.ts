@@ -9,11 +9,11 @@ export class VideoStore {
     mobx.makeAutoObservable(this);
   }
 
-  url: string = "";
+  url = "";
 
   videoLiveTime = 0;
 
-  defaultBackgroundEnabled: boolean = false;
+  defaultBackgroundEnabled = false;
 
   enableDefaultBackground(enable: boolean) {
     this.defaultBackgroundEnabled = enable;

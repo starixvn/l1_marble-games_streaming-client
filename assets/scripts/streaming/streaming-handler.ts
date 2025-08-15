@@ -7,9 +7,9 @@ import { gameSettings } from "../game-settings";
 @injectable()
 export class StreamingHandler {
   private eventSource: EventSource | null = null;
-  private maxReconnectAttempts = gameSettings.maxReconnectAttempts;
+  private readonly maxReconnectAttempts = gameSettings.maxReconnectAttempts;
   private reconnectAttempts = 0;
-  private reconnectDelay = gameSettings.reconnectDelay;
+  private readonly reconnectDelay = gameSettings.reconnectDelay;
   private reconnectTimeout: NodeJS.Timeout | null = null;
 
   @inject(StreamingStore) private readonly streamingStore: StreamingStore;
@@ -33,7 +33,9 @@ export class StreamingHandler {
   }
 
   private setupEventListeners(): void {
-    if (!this.eventSource) return;
+    if (!this.eventSource) {
+      return;
+    }
 
     this.eventSource.onopen = () => {
       console.log("StreamingHandler: Connected to server");

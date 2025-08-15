@@ -31,7 +31,7 @@ function tryToPlayAudio(): Promise<boolean> {
 }
 
 export async function canPlayAudio(): Promise<boolean> {
-  return await tryToPlayAudio();
+  return tryToPlayAudio();
 }
 
 export function initializeAudio(onEnable: () => void = () => {}): void {

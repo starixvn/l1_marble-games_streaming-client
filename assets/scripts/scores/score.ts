@@ -14,10 +14,10 @@ export class Score extends Component {
   private label: Label = null;
 
   @property(CCString)
-  private prefix: string = "";
+  private readonly prefix = "";
 
   @property(CCBoolean)
-  private isPreviousScore = false;
+  private readonly isPreviousScore = false;
 
   private score = "";
 

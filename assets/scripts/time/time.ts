@@ -11,13 +11,13 @@ const { render, observer } = Observer;
 @observer
 export class Time extends Component {
   @property(Label)
-  private halfLabel: Label = null;
+  private readonly halfLabel: Label = null;
 
   @property(Label)
-  private minutesLabel: Label = null;
+  private readonly minutesLabel: Label = null;
 
   @property(Label)
-  private secondsLabel: Label = null;
+  private readonly secondsLabel: Label = null;
 
   minutes = 0;
   seconds = 0;

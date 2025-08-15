@@ -41,7 +41,7 @@ window.addEventListener("message", handleWindowMessage(container));
 @observer
 export class Startup extends Component {
   @property(Node)
-  private infoLayer: Node = null;
+  private readonly infoLayer: Node = null;
 
   @render(Store, (store) => store.language)
   private initLanguage(language: string) {
@@ -133,7 +133,7 @@ export class Startup extends Component {
   }
 
   @handle(VideoStore, (store, videoLiveTimeMs: number) =>
-    store.updateVideoTime(videoLiveTimeMs),
+    store.updateVideoTime(videoLiveTimeMs)
   )
   private updateVideoTime(videoLiveTimeMs: number) {
     return videoLiveTimeMs;

@@ -5,6 +5,7 @@ import { Stage } from "./stage";
 import { LocalizedLabel } from "db://i18n/LocalizedLabel";
 import { Store } from "../store";
 import { t } from "db://i18n/LanguageData";
+import type { Result } from "../streaming/streaming-type";
 
 const { render, observer } = Observer;
 
@@ -15,21 +16,21 @@ const { ccclass, property, menu } = _decorator;
 @observer
 export class ResultStage extends Stage {
   @property(Node)
-  private home: Node = null;
+  private readonly home: Node = null;
 
   @property(Node)
-  private away: Node = null;
+  private readonly away: Node = null;
 
   @property(LocalizedLabel)
-  private label: LocalizedLabel = null;
+  private readonly label: LocalizedLabel = null;
 
-  private result: "H" | "A" | "D" | null = null;
-  private homeCode: string = "";
-  private awayCode: string = "";
-  private operator: string = "";
+  private result: Result = null;
+  private homeCode = "";
+  private awayCode = "";
+  private operator = "";
 
   @render(StreamingStore, (store) => store.result)
-  private updateResult(result: "H" | "A" | "D" | null) {
+  private updateResult(result: Result) {
     this.result = result;
 
     this.render();
