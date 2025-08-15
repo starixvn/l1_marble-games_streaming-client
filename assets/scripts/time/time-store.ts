@@ -26,7 +26,7 @@ export class TimeStore {
   }) {
     this.currentPhase = data.currentPhase;
 
-    const matchLiveTime = Math.floor(
+    const matchLiveTime = Math.round(
       ((data.matchLiveTime / gameSettings.videoDuration) *
         gameSettings.halfDuration) /
         1000
