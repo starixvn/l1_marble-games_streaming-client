@@ -68,8 +68,9 @@ export class StageManager extends Component {
 
     const mapping = {
       [Phase.ScheduleEvent]: "prebetting",
-      [Phase.UpdatePreloadVideoInfo]: this.current,
-      [Phase.UpdateOdds]: this.current,
+      [Phase.UpdateOdds]: data.eventIndex === 0 ? "prebetting" : "streaming",
+      [Phase.UpdatePreloadVideoInfo]:
+        data.eventIndex === 0 ? "prebetting" : "halftime",
       [Phase.UpdateVideoInfo]: "streaming",
       [Phase.UpdateResult]: isHalfTime ? "halftime" : "fulltime",
     };
