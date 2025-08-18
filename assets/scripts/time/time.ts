@@ -11,13 +11,13 @@ const { render, observer } = Observer;
 @observer
 export class Time extends Component {
   @property(Label)
-  private readonly halfLabel: Label = null;
+  halfLabel: Label = null;
 
   @property(Label)
-  private readonly minutesLabel: Label = null;
+  minutesLabel: Label = null;
 
   @property(Label)
-  private readonly secondsLabel: Label = null;
+  secondsLabel: Label = null;
 
   minutes = 0;
   seconds = 0;
@@ -28,12 +28,12 @@ export class Time extends Component {
   }
 
   @render(TimeStore, (store) => store.paused)
-  private syncPaused(paused: boolean) {
+  syncPaused(paused: boolean) {
     this.paused = paused;
   }
 
   @render(TimeStore, (store) => store.matchLiveTime)
-  private syncMatchLiveTime(matchLiveTime: number) {
+  syncMatchLiveTime(matchLiveTime: number) {
     this.minutes = matchLiveTime;
     this.seconds = 0;
     this.secondsLabel.string = "00";
@@ -41,12 +41,12 @@ export class Time extends Component {
   }
 
   @render(TimeStore, (store) => store.halfIndex)
-  private syncHalf(halfIndex: number) {
+  syncHalf(halfIndex: number) {
     this.halfLabel.string =
       halfIndex === 0 ? t("Common.1st_half") : t("Common.2nd_half");
   }
 
-  updateSecondTimer() {
+  private updateSecondTimer() {
     if (!this.paused) {
       if (this.seconds < 59) {
         this.seconds += 1;
