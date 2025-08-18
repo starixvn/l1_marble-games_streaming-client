@@ -101,9 +101,11 @@ export class Startup extends Component {
     const currentEventDetail =
       eventData.eventDetails[eventData.currentEventIndex];
 
-    this.updateVideoUrl(currentEventDetail.playlist);
-
-    this.updateVideoTime(currentEventDetail.videoLiveTimeMs);
+    this.updateVideoStore({
+      videoLiveTimeMs: currentEventDetail.videoLiveTimeMs,
+      currentPhase: eventData.currentPhase,
+      url: currentEventDetail.playlist,
+    });
 
     this.updateTimeStore({
       matchLiveTime: eventData.matchLiveTimeMs,
@@ -127,16 +129,19 @@ export class Startup extends Component {
     return data;
   }
 
-  @handle(VideoStore, (store, url: string) => store.updateUrlFromEventData(url))
-  private updateVideoUrl(url: string) {
-    return url;
-  }
-
-  @handle(VideoStore, (store, videoLiveTimeMs: number) =>
-    store.updateVideoTime(videoLiveTimeMs)
+  @handle(
+    VideoStore,
+    (
+      store,
+      data: { videoLiveTimeMs: number; currentPhase: Phase; url: string }
+    ) => store.update(data)
   )
-  private updateVideoTime(videoLiveTimeMs: number) {
-    return videoLiveTimeMs;
+  private updateVideoStore(data: {
+    videoLiveTimeMs: number;
+    currentPhase: Phase;
+    url: string;
+  }) {
+    return data;
   }
 
   @handle(TimeStore, (store, data: TimeStore) => store.update(data))

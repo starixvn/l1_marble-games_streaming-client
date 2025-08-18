@@ -69,8 +69,7 @@ export class StageManager extends Component {
     const mapping = {
       [Phase.ScheduleEvent]: "prebetting",
       [Phase.UpdateOdds]: data.eventIndex === 0 ? "prebetting" : "streaming",
-      [Phase.UpdatePreloadVideoInfo]:
-        data.eventIndex === 0 ? "prebetting" : "halftime",
+      [Phase.UpdatePreloadVideoInfo]: this.current,
       [Phase.UpdateVideoInfo]: "streaming",
       [Phase.UpdateResult]: isHalfTime ? "halftime" : "fulltime",
     };
@@ -87,7 +86,6 @@ export class StageManager extends Component {
       this.current = stage;
 
       this.scheduledCallback = () => {
-        console.log("scheduled callback");
         if (data.result === "D") {
           this.current = "draw";
         } else {

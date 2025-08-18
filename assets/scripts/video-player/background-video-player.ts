@@ -3,6 +3,8 @@ import Hls from "hls.js";
 import Observer from "observer";
 import { DOMBackgroundVideo } from "./dom-background-video";
 import { VideoStore } from "./video-store";
+import { StreamingStore } from "../streaming/streaming-store";
+import { Phase } from "../streaming/streaming-type";
 
 const { ccclass } = _decorator;
 const { observer, render } = Observer;
@@ -21,13 +23,8 @@ export class BackgroundVideoPlayer extends Component {
 
   currentTime = 0;
 
-  @render(VideoStore, (store) => ({
-    url: store.url,
-    currentTime: store.videoLiveTime,
-  }))
-  load({ url, currentTime }: { url: string; currentTime: number }) {
-    this.currentTime = currentTime;
-
+  @render(VideoStore, (store) => store.url)
+  load(url: string) {
     if (url && this._url !== url) {
       if (!this.initialized) {
         this.initialize();
@@ -36,6 +33,18 @@ export class BackgroundVideoPlayer extends Component {
       this._url = url;
 
       this.hls.loadSource(this._url);
+      this.pause();
+    }
+  }
+
+  @render(VideoStore, (store) => ({
+    phase: store.currentPhase,
+    videoLiveTime: store.videoLiveTime,
+  }))
+  playVideo({ phase, videoLiveTime }: { phase: Phase; videoLiveTime: number }) {
+    if (phase === Phase.UpdateVideoInfo) {
+      this.currentTime = videoLiveTime;
+      this.syncCurrentTime();
       this.play();
     }
   }
@@ -90,12 +99,6 @@ export class BackgroundVideoPlayer extends Component {
       this.hls.detachMedia();
       this.hls.destroy();
     }
-  }
-
-  @render(VideoStore, (store) => store.videoLiveTime)
-  updateCurrentTime(videoLiveTime: number) {
-    this.currentTime = videoLiveTime;
-    this.syncCurrentTime();
   }
 
   private syncCurrentTime() {
