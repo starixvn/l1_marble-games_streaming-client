@@ -23,6 +23,7 @@ export type EventStreamPayload = {
 export enum Phase {
   ScheduleEvent = "ScheduleEvent",
   UpdateOdds = "UpdateOdds",
+  UpdatePreloadVideoInfo = "UpdatePreloadVideoInfo",
   UpdateVideoInfo = "UpdateVideoInfo",
   UpdateGoalInfo = "UpdateGoalInfo",
   UpdateResult = "UpdateResult",

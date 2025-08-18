@@ -70,6 +70,7 @@ export class TimeStore {
 
   isTimerPaused() {
     return (
+      this.currentPhase === Phase.UpdatePreloadVideoInfo ||
       (this.halfIndex === 0 &&
         this.matchLiveTime === gameSettings.halfDuration) ||
       this.matchLiveTime === gameSettings.halfDuration * 2
