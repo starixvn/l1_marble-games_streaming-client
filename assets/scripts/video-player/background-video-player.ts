@@ -3,7 +3,6 @@ import Hls from "hls.js";
 import Observer from "observer";
 import { DOMBackgroundVideo } from "./dom-background-video";
 import { VideoStore } from "./video-store";
-import { StreamingStore } from "../streaming/streaming-store";
 import { Phase } from "../streaming/streaming-type";
 
 const { ccclass } = _decorator;
