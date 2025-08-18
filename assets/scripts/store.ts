@@ -26,7 +26,7 @@ export class Store {
       host = "mgtv.lumigame.com";
     }
 
-    const root = host.split(".").slice(1).join(".");
+    const root = host.split(".").slice(-2).join(".");
     const domain = `mgstreaming.${root}`;
 
     return `https://${domain}/live/${this.game}`;
