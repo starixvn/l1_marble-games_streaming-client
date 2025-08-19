@@ -1,3 +1,4 @@
+import { Phase } from "../../../assets/scripts/streaming/streaming-type";
 import { VideoStore } from "../../../assets/scripts/video-player/video-store";
 
 describe("VideoStore", () => {
@@ -55,5 +56,38 @@ describe("VideoStore", () => {
     store.enableDefaultBackground(false);
     // Assert
     expect(store.defaultBackgroundEnabled).toBe(false);
+  });
+
+  describe("updateVideoTime", () => {
+    it("should update video live time", () => {
+      // Act
+      store.updateVideoTime(1500);
+      // Assert
+      expect(store.videoLiveTime).toBe(1.5);
+    });
+  });
+
+  describe("updateCurrentPhase", () => {
+    it("should update current phase", () => {
+      // Act
+      store.updateCurrentPhase(Phase.UpdateVideoInfo);
+      // Assert
+      expect(store.currentPhase).toBe(Phase.UpdateVideoInfo);
+    });
+  });
+
+  describe("update", () => {
+    it("should update all fields", () => {
+      // Act
+      store.update({
+        videoLiveTimeMs: 1500,
+        currentPhase: Phase.UpdateVideoInfo,
+        url: "https://example.com/stream.m3u8",
+      });
+      // Assert
+      expect(store.videoLiveTime).toBe(1.5);
+      expect(store.currentPhase).toBe(Phase.UpdateVideoInfo);
+      expect(store.url).toBe("https://example.com/stream.m3u8");
+    });
   });
 });
