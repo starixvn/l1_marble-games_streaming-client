@@ -83,11 +83,13 @@ describe("VideoStore", () => {
         videoLiveTimeMs: 1500,
         currentPhase: Phase.UpdateVideoInfo,
         url: "https://example.com/stream.m3u8",
+        halfIndex: 0,
       });
       // Assert
       expect(store.videoLiveTime).toBe(1.5);
       expect(store.currentPhase).toBe(Phase.UpdateVideoInfo);
       expect(store.url).toBe("https://example.com/stream.m3u8");
+      expect(store.halfIndex).toBe(0);
     });
   });
 });

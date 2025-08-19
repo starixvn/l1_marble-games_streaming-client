@@ -394,6 +394,154 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
+  describe("playVideo", () => {
+    beforeEach(() => {
+      (player as any).native = mockVideoElement;
+      (player as any).hls = mockHlsInstance;
+    });
+
+    describe("should play video for valid phases", () => {
+      it("should play video when phase is UpdateVideoInfo", () => {
+        // Arrange
+        const testTime = 15;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdateVideoInfo,
+          halfIndex: 1,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(playSpy).toHaveBeenCalled();
+      });
+
+      it("should play video when phase is ScheduleEvent", () => {
+        // Arrange
+        const testTime = 25;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.ScheduleEvent,
+          halfIndex: 2,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(playSpy).toHaveBeenCalled();
+      });
+
+      it("should play video when phase is UpdateResult and halfIndex is 0", () => {
+        // Arrange
+        const testTime = 35;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdateResult,
+          halfIndex: 0,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(playSpy).toHaveBeenCalled();
+      });
+    });
+
+    describe("should not play video for invalid conditions", () => {
+      it("should not play video when phase is UpdateResult and halfIndex is not 0", () => {
+        // Arrange
+        const testTime = 45;
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdateResult,
+          halfIndex: 1,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime); // should not change
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(playSpy).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdateOdds", () => {
+        // Arrange
+        const testTime = 55;
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdateOdds,
+          halfIndex: 0,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime); // should not change
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(playSpy).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdatePreloadVideoInfo", () => {
+        // Arrange
+        const testTime = 65;
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdatePreloadVideoInfo,
+          halfIndex: 0,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime); // should not change
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(playSpy).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdateGoalInfo", () => {
+        // Arrange
+        const testTime = 75;
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+        const playSpy = jest.spyOn(player, "play");
+
+        // Act
+        mockVideoStore.update({
+          videoLiveTime: testTime,
+          currentPhase: Phase.UpdateGoalInfo,
+          halfIndex: 0,
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime); // should not change
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(playSpy).not.toHaveBeenCalled();
+      });
+    });
+  });
+
   describe("@render VideoStore videoLiveTime", () => {
     beforeEach(() => {
       (player as any).native = mockVideoElement;

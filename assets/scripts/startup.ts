@@ -22,6 +22,7 @@ import { Phase } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { TimeStore } from "./time/time-store";
 import { VideoStore } from "./video-player/video-store";
+import { gameSettings } from "./game-settings";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -40,6 +41,16 @@ window.addEventListener("message", handleWindowMessage(container));
 @ccclass
 @observer
 export class Startup extends Component {
+
+  game = "";
+  operator = ""
+
+  @render(Store, (store) => store)
+  private loadOperator(store: Store) {
+    this.operator = store.operator;
+    this.game = store.game;
+  }
+
   @property(Node)
   private readonly infoLayer: Node = null;
 
@@ -56,7 +67,9 @@ export class Startup extends Component {
   }
 
   @handle(StreamingHandler, (handler) => handler.connect())
-  private loadStreaming() {}
+  private loadStreaming() {
+    // trigger handler, no need function body
+  }
 
   private onLoadedInfoLayer() {
     return (err: Error, prefab: Prefab) => {
@@ -98,13 +111,29 @@ export class Startup extends Component {
       away: firstHalfAwayScore,
     });
 
+    const defaultPlaylist = `${gameSettings.streamingUrl}${this.operator}_${this.game}_intro.m3u8`;
+
     const currentEventDetail =
       eventData.eventDetails[eventData.currentEventIndex];
 
+    const isHalfTime = eventData.currentEventIndex === 0 || eventData.matchLiveTimeMs / 1000 <= gameSettings.videoDuration;
+    
+    const truePlaylist = 
+      currentEventDetail.playlist && currentEventDetail.playlist !== ""
+        ? currentEventDetail.playlist
+        : defaultPlaylist;
+    
+    const videoLiveTime = 
+      eventData.currentPhase === Phase.ScheduleEvent || eventData.currentPhase === Phase.UpdateResult
+        ? 0 
+        : currentEventDetail.videoLiveTimeMs;
+
+
     this.updateVideoStore({
-      videoLiveTimeMs: currentEventDetail.videoLiveTimeMs,
+      videoLiveTimeMs: videoLiveTime,
       currentPhase: eventData.currentPhase,
-      url: currentEventDetail.playlist,
+      url: truePlaylist,
+      halfIndex: isHalfTime ? 0 : 1,
     });
 
     this.updateTimeStore({
@@ -133,13 +162,14 @@ export class Startup extends Component {
     VideoStore,
     (
       store,
-      data: { videoLiveTimeMs: number; currentPhase: Phase; url: string }
+      data: { videoLiveTimeMs: number; currentPhase: Phase; url: string; halfIndex: number }
     ) => store.update(data)
   )
   private updateVideoStore(data: {
     videoLiveTimeMs: number;
     currentPhase: Phase;
     url: string;
+    halfIndex: number;
   }) {
     return data;
   }

@@ -39,9 +39,10 @@ export class BackgroundVideoPlayer extends Component {
   @render(VideoStore, (store) => ({
     phase: store.currentPhase,
     videoLiveTime: store.videoLiveTime,
+    halfIndex: store.halfIndex,
   }))
-  playVideo({ phase, videoLiveTime }: { phase: Phase; videoLiveTime: number }) {
-    if (phase === Phase.UpdateVideoInfo) {
+  playVideo({ phase, videoLiveTime, halfIndex }: { phase: Phase; videoLiveTime: number; halfIndex: number }) {
+    if (phase === Phase.UpdateVideoInfo || phase === Phase.ScheduleEvent || ( phase === Phase.UpdateResult && halfIndex === 0)) {
       this.currentTime = videoLiveTime;
       this.syncCurrentTime();
       this.play();

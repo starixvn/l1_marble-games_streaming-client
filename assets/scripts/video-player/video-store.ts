@@ -11,6 +11,7 @@ export class VideoStore {
   }
 
   url = "";
+  halfIndex = 0;
 
   videoLiveTime = 0;
 
@@ -35,6 +36,10 @@ export class VideoStore {
     this.url = url;
   }
 
+  updateHalfIndex(halfIndex: number) {
+    this.halfIndex = halfIndex;
+  }
+
   updateVideoTime(videoLiveTimeMs: number) {
     this.videoLiveTime = videoLiveTimeMs / 1000;
   }
@@ -43,9 +48,10 @@ export class VideoStore {
     this.currentPhase = currentPhase;
   }
 
-  update(data: { videoLiveTimeMs: number; currentPhase: Phase; url: string }) {
+  update(data: { videoLiveTimeMs: number; currentPhase: Phase; url: string; halfIndex: number }) {
     this.updateVideoTime(data.videoLiveTimeMs);
     this.updateCurrentPhase(data.currentPhase);
     this.updateUrlFromEventData(data.url);
+    this.updateHalfIndex(data.halfIndex);
   }
 }
