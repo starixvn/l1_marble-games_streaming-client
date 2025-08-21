@@ -25,16 +25,16 @@ export class HLSPreloadedVideoPlayer {
     return this._videoPlayer.bandwidthEstimate;
   }
 
-  get currentTime() {
-    return this._videoPlayer.currentTime;
-  }
-
   get currentLevel() {
     return this._videoPlayer.currentLevel;
   }
 
   set currentTime(value: number) {
     this._videoPlayer.currentTime = value;
+  }
+
+  get currentTime() {
+    return this._videoPlayer.currentTime;
   }
 
   set muted(value: boolean) {

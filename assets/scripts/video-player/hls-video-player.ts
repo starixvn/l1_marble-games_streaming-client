@@ -32,14 +32,15 @@ export class HLSVideoPlayer {
       this._video.currentTime = value;
     }
   }
+  
+  get currentTime() {
+    return this._video.currentTime;
+  }
 
   get url() {
     return this._url;
   }
 
-  get currentTime() {
-    return this._video.currentTime;
-  }
 
   get currentLevel() {
     return this._hls.currentLevel;
