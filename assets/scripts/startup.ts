@@ -18,11 +18,12 @@ import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
 import { StreamingHandler } from "./streaming/streaming-handler";
 import { StreamingStore } from "./streaming/streaming-store";
-import { Phase } from "./streaming/streaming-type";
+import { Phase, VideoStatus } from "./streaming/streaming-type";
 import { TeamStore } from "./team/team-store";
 import { TimeStore } from "./time/time-store";
 import { VideoStore } from "./video-player/video-store";
 import { gameSettings } from "./game-settings";
+import { IntroStore } from "./intro/intro-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -49,6 +50,7 @@ export class Startup extends Component {
   private loadOperator(store: Store) {
     this.operator = store.operator;
     this.game = store.game;
+    this.setIntroUrl(`${gameSettings.streamingUrl}${store.operator}_${store.game}_intro.m3u8`);
   }
 
   @property(Node)
@@ -62,7 +64,6 @@ export class Startup extends Component {
   @render(Store, (store) => store.game)
   private loadGame(game: string) {
     resources.load(`games/${game}`, Prefab, this.onLoadedInfoLayer());
-
     this.loadStreaming();
   }
 
@@ -127,7 +128,15 @@ export class Startup extends Component {
       eventData.currentPhase === Phase.ScheduleEvent || eventData.currentPhase === Phase.UpdateResult
         ? 0 
         : currentEventDetail.videoLiveTimeMs;
+    
+    const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
 
+    if (this.isPlayingIntro(eventData)) {
+      this.updateIntroStore({
+        currentTime: introDuration + eventData.matchLiveTimeMs / 1000,
+        status: VideoStatus.Playing,
+      });
+    }
 
     this.updateVideoStore({
       videoLiveTimeMs: videoLiveTime,
@@ -174,6 +183,14 @@ export class Startup extends Component {
     return data;
   }
 
+  @handle(IntroStore, (store, data: IntroStore) => store.update(data))
+  private updateIntroStore(data: {
+    currentTime: number;
+    status: VideoStatus;
+  }) {
+    return data;
+  }
+
   @handle(TimeStore, (store, data: TimeStore) => store.update(data))
   private updateTimeStore(data: {
     matchLiveTime: number;
@@ -181,5 +198,19 @@ export class Startup extends Component {
     currentPhase: Phase;
   }) {
     return data;
+  }
+
+  @handle(IntroStore, (store, url: string) => store.setUrl(url))
+  private setIntroUrl(url: string) {
+    return url;
+  }
+
+  private isPlayingIntro({ currentEventIndex, matchLiveTimeMs, currentPhase }: {
+    currentEventIndex: number;
+    matchLiveTimeMs: number;
+    currentPhase: Phase;
+  }) {
+    const isHalfTime = currentEventIndex === 0 || matchLiveTimeMs / 1000 <= gameSettings.videoDuration;
+    return currentPhase === Phase.ScheduleEvent || (currentPhase === Phase.UpdateResult && isHalfTime);
   }
 }

@@ -52,3 +52,8 @@ export type StreamingState = {
 };
 
 export type Result = "H" | "A" | "D" | null;
+
+export enum VideoStatus {
+  Playing = "playing",
+  Stopped = "stopped",
+}

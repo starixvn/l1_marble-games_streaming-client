@@ -1,9 +1,10 @@
 import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
-import { DOMBackgroundVideo } from "./dom-background-video";
 import { VideoStore } from "./video-store";
 import { Phase } from "../streaming/streaming-type";
+import { IntroStore } from "../intro/intro-store";
+import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
 const { ccclass } = _decorator;
 const { observer, render } = Observer;
@@ -11,29 +12,23 @@ const { observer, render } = Observer;
 @ccclass("BackgroundVideoPlayer")
 @observer
 export class BackgroundVideoPlayer extends Component {
-  private hls: Hls = null;
-  private native: HTMLVideoElement = null;
-
-  private _url = "";
+  private hlsPlayer: HLSPreloadedVideoPlayer = null;
 
   private get initialized() {
-    return !!this.native && !!this.hls;
+    return !!this.hlsPlayer?.initialized;
   }
 
   currentTime = 0;
 
+  @render(IntroStore, (store) => store.url)
+  setIntroUrl(url: string) {
+    this.hlsPlayer.preload(url);
+  }
+
   @render(VideoStore, (store) => store.url)
   load(url: string) {
-    if (url && this._url !== url) {
-      if (!this.initialized) {
-        this.initialize();
-      }
-
-      this._url = url;
-
-      this.hls.loadSource(this._url);
-      this.pause();
-    }
+    this.hlsPlayer.preload(url);
+    this.hlsPlayer.load(url);
   }
 
   @render(VideoStore, (store) => ({
@@ -45,35 +40,26 @@ export class BackgroundVideoPlayer extends Component {
     if (phase === Phase.UpdateVideoInfo || phase === Phase.ScheduleEvent || ( phase === Phase.UpdateResult && halfIndex === 0)) {
       this.currentTime = videoLiveTime;
       this.syncCurrentTime();
-      this.play();
+      this.hlsPlayer.play();
     }
   }
 
   private get bandwidthEstimate() {
-    return this.hls?.bandwidthEstimate ?? 0;
-  }
-
-  play(retry = 0, maxRetry = 3) {
-    // Fix for iOS 17, video element is not playing immediately
-    this.native.play().catch(() => {
-      if (retry < maxRetry) {
-        this.play(retry + 1, maxRetry);
-      }
-    });
+    return this.hlsPlayer?.bandwidthEstimate ?? 0;
   }
 
   pause() {
     if (this.initialized) {
-      this.native.pause();
+      this.hlsPlayer.pause();
     }
   }
 
   set muted(value: boolean) {
-    this.native.muted = value;
+    this.hlsPlayer.muted = value;
   }
 
   get level() {
-    return this.hls?.currentLevel ?? 0;
+    return this.hlsPlayer?.currentLevel ?? 0;
   }
 
   protected lateUpdate(dt: number): void {
@@ -90,64 +76,36 @@ export class BackgroundVideoPlayer extends Component {
 
   stop() {
     if (this.initialized) {
-      this.native.removeEventListener(
+      this.hlsPlayer.removeEventListener(
         "timeupdate",
         this.syncCurrentTime.bind(this)
       );
 
-      this.hls.off(Hls.Events.ERROR);
-      this.hls.detachMedia();
-      this.hls.destroy();
+      this.hlsPlayer.off(Hls.Events.ERROR);
+      this.hlsPlayer.destroy();
     }
   }
 
   private syncCurrentTime() {
-    this.node.emit("syncNativeCurrentTime", this.native.currentTime);
+    this.node.emit("syncNativeCurrentTime", this.hlsPlayer.currentTime);
 
     const needSync =
       this.currentTime >= 0 &&
-      Math.abs(this.currentTime - this.native.currentTime) > 1;
+      Math.abs(this.currentTime - this.hlsPlayer.currentTime) > 1;
 
     if (this.initialized && needSync) {
-      this.native.currentTime = this.currentTime;
+      this.hlsPlayer.currentTime = this.currentTime;
     }
   }
 
   private initialize() {
-    const video = DOMBackgroundVideo.createOrLoadVideoElement();
+    this.hlsPlayer = new HLSPreloadedVideoPlayer();
+    this.hlsPlayer.init();
 
-    if (!Hls.isSupported()) {
-      this.node.emit("hlsNotSupported");
-      throw new Error("Hls.js is not supported.");
-    }
-
-    const hls = new Hls({
-      startLevel: -1,
-      capLevelToPlayerSize: true,
-      lowLatencyMode: true,
-      liveSyncDuration: 0.9,
-      liveMaxLatencyDuration: 1,
-      enableWorker: false,
-    });
-
-    video.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
-    hls.attachMedia(video);
+    this.hlsPlayer.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
 
     Object.values(Hls.Events).forEach((event) => {
-      hls.on(event, this.node.emit.bind(this.node));
+      this.hlsPlayer.addEventListener(event, this.node.emit.bind(this.node));
     });
-
-    hls.on(Hls.Events.ERROR, (event, data) => {
-      this.node.emit(event, {
-        ...data,
-        video: this._url,
-        bandwidth: this.bandwidthEstimate,
-      });
-      this.syncCurrentTime();
-      console.log("error", event, data);
-    });
-
-    this.hls = hls;
-    this.native = video;
   }
 }

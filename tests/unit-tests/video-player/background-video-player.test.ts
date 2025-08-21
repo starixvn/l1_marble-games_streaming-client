@@ -1,43 +1,40 @@
-import { createMockStore, cleanupMockObserver } from "../../utils/mock-store";
+import { createMockStore, cleanupMockObserver, initializeMockContainer } from "../../utils/mock-store";
 
-const mockHlsInstance = {
-  loadSource: jest.fn(),
-  attachMedia: jest.fn(),
-  detachMedia: jest.fn(),
-  destroy: jest.fn(),
-  on: jest.fn(),
-  off: jest.fn(),
-  currentLevel: 0,
+// Mock HLSPreloadedVideoPlayer
+const mockHLSPreloadedVideoPlayer = {
+  initialized: false,
   bandwidthEstimate: 1000,
+  currentTime: 0,
+  currentLevel: 0,
+  url: "",
+  muted: false,
+  init: jest.fn(),
+  preload: jest.fn(),
+  load: jest.fn(),
+  play: jest.fn(),
+  pause: jest.fn(),
+  destroy: jest.fn(),
+  addEventListener: jest.fn(),
+  removeEventListener: jest.fn(),
+  off: jest.fn(),
 };
 
-const mockHls = jest.fn().mockImplementation(() => mockHlsInstance) as any;
-mockHls.isSupported = jest.fn();
-mockHls.Events = {
-  ERROR: "hlsError",
-  MEDIA_DETACHED: "hlsMediaDetached",
-  MANIFEST_LOADING: "hlsManifestLoading",
-  LEVEL_LOADED: "hlsLevelLoaded",
-  MEDIA_ATTACHED: "hlsMediaAttached",
-  MANIFEST_PARSED: "hlsManifestParsed",
+jest.mock("../../../assets/scripts/video-player/preloaded-hls-player", () => ({
+  HLSPreloadedVideoPlayer: jest.fn().mockImplementation(() => mockHLSPreloadedVideoPlayer)
+}));
+
+const mockHls = {
+  Events: {
+    ERROR: "hlsError",
+    MEDIA_DETACHED: "hlsMediaDetached",
+    MANIFEST_LOADING: "hlsManifestLoading",
+    LEVEL_LOADED: "hlsLevelLoaded",
+    MEDIA_ATTACHED: "hlsMediaAttached",
+    MANIFEST_PARSED: "hlsManifestParsed",
+  }
 };
 
 jest.mock("hls.js", () => mockHls);
-
-const mockVideoElement = {
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
-  play: jest.fn().mockResolvedValue(undefined),
-  pause: jest.fn(),
-  currentTime: 0,
-  muted: false,
-};
-
-jest.mock("../../../assets/scripts/video-player/dom-background-video", () => ({
-  DOMBackgroundVideo: {
-    createOrLoadVideoElement: jest.fn().mockReturnValue(mockVideoElement),
-  },
-}));
 
 jest.mock("observer", () => {
   const { createMockObserver } = require("../../utils/mock-store");
@@ -54,14 +51,21 @@ jest.mock("cc", () => ({
   },
   Component: class MockComponent {
     node = mockNode;
+    
+    protected lateUpdate(dt: number): void {
+      // Mock implementation
+    }
+    
+    protected onDestroy(): void {
+      // Mock implementation
+    }
   },
 }));
 
 import { BackgroundVideoPlayer } from "../../../assets/scripts/video-player/background-video-player";
 import { VideoStore } from "../../../assets/scripts/video-player/video-store";
-import { DOMBackgroundVideo } from "../../../assets/scripts/video-player/dom-background-video";
-import Hls from "hls.js";
-import { Phase } from "db://assets/scripts/streaming/streaming-type";
+import { IntroStore } from "../../../assets/scripts/intro/intro-store";
+import { Phase, VideoStatus } from "../../../assets/scripts/streaming/streaming-type";
 
 describe("BackgroundVideoPlayer", () => {
   let player: BackgroundVideoPlayer;
@@ -69,12 +73,25 @@ describe("BackgroundVideoPlayer", () => {
     update: (props: Partial<VideoStore>) => void;
     reset: (props: Partial<VideoStore>) => void;
   };
+  let mockIntroStore: IntroStore & {
+    update: (props: Partial<IntroStore>) => void;
+    reset: (props: Partial<IntroStore>) => void;
+  };
 
   beforeAll(() => {
+    initializeMockContainer();
+    
     mockVideoStore = createMockStore(VideoStore, {
       url: "",
       videoLiveTime: 0,
-      defaultBackgroundEnabled: false,
+      currentPhase: Phase.ScheduleEvent,
+      halfIndex: 0,
+    });
+
+    mockIntroStore = createMockStore(IntroStore, {
+      url: "",
+      currentTime: 0,
+      status: VideoStatus.Stopped,
     });
 
     player = new BackgroundVideoPlayer();
@@ -89,190 +106,270 @@ describe("BackgroundVideoPlayer", () => {
     mockVideoStore.reset({
       url: "",
       videoLiveTime: 0,
-      defaultBackgroundEnabled: false,
+      currentPhase: Phase.ScheduleEvent,
+      halfIndex: 0,
+    });
+
+    mockIntroStore.reset({
+      url: "",
+      currentTime: 0,
+      status: VideoStatus.Stopped,
     });
 
     jest.clearAllMocks();
 
     player.currentTime = 0;
-    (player as any)._url = "";
-    (player as any).hls = null;
-    (player as any).native = null;
-
-    mockHls.isSupported.mockReturnValue(true);
-    mockHlsInstance.currentLevel = 0;
-    mockHlsInstance.bandwidthEstimate = 1000;
-    mockVideoElement.currentTime = 0;
-    mockVideoElement.muted = false;
-    mockVideoElement.play.mockResolvedValue(undefined);
+    
+    // Set up mock player instance on the component
+    (player as any).hlsPlayer = mockHLSPreloadedVideoPlayer;
+    
+    mockHLSPreloadedVideoPlayer.initialized = false;
+    mockHLSPreloadedVideoPlayer.bandwidthEstimate = 1000;
+    mockHLSPreloadedVideoPlayer.currentTime = 0;
+    mockHLSPreloadedVideoPlayer.currentLevel = 0;
+    mockHLSPreloadedVideoPlayer.url = "";
+    mockHLSPreloadedVideoPlayer.muted = false;
   });
 
-  describe("@render VideoStore url and videoLiveTime", () => {
-    it("should load video when url changes", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-
-      // Act
-      mockVideoStore.update({ url: testUrl });
-
+  describe("initialization", () => {
+    it("should initialize with default values", () => {
       // Assert
-      expect((player as any)._url).toBe(testUrl);
-      expect(mockHlsInstance.loadSource).toHaveBeenCalledWith(testUrl);
+      expect(player.currentTime).toBe(0);
+      expect((player as any).hlsPlayer).toBeDefined();
     });
 
-    it("should not reload video when url is same", () => {
+    it("should not be initialized by default", () => {
+      // Assert
+      expect((player as any).initialized).toBe(false);
+    });
+  });
+
+  describe("setIntroUrl method", () => {
+    it("should call preload when intro url is set", () => {
       // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-      (player as any)._url = testUrl;
+      const testUrl = "https://example.com/intro.m3u8";
 
       // Act
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 10 });
+      (player as any).setIntroUrl(testUrl);
 
       // Assert
-      expect(mockHlsInstance.loadSource).not.toHaveBeenCalled();
-      expect(mockVideoElement.play).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.preload).toHaveBeenCalledWith(testUrl);
     });
 
-    it("should not load video when url is empty", () => {
-      // Arrange
-
+    it("should handle empty intro url", () => {
       // Act
-      mockVideoStore.update({ url: "", videoLiveTime: 5 });
+      (player as any).setIntroUrl("");
 
       // Assert
-      expect(mockHlsInstance.loadSource).not.toHaveBeenCalled();
-      expect(mockVideoElement.play).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.preload).toHaveBeenCalledWith("");
+    });
+  });
+
+  describe("load method", () => {
+    it("should call preload and load when video url is set", () => {
+      // Arrange
+      const testUrl = "https://example.com/video.m3u8";
+
+      // Act
+      (player as any).load(testUrl);
+
+      // Assert
+      expect(mockHLSPreloadedVideoPlayer.preload).toHaveBeenCalledWith(testUrl);
+      expect(mockHLSPreloadedVideoPlayer.load).toHaveBeenCalledWith(testUrl);
     });
 
-    it("should initialize player when loading first video", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-
+    it("should handle empty video url", () => {
       // Act
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
+      (player as any).load("");
 
       // Assert
-      expect(DOMBackgroundVideo.createOrLoadVideoElement).toHaveBeenCalled();
-      expect(Hls).toHaveBeenCalledWith({
-        startLevel: -1,
-        capLevelToPlayerSize: true,
-        lowLatencyMode: true,
-        liveSyncDuration: 0.9,
-        liveMaxLatencyDuration: 1,
-        enableWorker: false,
+      expect(mockHLSPreloadedVideoPlayer.preload).toHaveBeenCalledWith("");
+      expect(mockHLSPreloadedVideoPlayer.load).toHaveBeenCalledWith("");
+    });
+  });
+
+  describe("playVideo method", () => {
+    beforeEach(() => {
+      mockHLSPreloadedVideoPlayer.initialized = true;
+    });
+
+    describe("should play video for valid phases", () => {
+      it("should play video when phase is UpdateVideoInfo", () => {
+        // Arrange
+        const testTime = 15;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdateVideoInfo,
+          videoLiveTime: testTime,
+          halfIndex: 0
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).toHaveBeenCalled();
       });
-      expect(mockHlsInstance.attachMedia).toHaveBeenCalledWith(
-        mockVideoElement
-      );
-      expect(mockVideoElement.addEventListener).toHaveBeenCalledWith(
-        "timeupdate",
-        expect.any(Function)
-      );
+
+      it("should play video when phase is ScheduleEvent", () => {
+        // Arrange
+        const testTime = 25;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.ScheduleEvent,
+          videoLiveTime: testTime,
+          halfIndex: 1
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).toHaveBeenCalled();
+      });
+
+      it("should play video when phase is UpdateResult and halfIndex is 0", () => {
+        // Arrange
+        const testTime = 35;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdateResult,
+          videoLiveTime: testTime,
+          halfIndex: 0
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(testTime);
+        expect(syncSpy).toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).toHaveBeenCalled();
+      });
+    });
+
+    describe("should not play video for invalid conditions", () => {
+      it("should not play video when phase is UpdateResult and halfIndex is not 0", () => {
+        // Arrange
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdateResult,
+          videoLiveTime: 40,
+          halfIndex: 1
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime);
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdateOdds", () => {
+        // Arrange
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdateOdds,
+          videoLiveTime: 50,
+          halfIndex: 0
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime);
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdatePreloadVideoInfo", () => {
+        // Arrange
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdatePreloadVideoInfo,
+          videoLiveTime: 60,
+          halfIndex: 0
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime);
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).not.toHaveBeenCalled();
+      });
+
+      it("should not play video when phase is UpdateGoalInfo", () => {
+        // Arrange
+        const initialTime = player.currentTime;
+        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
+
+        // Act
+        (player as any).playVideo({
+          phase: Phase.UpdateGoalInfo,
+          videoLiveTime: 70,
+          halfIndex: 0
+        });
+
+        // Assert
+        expect(player.currentTime).toBe(initialTime);
+        expect(syncSpy).not.toHaveBeenCalled();
+        expect(mockHLSPreloadedVideoPlayer.play).not.toHaveBeenCalled();
+      });
     });
   });
 
-  describe("play", () => {
-    beforeEach(() => {
-      (player as any).native = mockVideoElement;
-      (player as any).hls = mockHlsInstance;
-    });
-
-    it("should call native play method", () => {
+  describe("pause method", () => {
+    it("should call hlsPlayer pause when initialized", () => {
       // Arrange
-
-      // Act
-      player.play();
-
-      // Assert
-      expect(mockVideoElement.play).toHaveBeenCalled();
-    });
-
-    it("should retry play on failure up to maxRetry times", async () => {
-      // Arrange
-      const maxRetry = 3;
-      mockVideoElement.play.mockRejectedValue(new Error("Play failed"));
-      const playSpy = jest.spyOn(player, "play");
-
-      // Act
-      player.play(0, maxRetry);
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      // Assert
-      expect(playSpy).toHaveBeenCalledTimes(maxRetry + 1);
-    });
-
-    it("should stop retrying after maxRetry attempts", async () => {
-      // Arrange
-      const maxRetry = 2;
-      mockVideoElement.play.mockRejectedValue(new Error("Play failed"));
-      const playSpy = jest.spyOn(player, "play");
-
-      // Act
-      player.play(0, maxRetry);
-      await new Promise((resolve) => setTimeout(resolve, 0));
-
-      // Assert
-      expect(playSpy).toHaveBeenCalledTimes(maxRetry + 1);
-    });
-  });
-
-  describe("pause", () => {
-    it("should call native pause when initialized", () => {
-      // Arrange
-      (player as any).native = mockVideoElement;
-      (player as any).hls = mockHlsInstance;
+      mockHLSPreloadedVideoPlayer.initialized = true;
 
       // Act
       player.pause();
 
       // Assert
-      expect(mockVideoElement.pause).toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.pause).toHaveBeenCalled();
     });
 
-    it("should not call native pause when not initialized", () => {
+    it("should not call hlsPlayer pause when not initialized", () => {
       // Arrange
-      (player as any).native = null;
-      (player as any).hls = null;
+      mockHLSPreloadedVideoPlayer.initialized = false;
 
       // Act
       player.pause();
 
       // Assert
-      expect(mockVideoElement.pause).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.pause).not.toHaveBeenCalled();
     });
   });
 
-  describe("set muted", () => {
-    beforeEach(() => {
-      (player as any).native = mockVideoElement;
-    });
-
-    it("should set native muted property to true", () => {
-      // Arrange
-
+  describe("muted property", () => {
+    it("should set hlsPlayer muted property to true", () => {
       // Act
       player.muted = true;
 
       // Assert
-      expect(mockVideoElement.muted).toBe(true);
+      expect(mockHLSPreloadedVideoPlayer.muted).toBe(true);
     });
 
-    it("should set native muted property to false", () => {
-      // Arrange
-
+    it("should set hlsPlayer muted property to false", () => {
       // Act
       player.muted = false;
 
       // Assert
-      expect(mockVideoElement.muted).toBe(false);
+      expect(mockHLSPreloadedVideoPlayer.muted).toBe(false);
     });
   });
 
-  describe("get level", () => {
-    it("should return hls currentLevel when initialized", () => {
+  describe("level property", () => {
+    it("should return hlsPlayer currentLevel when initialized", () => {
       // Arrange
-      (player as any).hls = mockHlsInstance;
-      mockHlsInstance.currentLevel = 2;
+      mockHLSPreloadedVideoPlayer.currentLevel = 2;
 
       // Act
       const level = player.level;
@@ -281,9 +378,9 @@ describe("BackgroundVideoPlayer", () => {
       expect(level).toBe(2);
     });
 
-    it("should return 0 when hls is null", () => {
+    it("should return 0 when hlsPlayer is null", () => {
       // Arrange
-      (player as any).hls = null;
+      (player as any).hlsPlayer = null;
 
       // Act
       const level = player.level;
@@ -293,11 +390,10 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
-  describe("get bandwidthEstimate", () => {
-    it("should return hls bandwidthEstimate when initialized", () => {
+  describe("bandwidthEstimate property", () => {
+    it("should return hlsPlayer bandwidthEstimate when initialized", () => {
       // Arrange
-      (player as any).hls = mockHlsInstance;
-      mockHlsInstance.bandwidthEstimate = 5000;
+      mockHLSPreloadedVideoPlayer.bandwidthEstimate = 5000;
 
       // Act
       const bandwidth = (player as any).bandwidthEstimate;
@@ -306,9 +402,9 @@ describe("BackgroundVideoPlayer", () => {
       expect(bandwidth).toBe(5000);
     });
 
-    it("should return 0 when hls is null", () => {
+    it("should return 0 when hlsPlayer is null", () => {
       // Arrange
-      (player as any).hls = null;
+      (player as any).hlsPlayer = null;
 
       // Act
       const bandwidth = (player as any).bandwidthEstimate;
@@ -318,22 +414,21 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
-  describe("lateUpdate", () => {
-    it("should increment currentTime by delta time", () => {
+  describe("lateUpdate method", () => {
+    it("should increment currentTime by dt", () => {
       // Arrange
-      const initialTime = 5;
-      const deltaTime = 0.016;
-      player.currentTime = initialTime;
+      player.currentTime = 10;
+      const dt = 0.016; // ~60fps
 
       // Act
-      (player as any).lateUpdate(deltaTime);
+      (player as any).lateUpdate(dt);
 
       // Assert
-      expect(player.currentTime).toBe(initialTime + deltaTime);
+      expect(player.currentTime).toBeCloseTo(10.016);
     });
   });
 
-  describe("onLoad", () => {
+  describe("onLoad method", () => {
     it("should call initialize method", () => {
       // Arrange
       const initializeSpy = jest.spyOn(player as any, "initialize");
@@ -346,7 +441,7 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
-  describe("onDestroy", () => {
+  describe("onDestroy method", () => {
     it("should call stop method", () => {
       // Arrange
       const stopSpy = jest.spyOn(player, "stop");
@@ -359,387 +454,131 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
-  describe("stop", () => {
+  describe("stop method", () => {
     it("should cleanup resources when initialized", () => {
       // Arrange
-      (player as any).native = mockVideoElement;
-      (player as any).hls = mockHlsInstance;
+      mockHLSPreloadedVideoPlayer.initialized = true;
 
       // Act
       player.stop();
 
       // Assert
-      expect(mockVideoElement.removeEventListener).toHaveBeenCalledWith(
+      expect(mockHLSPreloadedVideoPlayer.removeEventListener).toHaveBeenCalledWith(
         "timeupdate",
         expect.any(Function)
       );
-      expect(mockHlsInstance.off).toHaveBeenCalledWith(mockHls.Events.ERROR);
-      expect(mockHlsInstance.detachMedia).toHaveBeenCalled();
-      expect(mockHlsInstance.destroy).toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.off).toHaveBeenCalledWith(mockHls.Events.ERROR);
+      expect(mockHLSPreloadedVideoPlayer.destroy).toHaveBeenCalled();
     });
 
     it("should not cleanup when not initialized", () => {
       // Arrange
-      (player as any).native = null;
-      (player as any).hls = null;
+      mockHLSPreloadedVideoPlayer.initialized = false;
 
       // Act
       player.stop();
 
       // Assert
-      expect(mockVideoElement.removeEventListener).not.toHaveBeenCalled();
-      expect(mockHlsInstance.off).not.toHaveBeenCalled();
-      expect(mockHlsInstance.detachMedia).not.toHaveBeenCalled();
-      expect(mockHlsInstance.destroy).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.removeEventListener).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.off).not.toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.destroy).not.toHaveBeenCalled();
     });
   });
 
-  describe("playVideo", () => {
+  describe("syncCurrentTime method", () => {
     beforeEach(() => {
-      (player as any).native = mockVideoElement;
-      (player as any).hls = mockHlsInstance;
-    });
-
-    describe("should play video for valid phases", () => {
-      it("should play video when phase is UpdateVideoInfo", () => {
-        // Arrange
-        const testTime = 15;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdateVideoInfo,
-          halfIndex: 1,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(testTime);
-        expect(syncSpy).toHaveBeenCalled();
-        expect(playSpy).toHaveBeenCalled();
-      });
-
-      it("should play video when phase is ScheduleEvent", () => {
-        // Arrange
-        const testTime = 25;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.ScheduleEvent,
-          halfIndex: 2,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(testTime);
-        expect(syncSpy).toHaveBeenCalled();
-        expect(playSpy).toHaveBeenCalled();
-      });
-
-      it("should play video when phase is UpdateResult and halfIndex is 0", () => {
-        // Arrange
-        const testTime = 35;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdateResult,
-          halfIndex: 0,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(testTime);
-        expect(syncSpy).toHaveBeenCalled();
-        expect(playSpy).toHaveBeenCalled();
-      });
-    });
-
-    describe("should not play video for invalid conditions", () => {
-      it("should not play video when phase is UpdateResult and halfIndex is not 0", () => {
-        // Arrange
-        const testTime = 45;
-        const initialTime = player.currentTime;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdateResult,
-          halfIndex: 1,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(initialTime); // should not change
-        expect(syncSpy).not.toHaveBeenCalled();
-        expect(playSpy).not.toHaveBeenCalled();
-      });
-
-      it("should not play video when phase is UpdateOdds", () => {
-        // Arrange
-        const testTime = 55;
-        const initialTime = player.currentTime;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdateOdds,
-          halfIndex: 0,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(initialTime); // should not change
-        expect(syncSpy).not.toHaveBeenCalled();
-        expect(playSpy).not.toHaveBeenCalled();
-      });
-
-      it("should not play video when phase is UpdatePreloadVideoInfo", () => {
-        // Arrange
-        const testTime = 65;
-        const initialTime = player.currentTime;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdatePreloadVideoInfo,
-          halfIndex: 0,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(initialTime); // should not change
-        expect(syncSpy).not.toHaveBeenCalled();
-        expect(playSpy).not.toHaveBeenCalled();
-      });
-
-      it("should not play video when phase is UpdateGoalInfo", () => {
-        // Arrange
-        const testTime = 75;
-        const initialTime = player.currentTime;
-        const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-        const playSpy = jest.spyOn(player, "play");
-
-        // Act
-        mockVideoStore.update({
-          videoLiveTime: testTime,
-          currentPhase: Phase.UpdateGoalInfo,
-          halfIndex: 0,
-        });
-
-        // Assert
-        expect(player.currentTime).toBe(initialTime); // should not change
-        expect(syncSpy).not.toHaveBeenCalled();
-        expect(playSpy).not.toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe("@render VideoStore videoLiveTime", () => {
-    beforeEach(() => {
-      (player as any).native = mockVideoElement;
-      (player as any).hls = mockHlsInstance;
-    });
-
-    it("should update currentTime and sync with native", () => {
-      // Arrange
-      const testTime = 15;
-      const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-
-      // Act
-      mockVideoStore.update({
-        videoLiveTime: testTime,
-        currentPhase: Phase.UpdateVideoInfo,
-      });
-
-      // Assert
-      expect(player.currentTime).toBe(testTime);
-      expect(syncSpy).toHaveBeenCalled();
+      mockHLSPreloadedVideoPlayer.initialized = true;
     });
 
     it("should emit syncNativeCurrentTime event", () => {
       // Arrange
-      mockVideoElement.currentTime = 10;
+      mockHLSPreloadedVideoPlayer.currentTime = 25.5;
 
       // Act
-      mockVideoStore.update({
-        videoLiveTime: 5,
-        currentPhase: Phase.UpdateVideoInfo,
-      });
+      (player as any).syncCurrentTime();
 
       // Assert
-      expect(mockNode.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 10);
+      expect(mockNode.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 25.5);
     });
 
-    it("should sync native currentTime when difference is greater than 1 second", () => {
+    it("should sync currentTime when difference is greater than 1 second", () => {
       // Arrange
-      player.currentTime = 10;
-      mockVideoElement.currentTime = 5;
+      player.currentTime = 30;
+      mockHLSPreloadedVideoPlayer.currentTime = 25;
 
       // Act
-      mockVideoStore.update({
-        videoLiveTime: 10,
-        currentPhase: Phase.UpdateVideoInfo,
-      });
+      (player as any).syncCurrentTime();
 
       // Assert
-      expect(mockVideoElement.currentTime).toBe(10);
+      expect(mockHLSPreloadedVideoPlayer.currentTime).toBe(30);
     });
 
-    it("should not sync native currentTime when difference is less than 1 second", () => {
+    it("should not sync currentTime when difference is less than 1 second", () => {
       // Arrange
-      player.currentTime = 10;
-      mockVideoElement.currentTime = 10.5;
+      player.currentTime = 25.5;
+      mockHLSPreloadedVideoPlayer.currentTime = 25;
+      const originalTime = mockHLSPreloadedVideoPlayer.currentTime;
 
       // Act
-      mockVideoStore.update({ videoLiveTime: 10 });
+      (player as any).syncCurrentTime();
 
       // Assert
-      expect(mockVideoElement.currentTime).toBe(10.5);
+      expect(mockHLSPreloadedVideoPlayer.currentTime).toBe(originalTime);
     });
 
     it("should not sync when currentTime is negative", () => {
       // Arrange
-      player.currentTime = -1;
-      mockVideoElement.currentTime = 5;
+      player.currentTime = -5;
+      mockHLSPreloadedVideoPlayer.currentTime = 25;
+      const originalTime = mockHLSPreloadedVideoPlayer.currentTime;
 
       // Act
-      mockVideoStore.update({ videoLiveTime: -1 });
+      (player as any).syncCurrentTime();
 
       // Assert
-      expect(mockVideoElement.currentTime).toBe(5);
+      expect(mockHLSPreloadedVideoPlayer.currentTime).toBe(originalTime);
+    });
+
+    it("should not sync when not initialized", () => {
+      // Arrange
+      mockHLSPreloadedVideoPlayer.initialized = false;
+      player.currentTime = 30;
+      mockHLSPreloadedVideoPlayer.currentTime = 25;
+      const originalTime = mockHLSPreloadedVideoPlayer.currentTime;
+
+      // Act
+      (player as any).syncCurrentTime();
+
+      // Assert
+      expect(mockHLSPreloadedVideoPlayer.currentTime).toBe(originalTime);
     });
   });
 
-  describe("initialization error handling", () => {
-    it("should emit hlsNotSupported and throw error when Hls is not supported", () => {
-      // Arrange
-      mockHls.isSupported.mockReturnValue(false);
-
-      // Act & Assert
-      expect(() => {
-        player.onLoad();
-      }).toThrow("Hls.js is not supported.");
-      expect(mockNode.emit).toHaveBeenCalledWith("hlsNotSupported");
-    });
-
-    it("should setup HLS error event handler with bandwidth data", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-      mockHlsInstance.bandwidthEstimate = 2000;
-
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      const errorCalls = mockHlsInstance.on.mock.calls.filter(
-        (call) => call[0] === mockHls.Events.ERROR
-      );
-      const errorHandler = errorCalls[errorCalls.length - 1]?.[1];
-
+  describe("initialize method", () => {
+    it("should create HLSPreloadedVideoPlayer and set up event listeners", () => {
       // Act
-      const errorData = { type: "networkError", details: "manifestLoadError" };
-      if (errorHandler) {
-        errorHandler(mockHls.Events.ERROR, errorData);
-      }
+      (player as any).initialize();
 
       // Assert
-      expect(mockNode.emit).toHaveBeenCalledWith(mockHls.Events.ERROR, {
-        ...errorData,
-        video: testUrl,
-        bandwidth: 2000,
-      });
-    });
-
-    it("should setup all HLS event listeners", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-
-      // Act
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      // Assert
-      expect(mockHlsInstance.on).toHaveBeenCalledWith(
-        mockHls.Events.ERROR,
+      expect(mockHLSPreloadedVideoPlayer.init).toHaveBeenCalled();
+      expect(mockHLSPreloadedVideoPlayer.addEventListener).toHaveBeenCalledWith(
+        "timeupdate",
         expect.any(Function)
       );
-      expect(mockHlsInstance.on).toHaveBeenCalledTimes(
-        Object.values(mockHls.Events).length + 1
-      );
-    });
-
-    it("should setup generic event listeners for all HLS events", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-
-      // Act
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      // Assert
+      
+      // Verify that HLS events are set up
       Object.values(mockHls.Events).forEach((event) => {
-        expect(mockHlsInstance.on).toHaveBeenCalledWith(
+        expect(mockHLSPreloadedVideoPlayer.addEventListener).toHaveBeenCalledWith(
           event,
           expect.any(Function)
         );
       });
     });
-
-    it("should emit generic HLS events through node", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      const genericHandler = mockHlsInstance.on.mock.calls.find(
-        (call) => call[0] === mockHls.Events.MANIFEST_LOADING
-      )?.[1];
-
-      // Act
-      if (genericHandler) {
-        genericHandler(mockHls.Events.MANIFEST_LOADING, { test: "data" });
-      }
-
-      // Assert
-      expect(mockNode.emit).toHaveBeenCalledWith(
-        mockHls.Events.MANIFEST_LOADING,
-        { test: "data" }
-      );
-    });
-
-    it("should call syncCurrentTime in error handler", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      const errorCalls = mockHlsInstance.on.mock.calls.filter(
-        (call) => call[0] === mockHls.Events.ERROR
-      );
-      const errorHandler = errorCalls[errorCalls.length - 1]?.[1];
-      const syncSpy = jest.spyOn(player as any, "syncCurrentTime");
-
-      // Act
-      if (errorHandler) {
-        errorHandler(mockHls.Events.ERROR, { type: "networkError" });
-      }
-
-      // Assert
-      expect(syncSpy).toHaveBeenCalled();
-    });
-
-    it("should set hls and native properties after initialization", () => {
-      // Arrange
-      const testUrl = "https://example.com/test.m3u8";
-
-      // Act
-      mockVideoStore.update({ url: testUrl, videoLiveTime: 0 });
-
-      // Assert
-      expect((player as any).hls).toBe(mockHlsInstance);
-      expect((player as any).native).toBe(mockVideoElement);
-    });
   });
 });
+
+
+
+
+
+
