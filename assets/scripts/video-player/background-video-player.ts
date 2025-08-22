@@ -18,7 +18,7 @@ export class BackgroundVideoPlayer extends Component {
     return !!this.hlsPlayer?.initialized;
   }
 
-  private _introUrl: string = "";
+  private _introUrl = "";
 
   currentTime = 0;
 
