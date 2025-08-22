@@ -130,7 +130,6 @@ export class DOMBackgroundVideo {
     video.autoplay = true;
     video.preload = "auto";
     video.style.zIndex = HTMLZIndex.HIDDEN;
-    video.style.objectFit = "cover";
   }
 
   private static applyGameStyles(game: HTMLElement) {

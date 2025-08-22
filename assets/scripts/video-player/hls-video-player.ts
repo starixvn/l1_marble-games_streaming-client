@@ -10,6 +10,7 @@ export class HLSVideoPlayer {
   private _hls: Hls = null;
   private _video: HTMLVideoElement = null;
   private _url = "";
+  private _intentionallyMuted = false;
 
   constructor(options: HLSVideoPlayerOptions) {
     this._id = options.id;
@@ -49,6 +50,11 @@ export class HLSVideoPlayer {
   get bandwidthEstimate() {
     return this._hls.bandwidthEstimate;
   }
+  
+  set muted(value: boolean) {
+    this._intentionallyMuted = value;
+    this._video.muted = value;
+  }
 
   init() {
     this._video = DOMBackgroundVideo.createOrLoadVideoElement(this._id);
@@ -66,6 +72,7 @@ export class HLSVideoPlayer {
     });
 
     this._hls.attachMedia(this._video);
+    this.registerVisibilityChangeEvent();
   }
 
   load(url: string, options: {
@@ -98,9 +105,6 @@ export class HLSVideoPlayer {
     this._hls.off(event);
   }
 
-  set muted(value: boolean) {
-    this._video.muted = value;
-  }
 
   addEventListener(event: string, listener: (...args: any[]) => void) {
     this._video.addEventListener(event, listener);
@@ -114,6 +118,7 @@ export class HLSVideoPlayer {
     this._hls.detachMedia();
     this._hls.destroy();
     DOMBackgroundVideo.removeVideoElement(this._id);
+    this.unregisterVisibilityChangeEvent();
   }
 
   private playWithRetry(retry = 0, maxRetry = 3) {
@@ -122,5 +127,26 @@ export class HLSVideoPlayer {
         this.playWithRetry(retry + 1, maxRetry);
       }
     });
+  }
+
+  private registerVisibilityChangeEvent() {
+    document.addEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+  }
+
+  private unregisterVisibilityChangeEvent() {
+    document.removeEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+  }
+
+  private handleVisibilityChange() {
+    if (!this.initialized) {
+      return;
+    }
+
+    if (document.hidden) {
+      this._video.muted = true;
+      return;
+    }
+
+    this._video.muted = this._intentionallyMuted;
   }
 }

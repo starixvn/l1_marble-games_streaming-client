@@ -71,6 +71,8 @@ export class HLSPreloadedVideoPlayer {
       muted: false,
     });
 
+    this._preloadPlayer.muted = true;
+
     DOMBackgroundVideo.genericEventNotifier.addEventListener(GenericBackgroundVideoEvents.SWITCH_BACKGROUND, (event: CustomEvent<BackgroundSwitchEventData>) => {
       const { url } = event.detail;
       DOMBackgroundVideo.changeBackground(this._videoPlayer.id, url);

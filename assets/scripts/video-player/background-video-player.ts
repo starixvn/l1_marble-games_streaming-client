@@ -2,7 +2,7 @@ import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { VideoStore } from "./video-store";
-import { Phase } from "../streaming/streaming-type";
+import { Phase, VideoStatus } from "../streaming/streaming-type";
 import { IntroStore } from "../intro/intro-store";
 import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
@@ -18,11 +18,27 @@ export class BackgroundVideoPlayer extends Component {
     return !!this.hlsPlayer?.initialized;
   }
 
+  private _introUrl: string = "";
+
   currentTime = 0;
 
   @render(IntroStore, (store) => store.url)
   setIntroUrl(url: string) {
+    this._introUrl = url;
     this.hlsPlayer.preload(url);
+  }
+
+  @render(IntroStore, (store) => ({
+    currentTime: store.currentTime,
+    status: store.status,
+  }))
+  playIntro({ currentTime, status }: { currentTime: number; status: VideoStatus }) {
+    if (status === VideoStatus.Playing) {
+      this.hlsPlayer.load(this._introUrl);
+      this.currentTime = currentTime;
+      this.syncCurrentTime();
+      this.hlsPlayer.play();
+    }
   }
 
   @render(VideoStore, (store) => store.url)
@@ -36,8 +52,9 @@ export class BackgroundVideoPlayer extends Component {
     videoLiveTime: store.videoLiveTime,
     halfIndex: store.halfIndex,
   }))
-  playVideo({ phase, videoLiveTime, halfIndex }: { phase: Phase; videoLiveTime: number; halfIndex: number }) {
-    if (phase === Phase.UpdateVideoInfo || phase === Phase.ScheduleEvent || ( phase === Phase.UpdateResult && halfIndex === 0)) {
+  playVideo({ phase, videoLiveTime }: { phase: Phase; videoLiveTime: number; halfIndex: number }) {
+    if (phase === Phase.UpdateVideoInfo) {
+      this.hlsPlayer.preload(this._introUrl);
       this.currentTime = videoLiveTime;
       this.syncCurrentTime();
       this.hlsPlayer.play();
@@ -88,7 +105,6 @@ export class BackgroundVideoPlayer extends Component {
 
   private syncCurrentTime() {
     this.node.emit("syncNativeCurrentTime", this.hlsPlayer.currentTime);
-
     const needSync =
       this.currentTime >= 0 &&
       Math.abs(this.currentTime - this.hlsPlayer.currentTime) > 1;

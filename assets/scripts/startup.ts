@@ -123,18 +123,21 @@ export class Startup extends Component {
       currentEventDetail.playlist && currentEventDetail.playlist !== ""
         ? currentEventDetail.playlist
         : defaultPlaylist;
-    
-    const videoLiveTime = 
-      eventData.currentPhase === Phase.ScheduleEvent || eventData.currentPhase === Phase.UpdateResult
-        ? 0 
-        : currentEventDetail.videoLiveTimeMs;
-    
+    const videoLiveTime = currentEventDetail.videoLiveTimeMs;
     const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
 
+
+
     if (this.isPlayingIntro(eventData)) {
+      const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
       this.updateIntroStore({
-        currentTime: introDuration + eventData.matchLiveTimeMs / 1000,
+        currentTime: introTime,
         status: VideoStatus.Playing,
+      });
+    } else {
+      this.updateIntroStore({
+        currentTime: 0,
+        status: VideoStatus.Stopped,
       });
     }
 

@@ -114,7 +114,7 @@ describe("DOMBackgroundVideo", () => {
         expect(mockVideoElement.style.width).toBe("800px");
         expect(mockVideoElement.style.height).toBe("600px");
         expect(mockVideoElement.style.zIndex).toBe("9"); // HIDDEN
-        expect(mockVideoElement.style.objectFit).toBe("cover");
+
         
         expect(mockGameCanvas.style.zIndex).toBe("11");
         expect(mockGameCanvas.style.position).toBe("relative");
