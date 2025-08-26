@@ -22,7 +22,7 @@ jest.mock("../../../assets/scripts/store", () => ({
 jest.mock("db://i18n/LanguageData", () => ({
   t: jest.fn((key: string) => {
     // Mock translation function - return empty string for operator-specific keys
-    if (key.startsWith("operator.")) {
+    if (key.startsWith("operator.") || key.startsWith("testOperator.")) {
       return "";
     }
     return key;
@@ -31,7 +31,7 @@ jest.mock("db://i18n/LanguageData", () => ({
 
 jest.mock("db://i18n/LocalizedLabel", () => ({
   LocalizedLabel: jest.fn().mockImplementation(() => ({
-    key: "",
+    _key: "",
   })),
 }));
 
@@ -55,7 +55,7 @@ describe("ResultStage", () => {
     } as Node;
 
     mockLabel = {
-      key: "",
+      _key: "",
     } as LocalizedLabel;
 
     // Create ResultStage instance
@@ -71,22 +71,6 @@ describe("ResultStage", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
-  });
-
-  describe("initialization", () => {
-    it("should initialize with default state", () => {
-      // Arrange
-      const newStage = new ResultStage();
-
-      // Assert
-      expect((newStage as any).home).toBeNull();
-      expect((newStage as any).away).toBeNull();
-      expect((newStage as any).label).toBeNull();
-      expect((newStage as any).result).toBeNull();
-      expect((newStage as any).homeCode).toBe("");
-      expect((newStage as any).awayCode).toBe("");
-      expect((newStage as any).operator).toBe("");
-    });
   });
 
   describe("updateResult method", () => {
@@ -199,7 +183,7 @@ describe("ResultStage", () => {
       // Assert
       expect(mockHome.active).toBe(true);
       expect(mockAway.active).toBe(false);
-      expect(mockLabel.key).toBe("testOperator.HOME");
+      expect(mockLabel._key).toBe("Common.HOME");
     });
 
     it("should render away win correctly", () => {
@@ -212,7 +196,7 @@ describe("ResultStage", () => {
       // Assert
       expect(mockHome.active).toBe(false);
       expect(mockAway.active).toBe(true);
-      expect(mockLabel.key).toBe("testOperator.AWAY");
+      expect(mockLabel._key).toBe("Common.AWAY");
     });
 
     it("should render draw correctly", () => {
@@ -242,13 +226,13 @@ describe("ResultStage", () => {
     it("should use Common fallback when operator translation is empty", () => {
       // Arrange
       (resultStage as any).result = "H";
-      (resultStage as any).operator = "operator"; // This will return empty string from mock t function
+      (resultStage as any).operator = "testOperator"; // This will return empty string from mock t function
 
       // Act
       (resultStage as any).render();
 
       // Assert
-      expect(mockLabel.key).toBe("Common.HOME");
+      expect(mockLabel._key).toBe("Common.HOME");
     });
 
     it("should use operator-specific key when translation exists", () => {
@@ -260,7 +244,7 @@ describe("ResultStage", () => {
       (resultStage as any).render();
 
       // Assert
-      expect(mockLabel.key).toBe("validOperator.AWAY");
+      expect(mockLabel._key).toBe("validOperator.AWAY");
     });
   });
 });

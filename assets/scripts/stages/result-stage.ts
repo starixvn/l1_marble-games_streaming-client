@@ -55,31 +55,31 @@ export class ResultStage extends Stage {
   }
 
   private render() {
-    if (this.result === "H") {
-      this.home.active = true;
-      this.away.active = false;
+    const isDraw = this.result === "D" || this.result === null;
 
-      const key = `${this.operator}.${this.homeCode}`;
-
-      if (t(key) === "") {
-        this.label.key = `Common.${this.homeCode}`;
-      } else {
-        this.label.key = key;
-      }
-    } else if (this.result === "A") {
+    if (isDraw) {
       this.home.active = false;
-      this.away.active = true;
+      this.away.active = false;
+      return;
+    }
 
-      const key = `${this.operator}.${this.awayCode}`;
+    const homeWin = this.result === "H";
 
-      if (t(key) === "") {
-        this.label.key = `Common.${this.awayCode}`;
-      } else {
-        this.label.key = key;
-      }
+    const winner = homeWin ? this.homeCode : this.awayCode;
+
+    this.home.active = homeWin;
+    this.away.active = !homeWin;
+
+    const key = getWinnerKey(this.operator, winner);
+
+    if (t(key) === "") {
+      this.label._key = `Common.${winner}`;
     } else {
-      this.home.active = false;
-      this.away.active = false;
+      this.label._key = key;
     }
   }
+}
+
+function getWinnerKey(operator: string, winner: string) {
+  return `${operator}.${winner}`;
 }
