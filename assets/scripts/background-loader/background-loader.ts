@@ -1,22 +1,35 @@
-import { _decorator, Component, SpriteFrame } from 'cc';
-import { DOMBackgroundVideo, GenericBackgroundVideoEvents } from '../video-player/dom-background-video';
+import { _decorator, Component, Node, SpriteFrame } from 'cc';
+import { DOMBackgroundImage } from './dom-background-image';
+import Observer from 'observer';
+import { VideoStore } from '../video-player/video-store';
 const { ccclass, property } = _decorator;
+const { observer, render } = Observer;
 
 @ccclass('BackgroundLoader')
+@observer
 export class BackgroundLoader extends Component {
 
+    @property(Node)
+    public videoPlaceholderNode: Node = null;
+
     @property(SpriteFrame)
-    public backgroundSprite: SpriteFrame = null;
+    public backgroundImage: SpriteFrame = null;
 
     protected onLoad(): void {
-        if (!this.backgroundSprite) {
+        if (!this.backgroundImage) {
             return;
         }
-        const bgUrl = (this.backgroundSprite.texture as any).image._nativeData.currentSrc;
 
-        DOMBackgroundVideo.notify(GenericBackgroundVideoEvents.SWITCH_BACKGROUND, {
-            url: bgUrl,
-        });
+        const imagePath = (this.backgroundImage.texture as any).image._nativeData.currentSrc;
+
+        DOMBackgroundImage.createBackgroundImageElement(imagePath);
+    }
+
+    @render(VideoStore, (store) => store.play)
+    private updateVideoPlaceholderNode(play: boolean) {
+        if (this.videoPlaceholderNode) {
+            this.videoPlaceholderNode.active = !play;
+        }
     }
 }
 

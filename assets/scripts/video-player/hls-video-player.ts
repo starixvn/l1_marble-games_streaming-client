@@ -11,6 +11,7 @@ export class HLSVideoPlayer {
   private _video: HTMLVideoElement = null;
   private _url = "";
   private _intentionallyMuted = false;
+  private _onPlayStateChanged: (play: boolean) => void = () => {};
 
   constructor(options: HLSVideoPlayerOptions) {
     this._id = options.id;
@@ -18,6 +19,10 @@ export class HLSVideoPlayer {
 
   get id() {
     return this._id;
+  }
+
+  set onPlayStateChanged(value: (play: boolean) => void) {
+    this._onPlayStateChanged = value;
   }
 
   get video() {
@@ -85,6 +90,7 @@ export class HLSVideoPlayer {
       this._hls.loadSource(this._url);
       if (!options.play) {
         this._video.pause();
+        this._onPlayStateChanged(false);
       }
     }
   }
@@ -105,13 +111,16 @@ export class HLSVideoPlayer {
     this._hls.off(event);
   }
 
-
   addEventListener(event: string, listener: (...args: any[]) => void) {
     this._video.addEventListener(event, listener);
   }
 
   removeEventListener(event: string, listener: (...args: any[]) => void) {
     this._video.removeEventListener(event, listener);
+  }
+
+  on(event: keyof HlsListeners, listener: (...args: any[]) => void) {
+    this._hls.on(event, listener);
   }
 
   destroy() {
@@ -122,7 +131,9 @@ export class HLSVideoPlayer {
   }
 
   private playWithRetry(retry = 0, maxRetry = 3) {
-    this._video.play().catch(() => {
+    this._video.play().then(() => {
+      this._onPlayStateChanged(true);
+    }).catch(() => {
       if (retry < maxRetry) {
         this.playWithRetry(retry + 1, maxRetry);
       }

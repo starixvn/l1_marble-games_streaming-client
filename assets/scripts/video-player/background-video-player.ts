@@ -7,7 +7,7 @@ import { IntroStore } from "../intro/intro-store";
 import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
 const { ccclass } = _decorator;
-const { observer, render } = Observer;
+const { observer, render, handle } = Observer;
 
 @ccclass("BackgroundVideoPlayer")
 @observer
@@ -118,10 +118,19 @@ export class BackgroundVideoPlayer extends Component {
     this.hlsPlayer = new HLSPreloadedVideoPlayer();
     this.hlsPlayer.init();
 
+    this.hlsPlayer.onPlayStateChanged = (play: boolean) => {
+      this.updateVideoPlayState(play);
+    };
+
     this.hlsPlayer.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
 
     Object.values(Hls.Events).forEach((event) => {
       this.hlsPlayer.addEventListener(event, this.node.emit.bind(this.node));
     });
+  }
+  
+  @handle(VideoStore, (store, data: boolean) => store.setPlay(data))
+  updateVideoPlayState(data: boolean) {
+    return data;
   }
 }

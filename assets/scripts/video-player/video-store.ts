@@ -10,6 +10,8 @@ export class VideoStore {
     mobx.makeAutoObservable(this);
   }
 
+  play = false;
+
   url = "";
   halfIndex = 0;
 
@@ -21,6 +23,10 @@ export class VideoStore {
 
   enableDefaultBackground(enable: boolean) {
     this.defaultBackgroundEnabled = enable;
+  }
+
+  setPlay(play: boolean) {
+    this.play = play;
   }
 
   setUrl(url: string) {

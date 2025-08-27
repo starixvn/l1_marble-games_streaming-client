@@ -1,3 +1,5 @@
+import { createMockStore, cleanupMockObserver, initializeMockContainer } from "../../utils/mock-store";
+
 // Mock cc module first (before any imports)
 const mockSpriteFrame = {
   texture: {
@@ -19,6 +21,10 @@ const mockSpriteFrameWithoutSrc = {
   }
 };
 
+const mockNode = {
+  active: true,
+};
+
 jest.mock("cc", () => ({
   _decorator: {
     ccclass: jest.fn().mockImplementation(() => (target: any) => target),
@@ -27,23 +33,30 @@ jest.mock("cc", () => ({
   Component: class MockComponent {
     node: any = {};
   },
+  Node: class MockNode {
+    active: boolean = true;
+  },
   SpriteFrame: class MockSpriteFrame {
     texture: any = null;
   },
 }));
 
-// Mock DOMBackgroundVideo
-jest.mock("../../../assets/scripts/video-player/dom-background-video", () => ({
-  DOMBackgroundVideo: {
-    notify: jest.fn(),
-  },
-  GenericBackgroundVideoEvents: {
-    SWITCH_BACKGROUND: "SwitchBackground",
+// Mock Observer BEFORE importing the component
+jest.mock("observer", () => {
+  const { createMockObserver } = require("../../utils/mock-store");
+  return createMockObserver();
+});
+
+// Mock DOMBackgroundImage
+jest.mock("../../../assets/scripts/background-loader/dom-background-image", () => ({
+  DOMBackgroundImage: {
+    createBackgroundImageElement: jest.fn(),
   },
 }));
 
 import { BackgroundLoader } from "../../../assets/scripts/background-loader/background-loader";
-import { DOMBackgroundVideo, GenericBackgroundVideoEvents } from "../../../assets/scripts/video-player/dom-background-video";
+import { DOMBackgroundImage } from "../../../assets/scripts/background-loader/dom-background-image";
+import { VideoStore } from "../../../assets/scripts/video-player/video-store";
 import { Component } from "cc";
 
 // Test class to access protected methods
@@ -55,10 +68,36 @@ class TestableBackgroundLoader extends BackgroundLoader {
 
 describe("BackgroundLoader", () => {
   let loader: TestableBackgroundLoader;
+  let mockVideoStore: VideoStore & {
+    update: (props: Partial<VideoStore>) => void;
+    reset: (props: Partial<VideoStore>) => void;
+  };
+
+  beforeAll(() => {
+    initializeMockContainer();
+    
+    mockVideoStore = createMockStore(VideoStore, {
+      play: false,
+      url: "",
+      videoLiveTime: 0,
+      defaultBackgroundEnabled: false,
+    });
+  });
+
+  afterAll(() => {
+    cleanupMockObserver();
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
     loader = new TestableBackgroundLoader();
+    
+    mockVideoStore.reset({
+      play: false,
+      url: "",
+      videoLiveTime: 0,
+      defaultBackgroundEnabled: false,
+    });
   });
 
   describe("initialization", () => {
@@ -67,74 +106,74 @@ describe("BackgroundLoader", () => {
       expect(loader).toBeInstanceOf(Component);
     });
 
-    it("should have backgroundSprite property initialized as null", () => {
+    it("should have backgroundImage property initialized as null", () => {
       // Assert
-      expect(loader.backgroundSprite).toBeNull();
+      expect(loader.backgroundImage).toBeNull();
+    });
+
+    it("should have videoPlaceholderNode property initialized as null", () => {
+      // Assert
+      expect(loader.videoPlaceholderNode).toBeNull();
     });
 
     it("should be a properly decorated component class", () => {
       // Assert - The class should have proper decorator setup
       // Note: Decorators are applied at module load time, not during test execution
-      expect(loader.backgroundSprite).toBeDefined(); // Property exists due to @property decorator
+      expect(loader.backgroundImage).toBeDefined(); // Property exists due to @property decorator
+      expect(loader.videoPlaceholderNode).toBeDefined(); // Property exists due to @property decorator
       expect(loader).toBeInstanceOf(Component); // Class inheritance due to @ccclass decorator
     });
   });
 
   describe("onLoad", () => {
-    describe("when backgroundSprite is null", () => {
-      it("should return early without calling DOMBackgroundVideo.notify", () => {
+    describe("when backgroundImage is null", () => {
+      it("should return early without calling DOMBackgroundImage.createBackgroundImageElement", () => {
         // Arrange
-        loader.backgroundSprite = null;
+        loader.backgroundImage = null;
 
         // Act
         loader.callOnLoad();
 
         // Assert
-        expect(DOMBackgroundVideo.notify).not.toHaveBeenCalled();
+        expect(DOMBackgroundImage.createBackgroundImageElement).not.toHaveBeenCalled();
       });
     });
 
-    describe("when backgroundSprite is undefined", () => {
-      it("should return early without calling DOMBackgroundVideo.notify", () => {
+    describe("when backgroundImage is undefined", () => {
+      it("should return early without calling DOMBackgroundImage.createBackgroundImageElement", () => {
         // Arrange
-        loader.backgroundSprite = undefined as any;
+        loader.backgroundImage = undefined as any;
 
         // Act
         loader.callOnLoad();
 
         // Assert
-        expect(DOMBackgroundVideo.notify).not.toHaveBeenCalled();
+        expect(DOMBackgroundImage.createBackgroundImageElement).not.toHaveBeenCalled();
       });
     });
 
-    describe("when backgroundSprite exists", () => {
-      it("should extract URL from sprite texture and notify DOMBackgroundVideo", () => {
+    describe("when backgroundImage exists", () => {
+      it("should extract URL from sprite texture and call DOMBackgroundImage.createBackgroundImageElement", () => {
         // Arrange
         const expectedUrl = "https://example.com/background.jpg";
-        loader.backgroundSprite = mockSpriteFrame as any;
+        loader.backgroundImage = mockSpriteFrame as any;
 
         // Act
         loader.callOnLoad();
 
         // Assert
-        expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-          GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-          { url: expectedUrl }
-        );
+        expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(expectedUrl);
       });
 
       it("should handle empty URL from sprite texture", () => {
         // Arrange
-        loader.backgroundSprite = mockSpriteFrameWithoutSrc as any;
+        loader.backgroundImage = mockSpriteFrameWithoutSrc as any;
 
         // Act
         loader.callOnLoad();
 
         // Assert
-        expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-          GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-          { url: "" }
-        );
+        expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith("");
       });
 
       it("should handle different URL formats", () => {
@@ -159,16 +198,13 @@ describe("BackgroundLoader", () => {
               }
             }
           };
-          loader.backgroundSprite = spriteWithUrl as any;
+          loader.backgroundImage = spriteWithUrl as any;
 
           // Act
           loader.callOnLoad();
 
           // Assert
-          expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-            GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-            { url }
-          );
+          expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(url);
         });
       });
     });
@@ -191,16 +227,13 @@ describe("BackgroundLoader", () => {
         },
         otherSpriteProperty: "should be ignored"
       };
-      loader.backgroundSprite = complexSpriteFrame as any;
+      loader.backgroundImage = complexSpriteFrame as any;
 
       // Act
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: expectedUrl }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(expectedUrl);
     });
 
     it("should access texture through type casting", () => {
@@ -214,69 +247,83 @@ describe("BackgroundLoader", () => {
           }
         }
       };
-      loader.backgroundSprite = spriteFrame as any;
+      loader.backgroundImage = spriteFrame as any;
 
       // Act
       loader.callOnLoad();
 
       // Assert - Verify that the texture was accessed as 'any' type to bypass TypeScript restrictions
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "test-url.png" }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith("test-url.png");
     });
   });
 
-  describe("DOMBackgroundVideo integration", () => {
-    it("should call notify with correct event type", () => {
+  describe("DOMBackgroundImage integration", () => {
+    it("should call createBackgroundImageElement with correct URL", () => {
       // Arrange
-      loader.backgroundSprite = mockSpriteFrame as any;
+      loader.backgroundImage = mockSpriteFrame as any;
 
       // Act
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        expect.any(Object)
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith("https://example.com/background.jpg");
     });
 
-    it("should call notify with correctly structured data object", () => {
+    it("should call createBackgroundImageElement exactly once per onLoad call", () => {
       // Arrange
-      const testUrl = "https://test.example.com/bg.jpg";
-      const spriteWithTestUrl = {
-        texture: {
-          image: {
-            _nativeData: {
-              currentSrc: testUrl
-            }
-          }
-        }
-      };
-      loader.backgroundSprite = spriteWithTestUrl as any;
+      loader.backgroundImage = mockSpriteFrame as any;
 
       // Act
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        {
-          url: testUrl
-        }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("VideoStore integration and render decorator", () => {
+    it("should update videoPlaceholderNode visibility when VideoStore.play changes", () => {
+      // Arrange
+      const mockVideoPlaceholderNode = { ...mockNode };
+      loader.videoPlaceholderNode = mockVideoPlaceholderNode as any;
+      
+      // Act - VideoStore play becomes true (video playing)
+      mockVideoStore.update({ play: true });
+
+      // Assert - Node should be hidden when video is playing
+      expect(mockVideoPlaceholderNode.active).toBe(false);
     });
 
-    it("should call notify exactly once per onLoad call", () => {
+    it("should show videoPlaceholderNode when video is not playing", () => {
       // Arrange
-      loader.backgroundSprite = mockSpriteFrame as any;
+      const mockVideoPlaceholderNode = { ...mockNode };
+      loader.videoPlaceholderNode = mockVideoPlaceholderNode as any;
+      
+      // Act - VideoStore play becomes false (video not playing)
+      mockVideoStore.update({ play: false });
 
-      // Act
-      loader.callOnLoad();
+      // Assert - Node should be visible when video is not playing
+      expect(mockVideoPlaceholderNode.active).toBe(true);
+    });
 
-      // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledTimes(1);
+    it("should handle null videoPlaceholderNode gracefully", () => {
+      // Arrange
+      loader.videoPlaceholderNode = null;
+      
+      // Act & Assert - Should not throw error
+      expect(() => {
+        mockVideoStore.update({ play: true });
+      }).not.toThrow();
+    });
+
+    it("should handle undefined videoPlaceholderNode gracefully", () => {
+      // Arrange
+      loader.videoPlaceholderNode = undefined as any;
+      
+      // Act & Assert - Should not throw error
+      expect(() => {
+        mockVideoStore.update({ play: false });
+      }).not.toThrow();
     });
   });
 
@@ -286,7 +333,7 @@ describe("BackgroundLoader", () => {
       const malformedSprite = {
         texture: null
       };
-      loader.backgroundSprite = malformedSprite as any;
+      loader.backgroundImage = malformedSprite as any;
 
       // Act & Assert - Should throw error when trying to access nested properties
       expect(() => {
@@ -303,7 +350,7 @@ describe("BackgroundLoader", () => {
           }
         }
       };
-      loader.backgroundSprite = spriteWithoutNativeData as any;
+      loader.backgroundImage = spriteWithoutNativeData as any;
 
       // Act & Assert - Should throw error when trying to access currentSrc
       expect(() => {
@@ -318,7 +365,7 @@ describe("BackgroundLoader", () => {
           // Missing image property
         }
       };
-      loader.backgroundSprite = spriteWithoutImage as any;
+      loader.backgroundImage = spriteWithoutImage as any;
 
       // Act & Assert - Should throw error when trying to access image
       expect(() => {
@@ -328,7 +375,7 @@ describe("BackgroundLoader", () => {
 
     it("should handle multiple onLoad calls", () => {
       // Arrange
-      loader.backgroundSprite = mockSpriteFrame as any;
+      loader.backgroundImage = mockSpriteFrame as any;
 
       // Act
       loader.callOnLoad();
@@ -336,22 +383,13 @@ describe("BackgroundLoader", () => {
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledTimes(3);
-      expect(DOMBackgroundVideo.notify).toHaveBeenNthCalledWith(1,
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "https://example.com/background.jpg" }
-      );
-      expect(DOMBackgroundVideo.notify).toHaveBeenNthCalledWith(2,
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "https://example.com/background.jpg" }
-      );
-      expect(DOMBackgroundVideo.notify).toHaveBeenNthCalledWith(3,
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "https://example.com/background.jpg" }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledTimes(3);
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenNthCalledWith(1, "https://example.com/background.jpg");
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenNthCalledWith(2, "https://example.com/background.jpg");
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenNthCalledWith(3, "https://example.com/background.jpg");
     });
 
-    it("should handle changing backgroundSprite between calls", () => {
+    it("should handle changing backgroundImage between calls", () => {
       // Arrange
       const sprite1 = {
         texture: {
@@ -373,24 +411,18 @@ describe("BackgroundLoader", () => {
       };
 
       // Act & Assert
-      loader.backgroundSprite = sprite1 as any;
+      loader.backgroundImage = sprite1 as any;
       loader.callOnLoad();
-      expect(DOMBackgroundVideo.notify).toHaveBeenLastCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "url1.jpg" }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenLastCalledWith("url1.jpg");
 
-      loader.backgroundSprite = sprite2 as any;
+      loader.backgroundImage = sprite2 as any;
       loader.callOnLoad();
-      expect(DOMBackgroundVideo.notify).toHaveBeenLastCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "url2.jpg" }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenLastCalledWith("url2.jpg");
 
-      loader.backgroundSprite = null;
+      loader.backgroundImage = null;
       loader.callOnLoad();
-      // Should not call notify when sprite is null
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledTimes(2);
+      // Should not call createBackgroundImageElement when sprite is null
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -408,7 +440,7 @@ describe("BackgroundLoader", () => {
     it("should call onLoad as part of component lifecycle", () => {
       // Arrange
       const callOnLoadSpy = jest.spyOn(loader, "callOnLoad");
-      loader.backgroundSprite = mockSpriteFrame as any;
+      loader.backgroundImage = mockSpriteFrame as any;
 
       // Act
       loader.callOnLoad();
@@ -419,31 +451,58 @@ describe("BackgroundLoader", () => {
   });
 
   describe("property decoration", () => {
-    it("should initialize backgroundSprite as null by default", () => {
+    it("should initialize backgroundImage as null by default", () => {
       // Arrange
       const newLoader = new TestableBackgroundLoader();
 
       // Assert
-      expect(newLoader.backgroundSprite).toBeNull();
+      expect(newLoader.backgroundImage).toBeNull();
     });
 
-    it("should allow setting backgroundSprite to valid SpriteFrame", () => {
-      // Act
-      loader.backgroundSprite = mockSpriteFrame as any;
-
-      // Assert
-      expect(loader.backgroundSprite).toBe(mockSpriteFrame);
-    });
-
-    it("should allow setting backgroundSprite back to null", () => {
+    it("should initialize videoPlaceholderNode as null by default", () => {
       // Arrange
-      loader.backgroundSprite = mockSpriteFrame as any;
-
-      // Act
-      loader.backgroundSprite = null;
+      const newLoader = new TestableBackgroundLoader();
 
       // Assert
-      expect(loader.backgroundSprite).toBeNull();
+      expect(newLoader.videoPlaceholderNode).toBeNull();
+    });
+
+    it("should allow setting backgroundImage to valid SpriteFrame", () => {
+      // Act
+      loader.backgroundImage = mockSpriteFrame as any;
+
+      // Assert
+      expect(loader.backgroundImage).toBe(mockSpriteFrame);
+    });
+
+    it("should allow setting videoPlaceholderNode to valid Node", () => {
+      // Act
+      loader.videoPlaceholderNode = mockNode as any;
+
+      // Assert
+      expect(loader.videoPlaceholderNode).toBe(mockNode);
+    });
+
+    it("should allow setting backgroundImage back to null", () => {
+      // Arrange
+      loader.backgroundImage = mockSpriteFrame as any;
+
+      // Act
+      loader.backgroundImage = null;
+
+      // Assert
+      expect(loader.backgroundImage).toBeNull();
+    });
+
+    it("should allow setting videoPlaceholderNode back to null", () => {
+      // Arrange
+      loader.videoPlaceholderNode = mockNode as any;
+
+      // Act
+      loader.videoPlaceholderNode = null;
+
+      // Assert
+      expect(loader.videoPlaceholderNode).toBeNull();
     });
   });
 
@@ -460,16 +519,15 @@ describe("BackgroundLoader", () => {
           }
         }
       };
+      const mockVideoPlaceholderNode = { ...mockNode };
 
       // Act - Complete workflow
-      loader.backgroundSprite = sprite as any;
+      loader.backgroundImage = sprite as any;
+      loader.videoPlaceholderNode = mockVideoPlaceholderNode as any;
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: backgroundUrl }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(backgroundUrl);
     });
 
     it("should work correctly with different background assets", () => {
@@ -494,14 +552,11 @@ describe("BackgroundLoader", () => {
         };
 
         // Act
-        loader.backgroundSprite = sprite as any;
+        loader.backgroundImage = sprite as any;
         loader.callOnLoad();
 
         // Assert
-        expect(DOMBackgroundVideo.notify).toHaveBeenCalledWith(
-          GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-          { url: bgUrl }
-        );
+        expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(bgUrl);
       });
     });
 
@@ -527,25 +582,52 @@ describe("BackgroundLoader", () => {
       };
 
       // Act - Set first sprite and load
-      loader.backgroundSprite = sprite1 as any;
-      expect(loader.backgroundSprite).toBe(sprite1);
+      loader.backgroundImage = sprite1 as any;
+      expect(loader.backgroundImage).toBe(sprite1);
       loader.callOnLoad();
 
       // Act - Change sprite and load again
-      loader.backgroundSprite = sprite2 as any;
-      expect(loader.backgroundSprite).toBe(sprite2);
+      loader.backgroundImage = sprite2 as any;
+      expect(loader.backgroundImage).toBe(sprite2);
       loader.callOnLoad();
 
       // Assert
-      expect(DOMBackgroundVideo.notify).toHaveBeenCalledTimes(2);
-      expect(DOMBackgroundVideo.notify).toHaveBeenNthCalledWith(1,
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "background1.jpg" }
-      );
-      expect(DOMBackgroundVideo.notify).toHaveBeenNthCalledWith(2,
-        GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
-        { url: "background2.jpg" }
-      );
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledTimes(2);
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenNthCalledWith(1, "background1.jpg");
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenNthCalledWith(2, "background2.jpg");
+    });
+
+    it("should handle combined background loading and video placeholder management", () => {
+      // Arrange
+      const backgroundUrl = "https://example.com/bg.jpg";
+      const sprite = {
+        texture: {
+          image: {
+            _nativeData: {
+              currentSrc: backgroundUrl
+            }
+          }
+        }
+      };
+      const mockVideoPlaceholderNode = { ...mockNode };
+      loader.backgroundImage = sprite as any;
+      loader.videoPlaceholderNode = mockVideoPlaceholderNode as any;
+
+      // Act - Load background
+      loader.callOnLoad();
+
+      // Act - Start video playback
+      mockVideoStore.update({ play: true });
+
+      // Assert
+      expect(DOMBackgroundImage.createBackgroundImageElement).toHaveBeenCalledWith(backgroundUrl);
+      expect(mockVideoPlaceholderNode.active).toBe(false);
+
+      // Act - Stop video playback
+      mockVideoStore.update({ play: false });
+
+      // Assert
+      expect(mockVideoPlaceholderNode.active).toBe(true);
     });
   });
 });

@@ -62,7 +62,7 @@ export class Startup extends Component {
   }
 
   @render(Store, (store) => store.game)
-  private loadGame(game: string) {
+  public loadGame(game: string) {
     resources.load(`games/${game}`, Prefab, this.onLoadedInfoLayer());
     this.loadStreaming();
   }
@@ -88,7 +88,7 @@ export class Startup extends Component {
   }
 
   @render(StreamingStore, (store) => store.eventData)
-  private renderEventData(eventData: EventData) {
+  public renderEventData(eventData: EventData) {
     if (!eventData?.eventId) {
       return;
     }
@@ -156,17 +156,17 @@ export class Startup extends Component {
   }
 
   @handle(TeamStore, (store, data: TeamStore) => store.update(data))
-  private updateTeamName(data: { home: string; away: string }) {
+  public updateTeamName(data: { home: string; away: string }) {
     return data;
   }
 
   @handle(ScoreStore, (store, data: ScoreStore) => store.update(data))
-  private updateScore(data: { home: number; away: number }) {
+  public updateScore(data: { home: number; away: number }) {
     return data;
   }
 
   @handle(ScoreStore, (store, data: ScoreStore) => store.updatePrevious(data))
-  private update1HalfScore(data: { home: number; away: number }) {
+  public update1HalfScore(data: { home: number; away: number }) {
     return data;
   }
 
@@ -177,7 +177,7 @@ export class Startup extends Component {
       data: { videoLiveTimeMs: number; currentPhase: Phase; url: string; halfIndex: number }
     ) => store.update(data)
   )
-  private updateVideoStore(data: {
+  public updateVideoStore(data: {
     videoLiveTimeMs: number;
     currentPhase: Phase;
     url: string;
@@ -187,7 +187,7 @@ export class Startup extends Component {
   }
 
   @handle(IntroStore, (store, data: IntroStore) => store.update(data))
-  private updateIntroStore(data: {
+  public updateIntroStore(data: {
     currentTime: number;
     status: VideoStatus;
   }) {
@@ -195,7 +195,7 @@ export class Startup extends Component {
   }
 
   @handle(TimeStore, (store, data: TimeStore) => store.update(data))
-  private updateTimeStore(data: {
+  public updateTimeStore(data: {
     matchLiveTime: number;
     halfIndex: number;
     currentPhase: Phase;
@@ -204,7 +204,7 @@ export class Startup extends Component {
   }
 
   @handle(IntroStore, (store, url: string) => store.setUrl(url))
-  private setIntroUrl(url: string) {
+  public setIntroUrl(url: string) {
     return url;
   }
 

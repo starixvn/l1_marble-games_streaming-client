@@ -11,6 +11,7 @@ interface BackgroundSwitchEventData {
 export class HLSPreloadedVideoPlayer {
   private readonly _preloadPlayer: HLSVideoPlayer = null;
   private readonly _videoPlayer: HLSVideoPlayer = null;
+  private _onPlayStateChanged: (play: boolean) => void = () => {};
 
   constructor() {
     this._preloadPlayer = new HLSVideoPlayer({ id: "PreloadVideo" });
@@ -78,6 +79,13 @@ export class HLSPreloadedVideoPlayer {
       DOMBackgroundVideo.changeBackground(this._videoPlayer.id, url);
     });
     DOMBackgroundVideo.toFront(this._videoPlayer.id);
+    this._videoPlayer.onPlayStateChanged = (play: boolean) => {
+      this._onPlayStateChanged(play);
+    };
+  }
+
+  set onPlayStateChanged(value: (play: boolean) => void) {
+    this._onPlayStateChanged = value;
   }
 
   preload(url: string) {
