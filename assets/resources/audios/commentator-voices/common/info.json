@@ -1,0 +1,1173 @@
+{
+  "version": "2",
+  "sounds": {
+    "goal_1_1": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_1_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_1_2": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_1_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_1": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_1": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_1_3": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_1_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_1_4": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_1_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_5": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_2": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_3": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_4": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_4_1": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_6": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_5": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_2": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_6": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_7": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_7",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_7": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_7",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_8": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_8",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_9": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_9",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_10": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_10",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_11": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_11",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_2_12": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_2_12",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_3": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal_3_4": {
+      "type": "sfx",
+      "path": "commentators/goal/goal_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_1_1": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_1_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_1_2": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_1_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_3_1": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_2_1": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_3_2": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_4_1": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_3_3": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_3_4": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_2_2": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw1_3_5": {
+      "type": "sfx",
+      "path": "commentators/draw1/draw1_3_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_3_1": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_1": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_2": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_3": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_3_2": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_3_3": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_4": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_5": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_4_1": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw2_2_6": {
+      "type": "sfx",
+      "path": "commentators/draw2/draw2_2_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_2_1": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_3_1": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_2_2": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_3_2": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_3_3": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_3_4": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_4_1": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_3_5": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_3_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_2_3": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw3_2_4": {
+      "type": "sfx",
+      "path": "commentators/draw3/draw3_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_2_1": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_2_2": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_3_1": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_3_2": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_3_3": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_4_1": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_3_4": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_2_3": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "draw4_4_2": {
+      "type": "sfx",
+      "path": "commentators/draw4/draw4_4_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_3_1": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_3_2": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_3_3": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_2_1": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_2_2": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_2_3": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal2nd_4_1": {
+      "type": "sfx",
+      "path": "commentators/goal2nd/goal2nd_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_4_1": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_2_1": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_2_2": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_3_1": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_4_2": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_4_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_3_2": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_4_3": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_4_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_2_3": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_3_3": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal3rd_4_4": {
+      "type": "sfx",
+      "path": "commentators/goal3rd/goal3rd_4_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_2_1": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_2_2": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_2_3": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_3_1": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_3_2": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_3_3": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_4_1": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_3_4": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal4th_2_4": {
+      "type": "sfx",
+      "path": "commentators/goal4th/goal4th_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_2_1": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_3_1": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_4_1": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_2_2": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_2_3": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_2_4": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "goal5th_3_2": {
+      "type": "sfx",
+      "path": "commentators/goal5th/goal5th_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_4_1": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_3_1": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_3_2": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_3_3": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_2_1": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "fastGoal_3_4": {
+      "type": "sfx",
+      "path": "commentators/fastGoal/fastGoal_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_1": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_2": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_3": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_4": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_5": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_1_1": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_1_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_3_1": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "firstGoal_2_6": {
+      "type": "sfx",
+      "path": "commentators/firstGoal/firstGoal_2_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_2_1": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_3_1": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_2_2": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_2_3": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_2_4": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_3_2": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "lastGoal_3_3": {
+      "type": "sfx",
+      "path": "commentators/lastGoal/lastGoal_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_1": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_2": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_3": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_4_1": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_3_1": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_4": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_3_2": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_5": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_3_3": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_2_6": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_2_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "noGoal_3_4": {
+      "type": "sfx",
+      "path": "commentators/noGoal/noGoal_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_1_1": {
+      "type": "sfx",
+      "path": "commentators/save/save_1_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_1": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_3_1": {
+      "type": "sfx",
+      "path": "commentators/save/save_3_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_2": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_4_1": {
+      "type": "sfx",
+      "path": "commentators/save/save_4_1",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_3": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_4_2": {
+      "type": "sfx",
+      "path": "commentators/save/save_4_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_4": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_5": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_3_2": {
+      "type": "sfx",
+      "path": "commentators/save/save_3_2",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_6": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_6",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_3_3": {
+      "type": "sfx",
+      "path": "commentators/save/save_3_3",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_7": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_7",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_3_4": {
+      "type": "sfx",
+      "path": "commentators/save/save_3_4",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_8": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_8",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_9": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_9",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_2_10": {
+      "type": "sfx",
+      "path": "commentators/save/save_2_10",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    },
+    "save_3_5": {
+      "type": "sfx",
+      "path": "commentators/save/save_3_5",
+      "isLazyLoad": true,
+      "supportedLanguages": ["vi", "en"],
+      "isRemote": true,
+      "remoteType": "game"
+    }
+  }
+}
