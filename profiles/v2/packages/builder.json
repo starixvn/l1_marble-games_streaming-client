@@ -80,6 +80,30 @@
         },
         "time": "8-7-2025 14:11:17",
         "dirty": false
+      },
+      "buildBundle": {
+        "id": "buildBundle",
+        "progress": 1,
+        "state": "success",
+        "message": "9-3-2025 02:41:55Build Bundle success in 12 s!",
+        "detailMessage": "handle single json\r",
+        "options": {
+          "dest": "project://build/build-bundle",
+          "buildTaskIds": [
+            "1754366851296"
+          ],
+          "taskName": "build bundle db://assets/resources",
+          "bundleConfigs": [
+            {
+              "root": "db://assets/resources",
+              "name": "resources",
+              "output": true
+            }
+          ],
+          "packages": {}
+        },
+        "time": "",
+        "type": "bundle"
       }
     }
   }

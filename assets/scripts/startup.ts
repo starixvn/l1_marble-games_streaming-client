@@ -3,6 +3,7 @@ import {
   Component,
   error,
   instantiate,
+  log,
   Node,
   Prefab,
   resources,
@@ -24,6 +25,7 @@ import { TimeStore } from "./time/time-store";
 import { VideoStore } from "./video-player/video-store";
 import { gameSettings } from "./game-settings";
 import { IntroStore } from "./intro/intro-store";
+import { CommentatorVoiceStore, type VoiceConfig } from "./commentators-voices/commentator-voice-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -127,7 +129,6 @@ export class Startup extends Component {
     const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
 
 
-
     if (this.isPlayingIntro(eventData)) {
       const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
       this.updateIntroStore({
@@ -139,6 +140,13 @@ export class Startup extends Component {
         currentTime: 0,
         status: VideoStatus.Stopped,
       });
+    }
+    if (eventData.voiceConfigDetail) {
+      this.loadCommentatorVoices(eventData.voiceConfigDetail);
+    }
+
+    if (eventData.currentPhase === Phase.UpdateVideoInfo && eventData.voice) {
+      this.updateVoice(eventData.voice);
     }
 
     this.updateVideoStore({
@@ -154,6 +162,16 @@ export class Startup extends Component {
       currentPhase: eventData.currentPhase,
     });
   }
+
+  @handle(CommentatorVoiceStore, (store, voice: string) => store.playVoice(voice))
+  public updateVoice(voice: string) {
+    return voice;
+  }
+
+  @handle(CommentatorVoiceStore, (store, config: VoiceConfig) => store.loadVoices(config))
+  public loadCommentatorVoices(config: VoiceConfig) {
+    return config;
+  } 
 
   @handle(TeamStore, (store, data: TeamStore) => store.update(data))
   public updateTeamName(data: { home: string; away: string }) {

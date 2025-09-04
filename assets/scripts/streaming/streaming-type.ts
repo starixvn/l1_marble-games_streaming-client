@@ -1,3 +1,5 @@
+import { VoiceConfig } from "../commentators-voices/commentator-voice-store";
+
 export type EventDetail = {
   playlist: string;
   videoLiveTimeMs: number;
@@ -18,6 +20,8 @@ export type EventStreamPayload = {
   matchLiveTimeMs: number;
   currentPhase: Phase;
   message: string;
+  voice?: string;
+  voiceConfigDetail?: object;
 };
 
 export enum Phase {
@@ -27,6 +31,7 @@ export enum Phase {
   UpdateVideoInfo = "UpdateVideoInfo",
   UpdateGoalInfo = "UpdateGoalInfo",
   UpdateResult = "UpdateResult",
+  UpdateVoice = "UpdateVoice",
 }
 
 export type EventData = {
@@ -42,6 +47,8 @@ export type EventData = {
   currentPhase: Phase;
   eventDetails: EventDetail[];
   matchLiveTimeMs: number;
+  voice?: string;
+  voiceConfigDetail?: VoiceConfig;
 };
 
 export type StreamingState = {

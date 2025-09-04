@@ -83,6 +83,8 @@ export class StreamingStore {
       matchLiveTimeMs: payload.matchLiveTimeMs,
       homeScore,
       awayScore,
+      voice: payload.voice,
+      voiceConfigDetail: payload.voiceConfigDetail,
     };
   }
 
