@@ -3,7 +3,6 @@ import {
   Component,
   error,
   instantiate,
-  log,
   Node,
   Prefab,
   resources,

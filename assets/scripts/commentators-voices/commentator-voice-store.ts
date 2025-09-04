@@ -133,7 +133,7 @@ export class CommentatorVoiceStore {
     constructor() {
         mobx.makeAutoObservable(this);
     }
-    private configJson: string = ""
+    private configJson = "";
     private voices = getAllVoices();
     private readonly voiceMap = new Map<string, Voice>();
 
@@ -153,7 +153,7 @@ export class CommentatorVoiceStore {
         this.configJson = updatedConfigJSON;
         this.voices = getAllVoices(config);
         const voicesArray = Array.from(this.voices);
-        return Promise.all(voicesArray.map(voice => this.loadSingleVoice(voice)));
+        await Promise.all(voicesArray.map(voice => this.loadSingleVoice(voice)));
     }
 
     playVoice(voice: string) {
