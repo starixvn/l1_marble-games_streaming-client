@@ -12,7 +12,7 @@ describe("AudioStore", () => {
   });
 
   it("should initialize with defaults", () => {
-    expect(store.muted).toBe(true);
+    expect(store.muted).toBe(false);
     expect(store.browserBlocked).toBe(true);
   });
 
