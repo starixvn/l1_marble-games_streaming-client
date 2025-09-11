@@ -22,6 +22,7 @@ export type EventStreamPayload = {
   message: string;
   voice?: string;
   voiceConfigDetail?: object;
+  introTime?: number;
 };
 
 export enum Phase {
@@ -49,6 +50,7 @@ export type EventData = {
   matchLiveTimeMs: number;
   voice?: string;
   voiceConfigDetail?: VoiceConfig;
+  introTime?: number;
 };
 
 export type StreamingState = {

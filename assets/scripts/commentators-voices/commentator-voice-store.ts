@@ -145,6 +145,27 @@ export class CommentatorVoiceStore {
         return voiceResult;
     }
 
+    async initSingleVoice(voice: Voice) {
+        const initializedVoice = {
+            ...voice,
+            isLoaded: false,
+            audioClip: undefined,
+        }
+        this.voiceMap.set(voice.name, initializedVoice);
+        return initializedVoice;
+    }
+
+    initVoices(config: VoiceConfig = CONFIG) {
+        const updatedConfigJSON = JSON.stringify(config);
+        if (this.configJson === updatedConfigJSON) {
+            return;
+        }
+        this.configJson = updatedConfigJSON;
+        this.voices = getAllVoices(config);
+        const voicesArray = Array.from(this.voices);
+        return voicesArray.map(voice => this.initSingleVoice(voice));
+    }
+
     async loadVoices(config: VoiceConfig = CONFIG) { 
         const updatedConfigJSON = JSON.stringify(config);
         if (this.configJson === updatedConfigJSON) {
@@ -157,7 +178,17 @@ export class CommentatorVoiceStore {
     }
 
     playVoice(voice: string) {
-        this.playingVoice = this.voiceMap.get(voice);
+        const voiceToPlay = this.voiceMap.get(voice)
+        if (!voiceToPlay) {
+            return;
+        }
+        if (voiceToPlay.isLoaded) {
+            this.playingVoice = voiceToPlay;
+        } else {
+            this.loadSingleVoice(voiceToPlay)
+                .then((voice) => {
+                    this.playingVoice = voice as Voice;
+                });
+        }
     }
-
 }

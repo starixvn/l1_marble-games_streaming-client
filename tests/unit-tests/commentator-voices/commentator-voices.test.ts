@@ -19,11 +19,11 @@ jest.mock("../../../assets/scripts/asset-loader/bundle-manager", () => ({
 }));
 
 jest.mock("inversify", () => ({
-  injectable: () => (target: any) => target
+  injectable: () => (target: Function) => target
 }));
 
 jest.mock("../../../assets/scripts/store-decorator", () => ({
-  store: () => (target: any) => target
+  store: () => (target: Function) => target
 }));
 
 jest.mock("mobx", () => ({
@@ -146,8 +146,146 @@ describe("CommentatorVoiceStore", () => {
 
       // Act & Assert
       await expect(store.loadSingleVoice(voice)).rejects.toThrow("error is not a function");
-      const { error } = require("cc");
       expect(error).toHaveBeenCalledWith("Failed to load voice: audios/commentator-voices/common/en/test/null_voice - returned null");
+    });
+  });
+
+  describe("initSingleVoice", () => {
+    it("should initialize a voice with default state", async () => {
+      // Arrange
+      const voice: Voice = {
+        name: "goal_1_1",
+        event: "goal",
+        duration: 1,
+        index: 1,
+        isLoaded: true,
+        audioClip: mockAudioClip
+      };
+
+      // Act
+      const result = await store.initSingleVoice(voice);
+
+      // Assert
+      expect(result.name).toBe("goal_1_1");
+      expect(result.event).toBe("goal");
+      expect(result.duration).toBe(1);
+      expect(result.index).toBe(1);
+      expect(result.isLoaded).toBe(false);
+      expect(result.audioClip).toBeUndefined();
+    });
+
+    it("should store initialized voice in voiceMap", async () => {
+      // Arrange
+      const voice: Voice = {
+        name: "save_2_1",
+        event: "save",
+        duration: 2,
+        index: 1,
+        isLoaded: true,
+        audioClip: mockAudioClip
+      };
+
+      // Act
+      await store.initSingleVoice(voice);
+
+      // Assert
+      store.playVoice("save_2_1");
+      expect(store.playingVoice).toBe(null); // Should be null because voice is not loaded
+    });
+
+    it("should preserve original voice properties except isLoaded and audioClip", async () => {
+      // Arrange
+      const voice: Voice = {
+        name: "test_voice",
+        event: "test",
+        duration: 3,
+        index: 5,
+        isLoaded: true,
+        audioClip: mockAudioClip
+      };
+
+      // Act
+      const result = await store.initSingleVoice(voice);
+
+      // Assert
+      expect(result.name).toBe(voice.name);
+      expect(result.event).toBe(voice.event);
+      expect(result.duration).toBe(voice.duration);
+      expect(result.index).toBe(voice.index);
+      expect(result.isLoaded).toBe(false);
+      expect(result.audioClip).toBeUndefined();
+    });
+  });
+
+  describe("initVoices", () => {
+    it("should initialize all voices from config", () => {
+      // Act
+      const result = store.initVoices(mockConfig);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result?.length).toBe(8); // goal: 2+3=5, save: 1+2=3, total=8
+    });
+
+    it("should skip initialization if config hasn't changed", () => {
+      // Arrange
+      store.initVoices(mockConfig);
+
+      // Act
+      const result = store.initVoices(mockConfig);
+
+      // Assert
+      expect(result).toBeUndefined();
+    });
+
+    it("should reinitialize voices when config changes", () => {
+      // Arrange
+      store.initVoices(mockConfig);
+      const newConfig: VoiceConfig = {
+        "goal": {
+          "1": 1
+        }
+      };
+
+      // Act
+      const result = store.initVoices(newConfig);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result?.length).toBe(1);
+    });
+
+    it("should handle empty config", () => {
+      // Arrange
+      const emptyConfig: VoiceConfig = {};
+
+      // Act
+      const result = store.initVoices(emptyConfig);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result?.length).toBe(0);
+    });
+
+    it("should initialize voices with correct properties", async () => {
+      // Act
+      const result = store.initVoices(mockConfig);
+
+      // Assert
+      expect(result).toBeDefined();
+      if (result) {
+        const firstVoicePromise = result[0];
+        const firstVoice = await firstVoicePromise;
+        expect(firstVoice.isLoaded).toBe(false);
+        expect(firstVoice.audioClip).toBeUndefined();
+        expect(firstVoice.name).toBeDefined();
+        expect(firstVoice.event).toBeDefined();
+        expect(firstVoice.duration).toBeDefined();
+        expect(firstVoice.index).toBeDefined();
+      }
     });
   });
 
@@ -237,24 +375,25 @@ describe("CommentatorVoiceStore", () => {
       await store.loadVoices(mockConfig);
     });
 
-    it("should set playingVoice when voice exists in voiceMap", () => {
+    it("should set playingVoice when voice exists in voiceMap and is loaded", () => {
       // Act
       store.playVoice("goal_1_1");
 
       // Assert
       expect(store.playingVoice?.name).toBe("goal_1_1");
       expect(store.playingVoice?.event).toBe("goal");
+      expect(store.playingVoice?.isLoaded).toBe(true);
     });
 
-    it("should set playingVoice to undefined when voice doesn't exist", () => {
+    it("should not set playingVoice when voice doesn't exist", () => {
       // Act
       store.playVoice("nonexistent_voice");
 
       // Assert
-      expect(store.playingVoice).toBeUndefined();
+      expect(store.playingVoice).toBe(null);
     });
 
-    it("should update playingVoice when called multiple times", () => {
+    it("should update playingVoice when called multiple times with loaded voices", () => {
       // Arrange
       store.playVoice("goal_1_1");
       expect(store.playingVoice?.name).toBe("goal_1_1");
@@ -271,8 +410,38 @@ describe("CommentatorVoiceStore", () => {
       store.playVoice("");
 
       // Assert
-      expect(store.playingVoice).toBeUndefined();
+      expect(store.playingVoice).toBe(null);
     });
+
+    it("should load voice asynchronously when voice exists but is not loaded", async () => {
+      // Arrange
+      const unloadedVoice: Voice = {
+        name: "unloaded_voice",
+        event: "test",
+        duration: 1,
+        index: 1,
+        isLoaded: false
+      };
+      await store.initSingleVoice(unloadedVoice);
+
+      // Act
+      store.playVoice("unloaded_voice");
+
+      // Assert
+      expect(store.playingVoice).toBe(null); // Should be null initially
+      
+      // Wait for async loading to complete
+      await new Promise(resolve => setTimeout(resolve, 0));
+      
+      expect(store.playingVoice?.name).toBe("unloaded_voice");
+      expect(store.playingVoice?.isLoaded).toBe(true);
+      expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
+        "audios/commentator-voices/common/en/test/unloaded_voice",
+        AudioClip,
+        null
+      );
+    });
+
   });
 
   describe("voice generation and loading edge cases", () => {
@@ -354,7 +523,6 @@ describe("CommentatorVoiceStore", () => {
       // Arrange
       await store.loadVoices(mockConfig);
       store.playVoice("goal_1_1");
-      const firstPlay = store.playingVoice;
 
       // Act
       store.playVoice("save_2_1");

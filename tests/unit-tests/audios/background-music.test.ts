@@ -41,7 +41,7 @@ describe("BackgroundMusic", () => {
 
   describe("play method", () => {
     it("should play audio when not muted, playing is true, and audioSource is not playing", () => {
-      // Arrange
+    // Arrange
       (backgroundMusic as any).muted = false;
       (backgroundMusic as any).playing = true;
       (mockAudioSource as any).playing = false;

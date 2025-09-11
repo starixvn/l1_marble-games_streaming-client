@@ -7,6 +7,7 @@ import {
   Result,
   StreamingState,
 } from "./streaming-type";
+import { VoiceConfig } from "../commentators-voices/commentator-voice-store";
 
 @injectable()
 @store("StreamingStore")
@@ -84,7 +85,8 @@ export class StreamingStore {
       homeScore,
       awayScore,
       voice: payload.voice,
-      voiceConfigDetail: payload.voiceConfigDetail,
+      voiceConfigDetail: payload.voiceConfigDetail as VoiceConfig,
+      introTime: payload.introTime,
     };
   }
 

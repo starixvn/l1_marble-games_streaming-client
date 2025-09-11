@@ -126,11 +126,10 @@ export class Startup extends Component {
         ? currentEventDetail.playlist
         : defaultPlaylist;
     const videoLiveTime = currentEventDetail.videoLiveTimeMs;
-    const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
 
 
     if (this.isPlayingIntro(eventData)) {
-      const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
+      const introTime = eventData.introTime / 1000;
       this.updateIntroStore({
         currentTime: introTime,
         status: VideoStatus.Playing,
@@ -142,7 +141,7 @@ export class Startup extends Component {
       });
     }
     if (eventData.voiceConfigDetail) {
-      this.loadCommentatorVoices(eventData.voiceConfigDetail);
+      this.initCommentatorVoices(eventData.voiceConfigDetail);
     }
 
     if (eventData.currentPhase === Phase.UpdateVideoInfo && eventData.voice) {
@@ -168,8 +167,8 @@ export class Startup extends Component {
     return voice;
   }
 
-  @handle(CommentatorVoiceStore, (store, config: VoiceConfig) => store.loadVoices(config))
-  public loadCommentatorVoices(config: VoiceConfig) {
+  @handle(CommentatorVoiceStore, (store, config: VoiceConfig) => store.initVoices(config))
+  public initCommentatorVoices(config: VoiceConfig) {
     return config;
   } 
 
