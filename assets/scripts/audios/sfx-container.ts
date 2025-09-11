@@ -13,7 +13,7 @@ export class SfxContainer extends Component {
     @property(AudioSource)
     audioSource: AudioSource = null;
 
-    private muted = true;
+    private muted = false;
 
     @render(AudioStore, (store) => ({
         muted: store.muted,
@@ -45,7 +45,6 @@ export class SfxContainer extends Component {
         if (!playingVoice.audioClip) {
             return;
         }
-
         this.audioSource.clip = playingVoice.audioClip;
         this.audioSource.playOneShot(playingVoice.audioClip);
     }

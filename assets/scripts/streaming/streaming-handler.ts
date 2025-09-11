@@ -46,6 +46,7 @@ export class StreamingHandler {
     this.eventSource.onmessage = (event) => {
       try {
         const payload: EventStreamPayload = JSON.parse(event.data);
+        console.log("intro time received", (payload as any).introTime);
         this.handleEventStreamStateWithPayload(payload);
       } catch (err) {
         console.error("StreamingHandler: Failed to parse message:", err);

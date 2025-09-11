@@ -33,6 +33,9 @@ export class BackgroundVideoPlayer extends Component {
     status: store.status,
   }))
   playIntro({ currentTime, status }: { currentTime: number; status: VideoStatus }) {
+    if (!this._introUrl || this._introUrl === "") {
+      return;
+    }
     if (status === VideoStatus.Playing) {
       this.hlsPlayer.load(this._introUrl);
       this.currentTime = currentTime;

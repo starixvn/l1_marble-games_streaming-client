@@ -5,7 +5,7 @@ export const gameSettings = {
   videoDuration: 30,
   streamingUrl: "https://d1aof1lwumql9k.cloudfront.net/marble_tv/",
   introDuration: {
-    "default": 7,
-    "2000": 7,
+    "default": 8,
+    "2000": 8,
   }
 };

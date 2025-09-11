@@ -34,7 +34,7 @@ describe("BackgroundMusic", () => {
     it("should initialize with default state", () => {
       // Assert
       expect(backgroundMusic.playing).toBe(false);
-      expect(backgroundMusic.muted).toBe(true);
+      expect(backgroundMusic.muted).toBe(false);
       expect(backgroundMusic.audioSource).toBe(mockAudioSource);
     });
   });

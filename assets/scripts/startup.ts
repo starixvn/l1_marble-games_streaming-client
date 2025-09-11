@@ -108,6 +108,7 @@ export class Startup extends Component {
       away: eventData.awayScore,
     });
 
+
     this.update1HalfScore({
       home: firstHalfHomeScore,
       away: firstHalfAwayScore,

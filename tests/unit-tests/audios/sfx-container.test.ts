@@ -35,7 +35,7 @@ describe("SfxContainer", () => {
     it("should initialize with default values", () => {
       // Assert
       expect(sfxContainer.audioSource).toBe(mockAudioSource);
-      expect((sfxContainer as any).muted).toBe(true);
+      expect((sfxContainer as any).muted).toBe(false);
     });
 
     it("should be properly decorated with ccclass and observer decorators", () => {

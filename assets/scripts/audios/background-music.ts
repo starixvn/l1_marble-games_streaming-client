@@ -15,7 +15,7 @@ export class BackgroundMusic extends Component {
   audioSource: AudioSource = null;
 
   playing = false;
-  muted = true;
+  muted = false;
 
   play() {
     if (!this.muted && this.playing && !this.audioSource.playing) {
