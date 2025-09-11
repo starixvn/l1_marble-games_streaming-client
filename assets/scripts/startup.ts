@@ -130,8 +130,7 @@ export class Startup extends Component {
     console.log("Phase update", eventData.currentPhase);
 
     if (this.isPlayingIntro(eventData)) {
-      const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
-      const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
+      const introTime = eventData.introTime / 1000;
       this.updateIntroStore({
         currentTime: introTime,
         status: VideoStatus.Playing,

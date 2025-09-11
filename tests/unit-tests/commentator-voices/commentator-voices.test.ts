@@ -1,5 +1,6 @@
 import { AudioClip, error } from "cc";
 import { bundleManager } from "../../../assets/scripts/asset-loader/bundle-manager";
+import { Store } from "../../../assets/scripts/store";
 import { 
   CommentatorVoiceStore, 
   VoiceConfig, 
@@ -19,7 +20,8 @@ jest.mock("../../../assets/scripts/asset-loader/bundle-manager", () => ({
 }));
 
 jest.mock("inversify", () => ({
-  injectable: () => (target: Function) => target
+  injectable: () => (target: Function) => target,
+  inject: () => (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => {}
 }));
 
 jest.mock("../../../assets/scripts/store-decorator", () => ({
@@ -30,9 +32,14 @@ jest.mock("mobx", () => ({
   makeAutoObservable: jest.fn()
 }));
 
+jest.mock("../../../assets/scripts/store", () => ({
+  Store: jest.fn()
+}));
+
 describe("CommentatorVoiceStore", () => {
   let store: CommentatorVoiceStore;
   let mockAudioClip: AudioClip;
+  let mockStore: jest.Mocked<Store>;
 
   const mockConfig: VoiceConfig = {
     "goal": {
@@ -47,7 +54,17 @@ describe("CommentatorVoiceStore", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    
+    // Create mock store with default values
+    mockStore = {
+      language: "en-US",
+      operator: "common"
+    } as jest.Mocked<Store>;
+    
     store = new CommentatorVoiceStore();
+    // Manually inject the mock store since we're not using a real DI container
+    (store as any).store = mockStore;
+    
     mockAudioClip = new AudioClip();
     
     // Setup default mock behavior
@@ -92,7 +109,7 @@ describe("CommentatorVoiceStore", () => {
       expect(result.isLoaded).toBe(true);
       expect(result.audioClip).toBe(mockAudioClip);
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/goal/goal_1_1",
+        "audios/commentator-voices/common/en-US/goal/goal_1_1",
         AudioClip,
         null
       );
@@ -115,6 +132,29 @@ describe("CommentatorVoiceStore", () => {
       store.playVoice("save_2_1");
       expect(store.playingVoice?.name).toBe("save_2_1");
       expect(store.playingVoice?.isLoaded).toBe(true);
+    });
+
+    it("should use language and operator from store", async () => {
+      // Arrange
+      mockStore.language = "fr-FR";
+      mockStore.operator = "premium";
+      const voice: Voice = {
+        name: "goal_2_1",
+        event: "goal",
+        duration: 2,
+        index: 1,
+        isLoaded: false
+      };
+
+      // Act
+      await store.loadSingleVoice(voice);
+
+      // Assert
+      expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
+        "audios/commentator-voices/premium/fr-FR/goal/goal_2_1",
+        AudioClip,
+        null
+      );
     });
 
     it("should handle voice loading error", async () => {
@@ -146,7 +186,7 @@ describe("CommentatorVoiceStore", () => {
 
       // Act & Assert
       await expect(store.loadSingleVoice(voice)).rejects.toThrow("error is not a function");
-      expect(error).toHaveBeenCalledWith("Failed to load voice: audios/commentator-voices/common/en/test/null_voice - returned null");
+      expect(error).toHaveBeenCalledWith("Failed to load voice: audios/commentator-voices/common/en-US/test/null_voice - returned null");
     });
   });
 
@@ -366,12 +406,12 @@ describe("CommentatorVoiceStore", () => {
 
       // Assert
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/goal/goal_1_1",
+        "audios/commentator-voices/common/en-US/goal/goal_1_1",
         AudioClip,
         null
       );
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/save/save_2_1",
+        "audios/commentator-voices/common/en-US/save/save_2_1",
         AudioClip,
         null
       );
@@ -445,7 +485,7 @@ describe("CommentatorVoiceStore", () => {
       expect(store.playingVoice?.name).toBe("unloaded_voice");
       expect(store.playingVoice?.isLoaded).toBe(true);
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/test/unloaded_voice",
+        "audios/commentator-voices/common/en-US/test/unloaded_voice",
         AudioClip,
         null
       );
@@ -487,12 +527,12 @@ describe("CommentatorVoiceStore", () => {
       // Assert
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledTimes(4);
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/goal/goal_1_1",
+        "audios/commentator-voices/common/en-US/goal/goal_1_1",
         AudioClip,
         null
       );
       expect(bundleManager.loadResourcesAsset).toHaveBeenCalledWith(
-        "audios/commentator-voices/common/en/goal/goal_4_1",
+        "audios/commentator-voices/common/en-US/goal/goal_4_1",
         AudioClip,
         null
       );
