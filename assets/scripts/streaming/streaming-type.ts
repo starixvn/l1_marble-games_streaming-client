@@ -33,6 +33,7 @@ export enum Phase {
   UpdateGoalInfo = "UpdateGoalInfo",
   UpdateResult = "UpdateResult",
   UpdateVoice = "UpdateVoice",
+  PlayIntro = "PlayIntro",
 }
 
 export type EventData = {

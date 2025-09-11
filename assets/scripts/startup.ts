@@ -127,9 +127,11 @@ export class Startup extends Component {
         : defaultPlaylist;
     const videoLiveTime = currentEventDetail.videoLiveTimeMs;
 
+    console.log("Phase update", eventData.currentPhase);
 
     if (this.isPlayingIntro(eventData)) {
-      const introTime = eventData.introTime / 1000;
+      const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
+      const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
       this.updateIntroStore({
         currentTime: introTime,
         status: VideoStatus.Playing,
@@ -225,12 +227,17 @@ export class Startup extends Component {
     return url;
   }
 
-  private isPlayingIntro({ currentEventIndex, matchLiveTimeMs, currentPhase }: {
+  private isPlayingIntro({ currentEventIndex, matchLiveTimeMs, currentPhase, introTime }: {
     currentEventIndex: number;
     matchLiveTimeMs: number;
     currentPhase: Phase;
+    introTime?: number;
   }) {
-    const isHalfTime = currentEventIndex === 0 || matchLiveTimeMs / 1000 <= gameSettings.videoDuration;
-    return currentPhase === Phase.ScheduleEvent || (currentPhase === Phase.UpdateResult && isHalfTime);
+    return this.isValidIntroTime(introTime);
+  }
+
+  private isValidIntroTime(introTime: number) {
+    const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
+    return introTime !== undefined && introTime >= 0 && introTime <= introDuration * 1000;
   }
 }

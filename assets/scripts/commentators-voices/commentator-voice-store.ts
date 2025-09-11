@@ -1,8 +1,9 @@
 import { AudioClip, error } from "cc";
 import { bundleManager } from "../asset-loader/bundle-manager";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { store } from "../store-decorator";
 import mobx from "mobx";
+import { Store } from "../store";
 
 export interface VoiceConfig {
     [key: string]: {
@@ -130,6 +131,10 @@ async function loadVoice({ voice, language = "en", operator = "common" }: { voic
 @injectable()
 @store("CommentatorVoiceStore")
 export class CommentatorVoiceStore {
+    @inject(Store)
+    private readonly store: Store;
+
+
     constructor() {
         mobx.makeAutoObservable(this);
     }
@@ -140,7 +145,9 @@ export class CommentatorVoiceStore {
     playingVoice: Voice | null = null;
    
     async loadSingleVoice(voice: Voice) {
-        const voiceResult = await loadVoice({ voice, language: "en", operator: "common" });
+        const language = this.store.language ?? "en-US";
+        const operator = this.store.operator ?? "common";
+        const voiceResult = await loadVoice({ voice, language, operator });
         this.voiceMap.set(voice.name, voiceResult as Voice);
         return voiceResult;
     }
