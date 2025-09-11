@@ -163,7 +163,7 @@ export class CommentatorVoiceStore {
         this.configJson = updatedConfigJSON;
         this.voices = getAllVoices(config);
         const voicesArray = Array.from(this.voices);
-        return voicesArray.map(voice => this.initSingleVoice(voice));
+        voicesArray.forEach(voice => this.initSingleVoice(voice));
     }
 
     async loadVoices(config: VoiceConfig = CONFIG) { 
