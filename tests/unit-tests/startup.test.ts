@@ -1,4 +1,4 @@
-import { createMockStore, cleanupMockObserver, initializeMockContainer } from "../utils/mock-store";
+import { cleanupMockObserver, initializeMockContainer } from "../utils/mock-store";
 import { Phase, VideoStatus } from "../../assets/scripts/streaming/streaming-type";
 
 // Mock the observer decorator
@@ -77,8 +77,9 @@ jest.mock("../../assets/scripts/team/team-store");
 jest.mock("../../assets/scripts/time/time-store");
 jest.mock("../../assets/scripts/video-player/video-store");
 jest.mock("../../assets/scripts/intro/intro-store");
+jest.mock("../../assets/scripts/commentators-voices/commentator-voice-store");
 
-import { Component, error, instantiate } from "cc";
+import { error, instantiate } from "cc";
 import { init } from "db://i18n/LanguageData";
 
 // Import the actual Startup class to ensure coverage tracking
@@ -179,10 +180,9 @@ describe("Startup", () => {
             ? currentEventDetail.playlist
             : defaultPlaylist;
         const videoLiveTime = currentEventDetail.videoLiveTimeMs;
-        const introDuration = 10; // gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
 
         if (this.isPlayingIntro(eventData)) {
-          const introTime = Math.max(introDuration + 3 + 2 + videoLiveTime / 1000, 0);
+          const introTime = eventData.introTime / 1000;
           this.updateIntroStore({
             currentTime: introTime,
             status: VideoStatus.Playing,
@@ -192,6 +192,14 @@ describe("Startup", () => {
             currentTime: 0,
             status: VideoStatus.Stopped,
           });
+        }
+        
+        if (eventData.voiceConfigDetail) {
+          this.initCommentatorVoices(eventData.voiceConfigDetail);
+        }
+
+        if (eventData.currentPhase === Phase.UpdateVideoInfo && eventData.voice) {
+          this.updateVoice(eventData.voice);
         }
 
         this.updateVideoStore({
@@ -248,13 +256,20 @@ describe("Startup", () => {
         return url;
       },
 
+      updateVoice(voice: string) {
+        return voice;
+      },
+
+      initCommentatorVoices(config: any) {
+        return config;
+      },
+
       isPlayingIntro({ currentEventIndex, matchLiveTimeMs, currentPhase }: {
         currentEventIndex: number;
         matchLiveTimeMs: number;
         currentPhase: any;
       }) {
-        const isHalfTime = currentEventIndex === 0 || matchLiveTimeMs / 1000 <= 30; // videoDuration
-        return currentPhase === Phase.ScheduleEvent || (currentPhase === Phase.UpdateResult && isHalfTime);
+        return currentPhase === Phase.ScheduleEvent || currentPhase === Phase.PlayIntro;
       }
     };
   });
@@ -529,7 +544,8 @@ describe("Startup", () => {
     it("should call updateIntroStore with Playing status when isPlayingIntro returns true", () => {
       // Arrange
       const eventData = createMockEventData({
-        currentPhase: Phase.ScheduleEvent, // This should make isPlayingIntro return true
+        currentPhase: Phase.ScheduleEvent,
+        introTime: 15000, // 15 seconds
       });
       startupMock.operator = "test-op";
       startupMock.game = "2001";
@@ -543,7 +559,7 @@ describe("Startup", () => {
       // Assert
       expect(isPlayingIntroSpy).toHaveBeenCalledWith(eventData);
       expect(updateIntroStoreSpy).toHaveBeenCalledWith({
-        currentTime: expect.any(Number),
+        currentTime: 15, // introTime / 1000
         status: VideoStatus.Playing,
       });
     });
@@ -640,7 +656,7 @@ describe("Startup", () => {
     });
   });
 
-  describe("isPlayingIntro method - full branch coverage", () => {
+  describe("isPlayingIntro method - updated logic", () => {
     it("should return true when currentPhase is ScheduleEvent", () => {
       // Arrange
       const eventInfo = {
@@ -656,12 +672,12 @@ describe("Startup", () => {
       expect(result).toBe(true);
     });
 
-    it("should return true when currentPhase is UpdateResult and currentEventIndex is 0", () => {
+    it("should return true when currentPhase is PlayIntro", () => {
       // Arrange
       const eventInfo = {
-        currentEventIndex: 0, // Half time condition
+        currentEventIndex: 1,
         matchLiveTimeMs: 60000,
-        currentPhase: Phase.UpdateResult,
+        currentPhase: Phase.PlayIntro,
       };
 
       // Act
@@ -671,41 +687,11 @@ describe("Startup", () => {
       expect(result).toBe(true);
     });
 
-    it("should return true when currentPhase is UpdateResult and matchLiveTimeMs <= videoDuration", () => {
+    it("should return false when currentPhase is UpdateResult", () => {
       // Arrange
       const eventInfo = {
-        currentEventIndex: 1,
-        matchLiveTimeMs: 25000, // 25 seconds, less than videoDuration (30)
-        currentPhase: Phase.UpdateResult,
-      };
-
-      // Act
-      const result = startupMock.isPlayingIntro.call(startupMock, eventInfo);
-
-      // Assert
-      expect(result).toBe(true);
-    });
-
-    it("should return true when currentPhase is UpdateResult and matchLiveTimeMs exactly equals videoDuration", () => {
-      // Arrange
-      const eventInfo = {
-        currentEventIndex: 1,
-        matchLiveTimeMs: 30000, // 30 seconds, exactly equals videoDuration (30)
-        currentPhase: Phase.UpdateResult,
-      };
-
-      // Act
-      const result = startupMock.isPlayingIntro.call(startupMock, eventInfo);
-
-      // Assert
-      expect(result).toBe(true);
-    });
-
-    it("should return false when currentPhase is UpdateResult and both half time conditions are false", () => {
-      // Arrange
-      const eventInfo = {
-        currentEventIndex: 1, // Not 0
-        matchLiveTimeMs: 60000, // 60 seconds, more than videoDuration (30)
+        currentEventIndex: 0,
+        matchLiveTimeMs: 10000,
         currentPhase: Phase.UpdateResult,
       };
 
@@ -835,6 +821,188 @@ describe("Startup", () => {
 
       // Assert
       expect(result).toBe(url);
+    });
+
+    it("updateVoice should return the provided voice", () => {
+      // Arrange
+      const voice = "goal_celebration";
+
+      // Act
+      const result = startupMock.updateVoice.call(startupMock, voice);
+
+      // Assert
+      expect(result).toBe(voice);
+    });
+
+    it("initCommentatorVoices should return the provided config", () => {
+      // Arrange
+      const config = {
+        "goal": { "1": 2, "2": 3 },
+        "draw": { "1": 1, "2": 2 }
+      };
+
+      // Act
+      const result = startupMock.initCommentatorVoices.call(startupMock, config);
+
+      // Assert
+      expect(result).toBe(config);
+    });
+  });
+
+  describe("voice functionality in renderEventData", () => {
+
+    it("should call initCommentatorVoices when voiceConfigDetail is present", () => {
+      // Arrange
+      const voiceConfig = {
+        "goal": { "1": 2, "2": 3 },
+        "draw": { "1": 1, "2": 2 }
+      };
+      const eventData = {
+        eventId: "test-event-123",
+        homeTeam: "Team A",
+        awayTeam: "Team B",
+        homeScore: 2,
+        awayScore: 1,
+        liveScores: ["1:0", "2:1"],
+        currentEventIndex: 1,
+        matchLiveTimeMs: 45000,
+        currentPhase: Phase.UpdateResult,
+        eventDetails: [
+          { playlist: "", videoLiveTimeMs: 5000 },
+          { playlist: "custom.m3u8", videoLiveTimeMs: 10000 }
+        ],
+        voiceConfigDetail: voiceConfig,
+      };
+      startupMock.operator = "test-op";
+      startupMock.game = "2001";
+
+      const initCommentatorVoicesSpy = jest.spyOn(startupMock, 'initCommentatorVoices').mockReturnValue({});
+
+      // Act
+      startupMock.renderEventData(eventData);
+
+      // Assert
+      expect(initCommentatorVoicesSpy).toHaveBeenCalledWith(voiceConfig);
+    });
+
+    it("should not call initCommentatorVoices when voiceConfigDetail is not present", () => {
+      // Arrange
+      const eventData = {
+        eventId: "test-event-123",
+        homeTeam: "Team A",
+        awayTeam: "Team B",
+        homeScore: 2,
+        awayScore: 1,
+        liveScores: ["1:0", "2:1"],
+        currentEventIndex: 1,
+        matchLiveTimeMs: 45000,
+        currentPhase: Phase.UpdateResult,
+        eventDetails: [
+          { playlist: "", videoLiveTimeMs: 5000 },
+          { playlist: "custom.m3u8", videoLiveTimeMs: 10000 }
+        ],
+        voiceConfigDetail: null,
+      };
+      startupMock.operator = "test-op";
+      startupMock.game = "2001";
+
+      const initCommentatorVoicesSpy = jest.spyOn(startupMock, 'initCommentatorVoices').mockReturnValue({});
+
+      // Act
+      startupMock.renderEventData(eventData);
+
+      // Assert
+      expect(initCommentatorVoicesSpy).not.toHaveBeenCalled();
+    });
+
+    it("should call updateVoice when phase is UpdateVideoInfo and voice is present", () => {
+      // Arrange
+      const eventData = {
+        eventId: "test-event-123",
+        homeTeam: "Team A",
+        awayTeam: "Team B",
+        homeScore: 2,
+        awayScore: 1,
+        liveScores: ["1:0", "2:1"],
+        currentEventIndex: 1,
+        matchLiveTimeMs: 45000,
+        currentPhase: Phase.UpdateVideoInfo,
+        eventDetails: [
+          { playlist: "", videoLiveTimeMs: 5000 },
+          { playlist: "custom.m3u8", videoLiveTimeMs: 10000 }
+        ],
+        voice: "goal_celebration",
+      };
+      startupMock.operator = "test-op";
+      startupMock.game = "2001";
+
+      const updateVoiceSpy = jest.spyOn(startupMock, 'updateVoice').mockReturnValue({});
+
+      // Act
+      startupMock.renderEventData(eventData);
+
+      // Assert
+      expect(updateVoiceSpy).toHaveBeenCalledWith("goal_celebration");
+    });
+
+    it("should not call updateVoice when phase is not UpdateVideoInfo", () => {
+      // Arrange
+      const eventData = {
+        eventId: "test-event-123",
+        homeTeam: "Team A",
+        awayTeam: "Team B",
+        homeScore: 2,
+        awayScore: 1,
+        liveScores: ["1:0", "2:1"],
+        currentEventIndex: 1,
+        matchLiveTimeMs: 45000,
+        currentPhase: Phase.UpdateResult,
+        eventDetails: [
+          { playlist: "", videoLiveTimeMs: 5000 },
+          { playlist: "custom.m3u8", videoLiveTimeMs: 10000 }
+        ],
+        voice: "goal_celebration",
+      };
+      startupMock.operator = "test-op";
+      startupMock.game = "2001";
+
+      const updateVoiceSpy = jest.spyOn(startupMock, 'updateVoice').mockReturnValue({});
+
+      // Act
+      startupMock.renderEventData(eventData);
+
+      // Assert
+      expect(updateVoiceSpy).not.toHaveBeenCalled();
+    });
+
+    it("should not call updateVoice when voice is not present", () => {
+      // Arrange
+      const eventData = {
+        eventId: "test-event-123",
+        homeTeam: "Team A",
+        awayTeam: "Team B",
+        homeScore: 2,
+        awayScore: 1,
+        liveScores: ["1:0", "2:1"],
+        currentEventIndex: 1,
+        matchLiveTimeMs: 45000,
+        currentPhase: Phase.UpdateVideoInfo,
+        eventDetails: [
+          { playlist: "", videoLiveTimeMs: 5000 },
+          { playlist: "custom.m3u8", videoLiveTimeMs: 10000 }
+        ],
+        voice: null,
+      };
+      startupMock.operator = "test-op";
+      startupMock.game = "2001";
+
+      const updateVoiceSpy = jest.spyOn(startupMock, 'updateVoice').mockReturnValue({});
+
+      // Act
+      startupMock.renderEventData(eventData);
+
+      // Assert
+      expect(updateVoiceSpy).not.toHaveBeenCalled();
     });
   });
 });

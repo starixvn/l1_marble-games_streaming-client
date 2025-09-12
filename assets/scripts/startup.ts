@@ -141,6 +141,7 @@ export class Startup extends Component {
         status: VideoStatus.Stopped,
       });
     }
+    
     if (eventData.voiceConfigDetail) {
       this.initCommentatorVoices(eventData.voiceConfigDetail);
     }
@@ -232,11 +233,6 @@ export class Startup extends Component {
     currentPhase: Phase;
     introTime?: number;
   }) {
-    return this.isValidIntroTime(introTime);
-  }
-
-  private isValidIntroTime(introTime: number) {
-    const introDuration = gameSettings.introDuration[this.game] ?? gameSettings.introDuration["default"];
-    return introTime !== undefined && introTime >= 0 && introTime <= introDuration * 1000;
+    return currentPhase === Phase.ScheduleEvent || currentPhase === Phase.PlayIntro;
   }
 }

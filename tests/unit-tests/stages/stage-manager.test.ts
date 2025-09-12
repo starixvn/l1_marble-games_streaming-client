@@ -167,31 +167,6 @@ describe("StageManager", () => {
       expect(stageManager.current).toBe("prebetting");
     });
 
-    it("should map UpdateOdds to prebetting for first event", () => {
-      // Act
-      stageManager["updateStage"]({
-        phase: Phase.UpdateOdds,
-        eventIndex: 0,
-        result: null,
-        matchLiveTime: 0,
-      });
-
-      // Assert
-      expect(stageManager.current).toBe("prebetting");
-    });
-
-    it("should map UpdateOdds to streaming for subsequent events", () => {
-      // Act
-      stageManager["updateStage"]({
-        phase: Phase.UpdateOdds,
-        eventIndex: 1,
-        result: null,
-        matchLiveTime: 0,
-      });
-
-      // Assert
-      expect(stageManager.current).toBe("streaming");
-    });
 
     it("should map UpdateVideoInfo to streaming", () => {
       // Act
@@ -204,6 +179,38 @@ describe("StageManager", () => {
 
       // Assert
       expect(stageManager.current).toBe("streaming");
+    });
+
+    it("should map UpdatePreloadVideoInfo to current stage", () => {
+      // Arrange
+      stageManager.current = "halftime";
+
+      // Act
+      stageManager["updateStage"]({
+        phase: Phase.UpdatePreloadVideoInfo,
+        eventIndex: 1,
+        result: null,
+        matchLiveTime: 0,
+      });
+
+      // Assert
+      expect(stageManager.current).toBe("halftime");
+    });
+
+    it("should map UpdatePreloadVideoInfo to current stage when current is undefined", () => {
+      // Arrange - no stage is active initially
+      expect(stageManager.current).toBeUndefined();
+
+      // Act
+      stageManager["updateStage"]({
+        phase: Phase.UpdatePreloadVideoInfo,
+        eventIndex: 1,
+        result: null,
+        matchLiveTime: 0,
+      });
+
+      // Assert
+      expect(stageManager.current).toBeUndefined();
     });
 
     it("should map UpdateResult to halftime for first event", () => {
