@@ -5,4 +5,5 @@ window.envConfig = {
     logIdentifier: "Streaming-Client",
     env: "LOCAL",
   },
+  streamingUrl: "https://d1aof1lwumql9k.cloudfront.net/marble_tv/",
 };
