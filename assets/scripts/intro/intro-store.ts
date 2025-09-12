@@ -16,7 +16,6 @@ export class IntroStore {
   status: VideoStatus = VideoStatus.Stopped;
 
   setUrl(url: string) {
-    console.log("set intro url ", url);
     this.url = url;
   }
 

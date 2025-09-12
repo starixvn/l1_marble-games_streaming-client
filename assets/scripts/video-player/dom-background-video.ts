@@ -31,14 +31,12 @@ export class DOMBackgroundVideo {
   });
 
   static changeBackground(videoId: string, url: string) {
-    console.log("changing background", videoId, url);
     const video = DOMBackgroundVideo.videos.get(videoId);
     video.style.background = `url(${url}) center/cover no-repeat`;
     video.style.backgroundSize = "100% 100%";
   }
   
   static notify(event: GenericBackgroundVideoEvents, data: any) {
-    console.log("notifying", event, data);
     DOMBackgroundVideo.genericEventNotifier.dispatchEvent(new CustomEvent(event, { detail: data }));
   }
 

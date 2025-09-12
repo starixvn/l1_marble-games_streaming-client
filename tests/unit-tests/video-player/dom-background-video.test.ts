@@ -383,7 +383,6 @@ describe("DOMBackgroundVideo", () => {
       // Assert
       expect(video.style.background).toBe(`url(${imageUrl}) center/cover no-repeat`);
       expect(video.style.backgroundSize).toBe("100% 100%");
-      expect(consoleSpy).toHaveBeenCalledWith("changing background", videoId, imageUrl);
 
       // Cleanup
       consoleSpy.mockRestore();
@@ -401,7 +400,6 @@ describe("DOMBackgroundVideo", () => {
       DOMBackgroundVideo.notify(GenericBackgroundVideoEvents.SWITCH_BACKGROUND, testData);
 
       // Assert
-      expect(consoleSpy).toHaveBeenCalledWith("notifying", GenericBackgroundVideoEvents.SWITCH_BACKGROUND, testData);
       expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
       
       const dispatchedEvent = dispatchSpy.mock.calls[0][0] as CustomEvent;

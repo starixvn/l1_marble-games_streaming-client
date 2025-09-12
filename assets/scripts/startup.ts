@@ -127,7 +127,6 @@ export class Startup extends Component {
         : defaultPlaylist;
     const videoLiveTime = currentEventDetail.videoLiveTimeMs;
 
-    console.log("Phase update", eventData.currentPhase);
 
     if (this.isPlayingIntro(eventData)) {
       const introTime = eventData.introTime / 1000;
