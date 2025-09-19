@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@playwright/test": "1.54.2",
-    "@tolgee/web": "6.2.6",
+    "@tolgee/web": "6.2.7",
     "@types/jest": "29.5.14",
     "@types/node": "24.2.0",
     "javascript-obfuscator": "4.1.1",
