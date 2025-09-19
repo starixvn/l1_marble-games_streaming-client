@@ -27,7 +27,7 @@
     "jest-sonar-reporter": "2.0.0",
     "reflect-metadata": "0.2.2",
     "ts-jest": "29.4.1",
-    "tsx": "4.20.3",
+    "tsx": "4.20.5",
     "typescript": "5.9.2"
   },
   "creator": {
