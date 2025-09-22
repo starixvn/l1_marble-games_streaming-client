@@ -9,7 +9,7 @@
     "test-coverage": "jest --collect-coverage --testPathPattern=tests/unit-tests/ --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
-    "hls.js": "1.5.20",
+    "hls.js": "1.6.13",
     "inversify": "7.10.0",
     "mobx": "6.13.7",
     "observer": "1.3.1"
