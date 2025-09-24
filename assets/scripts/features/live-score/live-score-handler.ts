@@ -7,6 +7,9 @@ import { featureHandler } from "../../handler-registry";
 @featureHandler
 export class LiveScoreHandler extends BaseHandlerImpl<LiveScoreData> {
     name = "liveScore";
+
     @inject(LiveScoreStore) 
-    readonly store: LiveScoreStore
+    set store(store: LiveScoreStore) {
+        super.store = store;
+    }
 }

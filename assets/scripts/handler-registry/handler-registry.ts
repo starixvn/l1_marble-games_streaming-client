@@ -1,12 +1,12 @@
-import { Container, interfaces } from "inversify";
+import { Container, Newable } from "inversify";
 import { BaseHandler } from "../features/base/base-handler";
 
 export const HANDLER_TYPES = Symbol.for("Handler");
 
 class HandlerRegistry {
-    private readonly handlers: Array<interfaces.Newable<BaseHandler<any>>> = [];
+    private readonly handlers: Array<Newable<BaseHandler<any>>> = [];
 
-    register(handlerConstructor: interfaces.Newable<BaseHandler<any>>) {
+    register(handlerConstructor: Newable<BaseHandler<any>>) {
         this.handlers.push(handlerConstructor);
     }
 
@@ -23,7 +23,7 @@ class HandlerRegistry {
 
 export const handlerRegistry = new HandlerRegistry();
 
-export function featureHandler<T extends interfaces.Newable<BaseHandler<any>>>(constructor: T): T {
+export function featureHandler<T extends Newable<BaseHandler<any>>>(constructor: T): T {
     handlerRegistry.register(constructor);
     return constructor;
 }

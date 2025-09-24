@@ -20,12 +20,26 @@ export async function loadSfx(sfx: string) {
 @injectable()
 @store("SfxStore")
 export class SfxStore {
+    private _audioStore: AudioStore;
+    private _visibilityStore: VisibilityStore;
 
     @inject(AudioStore)
-    audioStore: AudioStore;
+    set audioStore(store: AudioStore) {
+        this._audioStore = store;
+    }
+
+    get audioStore(): AudioStore {
+        return this._audioStore;
+    }
 
     @inject(VisibilityStore)
-    visibilityStore: VisibilityStore;
+    set visibilityStore(store: VisibilityStore) {
+        this._visibilityStore = store;
+    }
+
+    get visibilityStore(): VisibilityStore {
+        return this._visibilityStore;
+    }
 
     constructor() {
         mobx.makeAutoObservable(this);

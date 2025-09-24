@@ -7,10 +7,9 @@ import { featureHandler } from "../../handler-registry";
 @featureHandler
 export class ResultHandler extends BaseHandlerImpl<ResultData> {
     name = "result";
-    @inject(ResultStore) 
-    readonly store: ResultStore;
 
-    override update(data: ResultData): void {
-        super.update(data);
+    @inject(ResultStore) 
+    set store(store: ResultStore) {
+        super.store = store;
     }
 }

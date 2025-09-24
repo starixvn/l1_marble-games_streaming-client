@@ -14,8 +14,26 @@ export enum FeatureStage {
 
 @injectable()
 export class StageWatcher {
-    @inject(GameFlowStore) private readonly gameFlowStore: GameFlowStore;
-    @inject(IntroStore) private readonly introStore: IntroStore;
+    private _gameFlowStore: GameFlowStore;
+    private _introStore: IntroStore;
+
+    @inject(GameFlowStore) 
+    set gameFlowStore(store: GameFlowStore) {
+        this._gameFlowStore = store;
+    }
+
+    get gameFlowStore(): GameFlowStore {
+        return this._gameFlowStore;
+    }
+
+    @inject(IntroStore) 
+    set introStore(store: IntroStore) {
+        this._introStore = store;
+    }
+
+    get introStore(): IntroStore {
+        return this._introStore;
+    }
 
     private readonly stageMapper = new Map<GameFlowState, FeatureStage>([
         [GameFlowState.Prebet, FeatureStage.Prebet],

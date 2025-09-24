@@ -9,14 +9,36 @@ import { GameFlowState, GameFlowStore } from "../../features/game-flow/game-flow
 @injectable()
 @store("BackgroundMusicStore")
 export class BackgroundMusicStore {
+    private _audioStore: AudioStore;
+    private _visibilityStore: VisibilityStore;
+    private _gameFlowStore: GameFlowStore;
+
     @inject(AudioStore)
-    audioStore: AudioStore;
+    set audioStore(store: AudioStore) {
+        this._audioStore = store;
+    }
+
+    get audioStore(): AudioStore {
+        return this._audioStore;
+    }
 
     @inject(VisibilityStore)
-    visibilityStore: VisibilityStore;
+    set visibilityStore(store: VisibilityStore) {
+        this._visibilityStore = store;
+    }
+
+    get visibilityStore(): VisibilityStore {
+        return this._visibilityStore;
+    }
 
     @inject(GameFlowStore)
-    gameFlowStore: GameFlowStore;
+    set gameFlowStore(store: GameFlowStore) {
+        this._gameFlowStore = store;
+    }
+
+    get gameFlowStore(): GameFlowStore {
+        return this._gameFlowStore;
+    }
     
     constructor() {
         mobx.makeAutoObservable(this);

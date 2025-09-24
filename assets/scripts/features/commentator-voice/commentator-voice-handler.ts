@@ -6,8 +6,10 @@ import { CommentatorVoiceData, CommentatorVoiceStore } from "./commentator-voice
 @injectable()
 @featureHandler
 export class CommentatorVoiceHandler extends BaseHandlerImpl<CommentatorVoiceData> {
-    @inject(CommentatorVoiceStore) 
-    readonly store: CommentatorVoiceStore;
-
     name = "commentatorVoice";
+
+    @inject(CommentatorVoiceStore) 
+    set store(store: CommentatorVoiceStore) {
+        super.store = store;
+    }
 }

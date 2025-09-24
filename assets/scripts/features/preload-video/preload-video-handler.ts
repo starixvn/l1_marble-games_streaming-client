@@ -9,6 +9,7 @@ export class PreloadVideoHandler extends BaseHandlerImpl<PreloadVideoData> {
     name = "preloadVideo";
 
     @inject(PreloadVideoStore) 
-    readonly store: PreloadVideoStore
-  
+    set store(store: PreloadVideoStore) {
+        super.store = store;
+    }
 }

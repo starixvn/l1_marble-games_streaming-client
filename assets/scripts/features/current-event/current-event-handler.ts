@@ -7,6 +7,9 @@ import { CurrentEventData, CurrentEventStore } from "./current-event-store";
 @featureHandler
 export class CurrentEventHandler extends BaseHandlerImpl<CurrentEventData> {
     name = "currentEvent";
+
     @inject(CurrentEventStore) 
-    readonly store: CurrentEventStore;
+    set store(store: CurrentEventStore) {
+        super.store = store;
+    }
 }

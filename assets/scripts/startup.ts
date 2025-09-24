@@ -22,6 +22,7 @@ const { observer, handle, render } = Observer;
 
 const container = new Container({
   autobind: true,
+  autobind: true,
   defaultScope: "Singleton",
 });
 
@@ -29,9 +30,7 @@ handlerRegistry.bindAll(container);
 
 
 Observer.configure({
-  default: { mobx, container: { resolve: (ctor) => container.get(ctor, {
-    autobind: true,
-  }) } },
+  default: { mobx, container: { resolve: (ctor) => container.get(ctor, { autobind: true}) } },
 });
 
 window.addEventListener("message", handleWindowMessage(container));

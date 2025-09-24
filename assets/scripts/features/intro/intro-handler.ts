@@ -7,8 +7,11 @@ import { featureHandler } from "../../handler-registry";
 @featureHandler
 export class IntroHandler extends BaseHandlerImpl<IntroData> {
     name = "intro";
+
     @inject(IntroStore) 
-    readonly store: IntroStore
+    set store(store: IntroStore) {
+        super.store = store;
+    }
   
     public override update(data: IntroData) {
         const currentTime = (Date.now() - data.timeToPlay) / 1000;

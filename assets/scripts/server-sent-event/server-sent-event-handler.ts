@@ -10,22 +10,25 @@ export class ServerSentEventHandler {
   private reconnectAttempts = 0;
   private readonly reconnectDelay = gameSettings.reconnectDelay;
   private reconnectTimeout: NodeJS.Timeout | null = null;
-
-  private _streamingStore: StreamingStore;
   private _store: Store;
+  private _featureHandler: FeatureHandler;
 
-  @inject(StreamingStore) set streamingStore(store: StreamingStore) {
-    this._streamingStore = store;
-  }
-  get streamingStore(): StreamingStore {
-    return this._streamingStore;
-  }
-
-  @inject(Store) set store(store: Store) {
+  @inject(Store) 
+  set store(store: Store) {
     this._store = store;
   }
+
   get store(): Store {
     return this._store;
+  }
+
+  @inject(FeatureHandler) 
+  set featureHandler(handler: FeatureHandler) {
+    this._featureHandler = handler;
+  }
+
+  get featureHandler(): FeatureHandler {
+    return this._featureHandler;
   }
 
   connect(): void {

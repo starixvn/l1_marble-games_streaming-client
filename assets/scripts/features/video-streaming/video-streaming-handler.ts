@@ -9,7 +9,9 @@ export class VideoStreamingHandler extends BaseHandlerImpl<VideoStreamingData> {
     name = "videoStreaming";
 
     @inject(VideoStreamingStore) 
-    readonly store: VideoStreamingStore
+    set store(store: VideoStreamingStore) {
+        super.store = store;
+    }
   
 
     public override update(data: VideoStreamingData) {

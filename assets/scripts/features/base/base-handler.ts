@@ -9,7 +9,15 @@ export interface BaseHandler<T> {
 export abstract class BaseHandlerImpl<T> implements BaseHandler<T> {
     abstract name: string;
 
-    abstract readonly store: BaseStoreImpl<T>;
+    protected _store: BaseStoreImpl<T>;
+
+    get store(): BaseStoreImpl<T> {
+        return this._store;
+    }
+
+    set store(store: BaseStoreImpl<T>) {
+        this._store = store;
+    }
 
     public handle(data: T): void {
         const value = data[this.name];
@@ -19,7 +27,7 @@ export abstract class BaseHandlerImpl<T> implements BaseHandler<T> {
     }
 
     public update(data: T) {
-        this.store.update(data);
+        this._store.update(data);
     }
 
 }

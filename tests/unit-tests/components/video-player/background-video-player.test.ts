@@ -36,6 +36,10 @@ jest.mock("hls.js", () => ({
 }));
 jest.mock("observer", () => require("../../../utils/mock-store").createMockObserver());
 
+// Mock Date.now for time-based calculations
+const mockDateNow = jest.fn();
+Date.now = mockDateNow;
+
 import { BackgroundVideoPlayer } from "../../../../assets/scripts/components/video-player/background-video-player";
 import { FeatureStage } from "../../../../assets/scripts/watchers/stages/stage-watcher";
 import { initializeMockContainer, cleanupMockObserver } from "../../../utils/mock-store";
@@ -67,6 +71,7 @@ describe("BackgroundVideoPlayer", () => {
 			onHlsPlayed: undefined,
 		};
 		(comp as any).hlsPlayer = hls;
+		mockDateNow.mockClear();
     initializeMockContainer();
   });
 
@@ -86,6 +91,32 @@ describe("BackgroundVideoPlayer", () => {
 			// Assert
 			expect(pauseSpy).toHaveBeenCalled();
 			expect(showSpy).toHaveBeenCalledWith(true);
+		});
+
+		it("does not pause or show background when stage is Intro", () => {
+			// Arrange
+			const pauseSpy = jest.spyOn(comp, "pause");
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+
+			// Act
+			(comp as any).syncPlayVideo(FeatureStage.Intro);
+
+			// Assert
+			expect(pauseSpy).not.toHaveBeenCalled();
+			expect(showSpy).not.toHaveBeenCalled();
+		});
+
+		it("does not pause or show background when stage is Streaming", () => {
+			// Arrange
+			const pauseSpy = jest.spyOn(comp, "pause");
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+
+			// Act
+			(comp as any).syncPlayVideo(FeatureStage.Streaming);
+
+			// Assert
+			expect(pauseSpy).not.toHaveBeenCalled();
+			expect(showSpy).not.toHaveBeenCalled();
 		});
 	});
 
@@ -153,6 +184,79 @@ describe("BackgroundVideoPlayer", () => {
 			// Assert
 			expect(hls.preload).toHaveBeenCalledWith("link");
 		});
+
+		it("does not preload when videoLink is falsy", () => {
+			// Arrange
+			// Act
+			(comp as any).setPreloadVideoLink("");
+
+			// Assert
+			expect(hls.preload).not.toHaveBeenCalled();
+		});
+
+		it("does not preload when videoLink is null", () => {
+			// Arrange
+			// Act
+			(comp as any).setPreloadVideoLink(null);
+
+			// Assert
+			expect(hls.preload).not.toHaveBeenCalled();
+		});
+
+		it("does not preload when videoLink is undefined", () => {
+			// Arrange
+			// Act
+			(comp as any).setPreloadVideoLink(undefined);
+
+			// Assert
+			expect(hls.preload).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("initialized", () => {
+		it("returns true when hlsPlayer is initialized", () => {
+			// Arrange
+			hls.initialized = true;
+
+			// Act
+			const result = (comp as any).initialized;
+
+			// Assert
+			expect(result).toBe(true);
+		});
+
+		it("returns false when hlsPlayer is not initialized", () => {
+			// Arrange
+			hls.initialized = false;
+
+			// Act
+			const result = (comp as any).initialized;
+
+			// Assert
+			expect(result).toBe(false);
+		});
+
+		it("returns false when hlsPlayer is null", () => {
+			// Arrange
+			(comp as any).hlsPlayer = null;
+
+			// Act
+			const result = (comp as any).initialized;
+
+			// Assert
+			expect(result).toBe(false);
+		});
+
+		it("returns false when hlsPlayer is undefined", () => {
+			// Arrange
+			(comp as any).hlsPlayer = undefined;
+
+			// Act
+			const result = (comp as any).initialized;
+
+			// Assert
+			expect(result).toBe(false);
+		});
 	});
 
 	describe("playVideo", () => {
@@ -162,13 +266,46 @@ describe("BackgroundVideoPlayer", () => {
 			const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
 
 			// Act
-			(comp as any).playVideo({ videoLink: "v", currentTime: 33 });
+			(comp as any).playVideo({ videoLink: "v", currentTime: 33, timeToStream: 1000 });
 
 			// Assert
 			expect(hls.load).toHaveBeenCalledWith("v");
 			expect(playSpy).toHaveBeenCalled();
 			expect(syncSpy).toHaveBeenCalled();
 			expect(comp.currentTime).toBe(33);
+			expect((comp as any).timeToStream).toBe(1000);
+		});
+
+		it("does not load or play when videoLink is empty", () => {
+			// Arrange
+			const playSpy = jest.spyOn(comp, "play");
+			const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
+
+			// Act
+			(comp as any).playVideo({ videoLink: "", currentTime: 33, timeToStream: 1000 });
+
+			// Assert
+			expect(hls.load).not.toHaveBeenCalled();
+			expect(playSpy).not.toHaveBeenCalled();
+			expect(syncSpy).not.toHaveBeenCalled();
+			expect(comp.currentTime).toBe(0); // Should remain unchanged
+			expect((comp as any).timeToStream).toBe(1000); // timeToStream should still be set
+		});
+
+		it("does not load or play when videoLink is null", () => {
+			// Arrange
+			const playSpy = jest.spyOn(comp, "play");
+			const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
+
+			// Act
+			(comp as any).playVideo({ videoLink: null, currentTime: 33, timeToStream: 1000 });
+
+			// Assert
+			expect(hls.load).not.toHaveBeenCalled();
+			expect(playSpy).not.toHaveBeenCalled();
+			expect(syncSpy).not.toHaveBeenCalled();
+			expect(comp.currentTime).toBe(0); // Should remain unchanged
+			expect((comp as any).timeToStream).toBe(1000); // timeToStream should still be set
 		});
 	});
 
@@ -180,6 +317,17 @@ describe("BackgroundVideoPlayer", () => {
 
 			// Assert
 			expect(hls.pause).toHaveBeenCalled();
+		});
+
+		it("does not pause when not initialized", () => {
+			// Arrange
+			hls.initialized = false;
+
+			// Act
+			comp.pause();
+
+			// Assert
+			expect(hls.pause).not.toHaveBeenCalled();
 		});
 	});
 
@@ -195,6 +343,19 @@ describe("BackgroundVideoPlayer", () => {
 			expect(hls.play).toHaveBeenCalled();
 			expect(showSpy).toHaveBeenCalledWith(true);
 		});
+
+		it("does not play when not initialized", () => {
+			// Arrange
+			hls.initialized = false;
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+
+			// Act
+			comp.play();
+
+			// Assert
+			expect(hls.play).not.toHaveBeenCalled();
+			expect(showSpy).not.toHaveBeenCalled();
+		});
 	});
 
 	describe("muted", () => {
@@ -205,6 +366,16 @@ describe("BackgroundVideoPlayer", () => {
 
 			// Assert
 			expect(hls.muted).toBe(true);
+		});
+
+		it("throws error when hlsPlayer is null", () => {
+			// Arrange
+			(comp as any).hlsPlayer = null;
+
+			// Act & Assert
+			expect(() => {
+				(comp as any).muted = true;
+			}).toThrow();
 		});
 	});
 
@@ -280,20 +451,96 @@ describe("BackgroundVideoPlayer", () => {
 			expect(hls.off).toHaveBeenCalled();
 			expect(hls.destroy).toHaveBeenCalled();
 		});
+
+		it("does not remove listeners or destroy when not initialized", () => {
+			// Arrange
+			hls.initialized = false;
+
+			// Act
+			(comp as any).stop();
+
+			// Assert
+			expect(hls.removeEventListener).not.toHaveBeenCalled();
+			expect(hls.destroy).not.toHaveBeenCalled();
+		});
 	});
 
 	describe("syncCurrentTime", () => {
 		it("emits and syncs player time when delta > 1", () => {
 			// Arrange
-			hls.currentTime = 1;
-			comp.currentTime = 5;
+			const currentTimestamp = 10000;
+			const timeToStream = 5000;
+			const expectedCurrentTime = (currentTimestamp - timeToStream) / 1000; // 5 seconds
+			
+			mockDateNow.mockReturnValue(currentTimestamp);
+			(comp as any).timeToStream = timeToStream;
+			hls.currentTime = 1; // Player time is behind by more than 1 second
 
 			// Act
 			(comp as any).syncCurrentTime();
 
 			// Assert
 			expect((comp as any).node.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 1);
-			expect(hls.currentTime).toBe(5);
+			expect(hls.currentTime).toBe(expectedCurrentTime);
+			expect(comp.currentTime).toBe(expectedCurrentTime);
+		});
+
+		it("does not sync player time when delta <= 1", () => {
+			// Arrange
+			const currentTimestamp = 10000;
+			const timeToStream = 5000;
+			const expectedCurrentTime = (currentTimestamp - timeToStream) / 1000; // 5 seconds
+			
+			mockDateNow.mockReturnValue(currentTimestamp);
+			(comp as any).timeToStream = timeToStream;
+			hls.currentTime = 4.5; // Player time is within 1 second
+
+			// Act
+			(comp as any).syncCurrentTime();
+
+			// Assert
+			expect((comp as any).node.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 4.5);
+			expect(hls.currentTime).toBe(4.5); // Should not be changed
+			expect(comp.currentTime).toBe(expectedCurrentTime);
+		});
+
+		it("does not sync player time when not initialized", () => {
+			// Arrange
+			const currentTimestamp = 10000;
+			const timeToStream = 5000;
+			const expectedCurrentTime = (currentTimestamp - timeToStream) / 1000; // 5 seconds
+			
+			mockDateNow.mockReturnValue(currentTimestamp);
+			(comp as any).timeToStream = timeToStream;
+			hls.currentTime = 1; // Player time is behind by more than 1 second
+			hls.initialized = false;
+
+			// Act
+			(comp as any).syncCurrentTime();
+
+			// Assert
+			expect((comp as any).node.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 1);
+			expect(hls.currentTime).toBe(1); // Should not be changed when not initialized
+			expect(comp.currentTime).toBe(expectedCurrentTime);
+		});
+
+		it("does not sync when currentTime is negative", () => {
+			// Arrange
+			const currentTimestamp = 2000;
+			const timeToStream = 5000;
+			const expectedCurrentTime = (currentTimestamp - timeToStream) / 1000; // -3 seconds
+			
+			mockDateNow.mockReturnValue(currentTimestamp);
+			(comp as any).timeToStream = timeToStream;
+			hls.currentTime = 1;
+
+			// Act
+			(comp as any).syncCurrentTime();
+
+			// Assert
+			expect((comp as any).node.emit).toHaveBeenCalledWith("syncNativeCurrentTime", 1);
+			expect(hls.currentTime).toBe(1); // Should not be changed when currentTime < 0
+			expect(comp.currentTime).toBe(expectedCurrentTime);
 		});
 	});
 
@@ -321,6 +568,75 @@ describe("BackgroundVideoPlayer", () => {
 			initInstance.onPlayStateChanged(true);
 			expect(showSpy).toHaveBeenCalled();
 			expect(initInstance.preload).toHaveBeenCalledWith("intro.m3u8");
+			ctorSpy.mockRestore();
+		});
+
+		it("onPlayStateChanged does not preload when play is false", () => {
+			// Arrange
+			const initInstance = {
+				init: jest.fn(),
+				addEventListener: jest.fn(),
+				onPlayStateChanged: undefined as any,
+				preload: jest.fn(),
+			};
+			jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
+			const ctorSpy = jest.spyOn(require("../../../../assets/scripts/components/video-player/preloaded-hls-player"), "HLSPreloadedVideoPlayer").mockImplementation(() => initInstance as any);
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+			(comp as any)._introUrl = "intro.m3u8";
+
+			// Act
+			(comp as any)["initialize"]();
+			initInstance.onPlayStateChanged(false);
+
+			// Assert
+			expect(showSpy).toHaveBeenCalledWith(true); // showBackground(!play) = showBackground(true)
+			expect(initInstance.preload).not.toHaveBeenCalled();
+			ctorSpy.mockRestore();
+		});
+
+		it("onPlayStateChanged does not preload when _introUrl is empty", () => {
+			// Arrange
+			const initInstance = {
+				init: jest.fn(),
+				addEventListener: jest.fn(),
+				onPlayStateChanged: undefined as any,
+				preload: jest.fn(),
+			};
+			jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
+			const ctorSpy = jest.spyOn(require("../../../../assets/scripts/components/video-player/preloaded-hls-player"), "HLSPreloadedVideoPlayer").mockImplementation(() => initInstance as any);
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+			(comp as any)._introUrl = ""; // Empty intro URL
+
+			// Act
+			(comp as any)["initialize"]();
+			initInstance.onPlayStateChanged(true);
+
+			// Assert
+			expect(showSpy).toHaveBeenCalledWith(false); // showBackground(!play) = showBackground(false)
+			expect(initInstance.preload).not.toHaveBeenCalled();
+			ctorSpy.mockRestore();
+		});
+
+		it("onPlayStateChanged does not preload when _introUrl is null", () => {
+			// Arrange
+			const initInstance = {
+				init: jest.fn(),
+				addEventListener: jest.fn(),
+				onPlayStateChanged: undefined as any,
+				preload: jest.fn(),
+			};
+			jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
+			const ctorSpy = jest.spyOn(require("../../../../assets/scripts/components/video-player/preloaded-hls-player"), "HLSPreloadedVideoPlayer").mockImplementation(() => initInstance as any);
+			const showSpy = jest.spyOn(comp as any, "showBackground");
+			(comp as any)._introUrl = null; // Null intro URL
+
+			// Act
+			(comp as any)["initialize"]();
+			initInstance.onPlayStateChanged(true);
+
+			// Assert
+			expect(showSpy).toHaveBeenCalledWith(false); // showBackground(!play) = showBackground(false)
+			expect(initInstance.preload).not.toHaveBeenCalled();
 			ctorSpy.mockRestore();
 		});
 	});

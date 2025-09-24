@@ -34,6 +34,7 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   currentTime = 0;
+  private timeToStream = 0;
 
   @render(Store, (store) => ({
     operator: store.operator,
@@ -55,14 +56,11 @@ export class BackgroundVideoPlayer extends Component {
     timeToPlay: store.data.timeToPlay,
   }))
   playIntro({ currentTime, status, timeToPlay }: { currentTime: number; status: boolean; timeToPlay: number }) {
-    if (!this._introUrl || this._introUrl === "") {
+    if (!this._introUrl || this._introUrl === "" || !status) {
       return;
     }
 
-    if (!status) {
-      return;
-    }
-
+    this.timeToStream = timeToPlay;
     this.hlsPlayer.load(this._introUrl);
     this.syncCurrentTime();
     this.currentTime = currentTime;
@@ -79,8 +77,9 @@ export class BackgroundVideoPlayer extends Component {
   @render(VideoStreamingStore, (store) => ({
     videoLink: store.data.videoLink,
     currentTime: store.data.currentTime,
+    timeToStream: store.data.timeToStream,
   }))
-  playVideo({ videoLink, currentTime }: { videoLink: string; currentTime: number }) {
+  playVideo({ videoLink, currentTime, timeToStream }: { videoLink: string; currentTime: number; timeToStream: number }) {
 
     if (videoLink && videoLink !== "") {
       this.hlsPlayer.load(videoLink);
@@ -88,10 +87,7 @@ export class BackgroundVideoPlayer extends Component {
       this.syncCurrentTime();
       this.currentTime = currentTime;
     }
-  }
-
-  private get bandwidthEstimate() {
-    return this.hlsPlayer?.bandwidthEstimate ?? 0;
+    this.timeToStream = timeToStream;
   }
 
   pause() {
@@ -140,6 +136,7 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   private syncCurrentTime() {
+    this.currentTime = (Date.now() - this.timeToStream) / 1000;
     this.node.emit("syncNativeCurrentTime", this.hlsPlayer.currentTime);
     const needSync =
       this.currentTime >= 0 &&

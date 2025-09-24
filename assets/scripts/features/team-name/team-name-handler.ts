@@ -10,6 +10,8 @@ export class TeamNameHandler extends BaseHandlerImpl<TeamNameData> {
     name = "teamName";
 
     @inject(TeamNameStore) 
-    readonly store: TeamNameStore
+    set store(store: TeamNameStore) {
+        super.store = store;
+    }
 }
 

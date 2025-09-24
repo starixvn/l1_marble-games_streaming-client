@@ -9,5 +9,7 @@ export class GameFlowHandler extends BaseHandlerImpl<GameFlowData> {
     name = "gameFlow";
     
     @inject(GameFlowStore) 
-    readonly store: GameFlowStore;
+    set store(store: GameFlowStore) {
+        super.store = store;
+    }
 }
