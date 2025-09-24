@@ -7,6 +7,8 @@
     "install-dependencies": "npm install",
     "test": "jest --testPathPatterns=tests/unit-tests/",
     "test-coverage": "jest --collect-coverage --testPathPatterns=tests/unit-tests/ --runInBand --detectOpenHandles --forceExit"
+    "test": "jest --testPathPatterns=tests/unit-tests/",
+    "test-coverage": "jest --collect-coverage --testPathPatterns=tests/unit-tests/ --runInBand --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "hls.js": "1.5.20",
