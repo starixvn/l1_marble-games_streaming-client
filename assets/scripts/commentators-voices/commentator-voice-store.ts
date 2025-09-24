@@ -131,8 +131,15 @@ async function loadVoice({ voice, language = "en", operator = "common" }: { voic
 @injectable()
 @store("CommentatorVoiceStore")
 export class CommentatorVoiceStore {
+    private _store: Store;
+
     @inject(Store)
-    private readonly store: Store;
+    set store(store: Store) {
+        this._store = store;
+    }
+    get store(): Store {
+        return this._store;
+    }
 
 
     constructor() {

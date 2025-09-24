@@ -30,7 +30,7 @@ const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
 
 const container = new Container({
-  autoBindInjectable: true,
+  autobind: true,
   defaultScope: "Singleton",
 });
 

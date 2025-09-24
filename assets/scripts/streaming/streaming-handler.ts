@@ -12,9 +12,22 @@ export class StreamingHandler {
   private readonly reconnectDelay = gameSettings.reconnectDelay;
   private reconnectTimeout: NodeJS.Timeout | null = null;
 
-  @inject(StreamingStore) private readonly streamingStore: StreamingStore;
+  private _streamingStore: StreamingStore;
+  private _store: Store;
 
-  @inject(Store) private readonly store: Store;
+  @inject(StreamingStore) set streamingStore(store: StreamingStore) {
+    this._streamingStore = store;
+  }
+  get streamingStore(): StreamingStore {
+    return this._streamingStore;
+  }
+
+  @inject(Store) set store(store: Store) {
+    this._store = store;
+  }
+  get store(): Store {
+    return this._store;
+  }
 
   connect(): void {
     if (this.eventSource) {
