@@ -35,7 +35,9 @@ const container = new Container({
 });
 
 Observer.configure({
-  default: { mobx, container: { resolve: (ctor) => container.get(ctor) } },
+  default: { mobx, container: { resolve: (ctor) => container.get(ctor, {
+    autobind: true,
+  }) } },
 });
 
 window.addEventListener("message", handleWindowMessage(container));
