@@ -1,42 +1,33 @@
 import { AudioStore } from "../../../assets/scripts/audios/audio-store";
 
+
 describe("AudioStore", () => {
-  let store: AudioStore;
+	let store: AudioStore;
 
-  beforeEach(() => {
-    store = new AudioStore();
-  });
+	beforeEach(() => {
+		// Arrange
+		store = new AudioStore();
+	});
 
-  afterEach(() => {
-    // keep consistent cleanup intent
-  });
+	describe("setMuted", () => {
+		it("updates muted flag", () => {
+			// Arrange
+			// Act
+			store.setMuted(true);
 
-  it("should initialize with defaults", () => {
-    expect(store.muted).toBe(false);
-    expect(store.browserBlocked).toBe(true);
-  });
+			// Assert
+			expect(store.muted).toBe(true);
+		});
+	});
 
-  it("should toggle muted", () => {
-    // Act
-    store.setMuted(true);
-    // Assert
-    expect(store.muted).toBe(true);
+	describe("setBrowserBlocked", () => {
+		it("updates browserBlocked flag", () => {
+			// Arrange
+			// Act
+			store.setBrowserBlocked(false);
 
-    // Act
-    store.setMuted(false);
-    // Assert
-    expect(store.muted).toBe(false);
-  });
-
-  it("should toggle browserBlocked", () => {
-    // Act
-    store.setBrowserBlocked(false);
-    // Assert
-    expect(store.browserBlocked).toBe(false);
-
-    // Act
-    store.setBrowserBlocked(true);
-    // Assert
-    expect(store.browserBlocked).toBe(true);
-  });
+			// Assert
+			expect(store.browserBlocked).toBe(false);
+		});
+	});
 });

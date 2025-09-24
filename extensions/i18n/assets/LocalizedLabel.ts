@@ -1,7 +1,7 @@
 
 import * as i18n from './LanguageData';
 
-import { _decorator, Component, Label } from 'cc';
+import { _decorator, Component, Label, log } from 'cc';
 const { ccclass, property, executeInEditMode } = _decorator;
 
 @ccclass('LocalizedLabel')
@@ -17,8 +17,8 @@ export class LocalizedLabel extends Component {
         return this.key;
     }
     set _key(str: string) {
-        this.updateLabel();
         this.key = str;
+        this.updateLabel();
     }
 
     onLoad() {

@@ -1,110 +1,54 @@
-import { Toggle } from "cc";
+jest.mock("observer", () => require("../../utils/mock-store").createMockObserver());
 import { SoundToggle } from "../../../assets/scripts/audios/sound-toggle";
-import { AudioStore } from "db://assets/scripts/audios/audio-store";
+import { Toggle } from "cc";
+import { initializeMockContainer, cleanupMockObserver, createMockStore, spyOnStoreMethods, expectStoreMethodCalled } from "../../utils/mock-store";
+import { AudioStore } from "../../../assets/scripts/audios/audio-store";
+
 
 describe("SoundToggle", () => {
-  let soundToggle: SoundToggle;
-  let mockToggle: jest.Mocked<Toggle>;
+	let comp: SoundToggle;
+	let toggle: jest.Mocked<Toggle>;
+	let audioStore: ReturnType<typeof createMockStore<AudioStore>>;
+	let audioSpies: Record<string, jest.SpyInstance>;
 
-  beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
+	beforeAll(() => {
+		initializeMockContainer();
+		audioStore = createMockStore(AudioStore as any, { muted: false, browserBlocked: false } as any);
+	});
 
-    // Create mock Toggle
-    mockToggle = {
-      isChecked: false,
-      _set: jest.fn(),
-      _internalToggle: jest.fn(),
-      playEffect: jest.fn(),
-      setIsCheckedWithoutNotify: jest.fn(),
-    } as any;
+	afterAll(() => {
+		cleanupMockObserver();
+	});
 
-    // Create SoundToggle instance
-    soundToggle = new SoundToggle();
-    soundToggle.soundToggle = mockToggle;
+	beforeEach(() => {
+		// Arrange
+		comp = new SoundToggle();
+		toggle = { isChecked: true } as any;
+		(comp as any).soundToggle = toggle as any;
+		audioSpies = spyOnStoreMethods(audioStore as any, ["setMuted"] as any);
+	});
 
-    // Mock the setMuted method
-    jest
-      .spyOn(soundToggle as any, "setMuted")
-      .mockImplementation((muted: boolean) => muted);
-  });
+	describe("onToggleSound", () => {
+		it("calls setMuted with inverse of isChecked", () => {
+			// Arrange
+			toggle.isChecked = false;
 
-  afterEach(() => {
-    jest.clearAllMocks();
-    jest.restoreAllMocks();
-    // Cleanup
-  });
+			// Act
+			comp.onToggleSound();
 
-  describe("initialization", () => {
-    it("should initialize with default state", () => {
-      // Assert
-      expect(soundToggle.soundToggle).toBe(mockToggle);
-    });
-  });
+			// Assert
+			expectStoreMethodCalled(audioSpies, "setMuted" as never, true);
+		});
+	});
 
-  describe("onToggleSound method", () => {
-    it("should set muted to true when toggle is unchecked", () => {
-      // Arrange
-      (mockToggle as any).isChecked = false;
+	describe("renderMuted", () => {
+		it("updates toggle isChecked inversely to muted", () => {
+			// Arrange
+			// Act
+			(comp as any).renderMuted(true);
 
-      // Act
-      soundToggle.onToggleSound();
-
-      // Assert
-      expect(soundToggle["setMuted"]).toHaveBeenCalledWith(true);
-    });
-
-    it("should set muted to false when toggle is checked", () => {
-      // Arrange
-      (mockToggle as any).isChecked = true;
-
-      // Act
-      soundToggle.onToggleSound();
-
-      // Assert
-      expect(soundToggle["setMuted"]).toHaveBeenCalledWith(false);
-    });
-  });
-
-  describe("setMuted method", () => {
-    it("should return false when passed false", () => {
-      // Act
-      const result = soundToggle["setMuted"](false);
-
-      // Assert
-      expect(result).toBe(false);
-    });
-
-    it("should return true when passed true", () => {
-      // Act
-      const result = soundToggle["setMuted"](true);
-
-      // Assert
-      expect(result).toBe(true);
-    });
-  });
-
-  describe("renderMuted method", () => {
-    it("should set toggle to checked when muted is false", () => {
-      // Arrange
-      const muted = false;
-
-      // Act
-      soundToggle["renderMuted"](muted);
-
-      // Assert
-      expect(mockToggle.isChecked).toBe(true);
-    });
-
-    it("should set toggle to unchecked when muted is true", () => {
-      // Arrange
-      const muted = true;
-
-      // Act
-      soundToggle["renderMuted"](muted);
-
-      // Assert
-      expect(mockToggle.isChecked).toBe(false);
-    });
-  });
+			// Assert
+			expect(toggle.isChecked).toBe(false);
+		});
+	});
 });

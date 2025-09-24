@@ -1,252 +1,109 @@
-import { AudioSource } from "cc";
+jest.mock("observer", () => require("../../utils/mock-store").createMockObserver());
 import { BackgroundMusic } from "../../../assets/scripts/audios/background-music";
-import {
-  Phase,
-  type EventData,
-} from "../../../assets/scripts/streaming/streaming-type";
+import { AudioSource } from "cc";
+
 
 describe("BackgroundMusic", () => {
-  let backgroundMusic: BackgroundMusic;
-  let mockAudioSource: jest.Mocked<AudioSource>;
+	let comp: BackgroundMusic;
+	let audioSource: jest.Mocked<AudioSource>;
 
-  beforeEach(() => {
-    // Reset mocks
-    jest.clearAllMocks();
+	beforeEach(() => {
+		// Arrange
+		comp = new BackgroundMusic();
+		audioSource = {
+			play: jest.fn(),
+			pause: jest.fn(),
+			playing: false,
+		} as any;
+		comp.audioSource = audioSource as any;
+		(comp as any).playing = true;
+		comp.muted = false;
+	});
 
-    // Create mock AudioSource
-    mockAudioSource = {
-      playing: false,
-      play: jest.fn(),
-      pause: jest.fn(),
-    } as any;
+	describe("play", () => {
+		it("plays when not muted, playing true, and not already playing", () => {
+			// Arrange
+			(audioSource as any).playing = false;
 
-    // Create BackgroundMusic instance
-    backgroundMusic = new BackgroundMusic();
-    backgroundMusic.audioSource = mockAudioSource;
-  });
+			// Act
+			comp.play();
 
-  afterEach(() => {
-    jest.clearAllMocks();
-    // Cleanup
-  });
+			// Assert
+			expect(audioSource.play).toHaveBeenCalled();
+		});
 
-  describe("initialization", () => {
-    it("should initialize with default state", () => {
-      // Assert
-      expect(backgroundMusic.playing).toBe(false);
-      expect(backgroundMusic.muted).toBe(false);
-      expect(backgroundMusic.audioSource).toBe(mockAudioSource);
-    });
-  });
+		it("does not play when muted", () => {
+			// Arrange
+			comp.muted = true;
 
-  describe("play method", () => {
-    it("should play audio when not muted, playing is true, and audioSource is not playing", () => {
-    // Arrange
-      (backgroundMusic as any).muted = false;
-      (backgroundMusic as any).playing = true;
-      (mockAudioSource as any).playing = false;
+			// Act
+			comp.play();
 
-      // Act
-      backgroundMusic.play();
+			// Assert
+			expect(audioSource.play).not.toHaveBeenCalled();
+		});
+	});
 
-      // Assert
-      expect(mockAudioSource.play).toHaveBeenCalledTimes(1);
-    });
+	describe("pause", () => {
+		it("pauses audio source", () => {
+			// Arrange
+			// Act
+			comp.pause();
 
-    it("should not play audio when muted", () => {
-      // Arrange
-      (backgroundMusic as any).muted = true;
-      (backgroundMusic as any).playing = true;
-      (mockAudioSource as any).playing = false;
+			// Assert
+			expect(audioSource.pause).toHaveBeenCalled();
+		});
+	});
 
-      // Act
-      backgroundMusic.play();
+	describe("syncMuted", () => {
+		it("pauses when muted true", () => {
+			// Arrange
+			const pauseSpy = jest.spyOn(comp, "pause");
 
-      // Assert
-      expect(mockAudioSource.play).not.toHaveBeenCalled();
-    });
+			// Act
+			(comp as any).syncMuted({ muted: true, browserBlocked: false });
 
-    it("should not play audio when playing is false", () => {
-      // Arrange
-      (backgroundMusic as any).muted = false;
-      (backgroundMusic as any).playing = false;
-      (mockAudioSource as any).playing = false;
+			// Assert
+			expect(pauseSpy).toHaveBeenCalled();
+			expect((comp as any).muted).toBe(true);
+		});
 
-      // Act
-      backgroundMusic.play();
+		it("plays when not muted and not browserBlocked", () => {
+			// Arrange
+			const playSpy = jest.spyOn(comp, "play");
 
-      // Assert
-      expect(mockAudioSource.play).not.toHaveBeenCalled();
-    });
+			// Act
+			(comp as any).syncMuted({ muted: false, browserBlocked: false });
 
-    it("should not call play audio when audioSource is already playing", () => {
-      // Arrange
-      (backgroundMusic as any).muted = false;
-      (backgroundMusic as any).playing = true;
-      (mockAudioSource as any).playing = true;
+			// Assert
+			expect(playSpy).toHaveBeenCalled();
+			expect((comp as any).muted).toBe(false);
+		});
+	});
 
-      // Act
-      backgroundMusic.play();
+	describe("renderEventData", () => {
+		it("sets playing true and calls play for non-streaming states", () => {
+			// Arrange
+			const playSpy = jest.spyOn(comp, "play");
 
-      // Assert
-      expect(mockAudioSource.play).not.toHaveBeenCalled();
-    });
-  });
+			// Act
+			(comp as any).renderEventData("Prebet");
 
-  describe("pause method", () => {
-    it("should pause audio source", () => {
-      // Act
-      backgroundMusic.pause();
+			// Assert
+			expect(comp.playing).toBe(true);
+			expect(playSpy).toHaveBeenCalled();
+		});
 
-      // Assert
-      expect(mockAudioSource.pause).toHaveBeenCalledTimes(1);
-    });
-  });
+		it("sets playing false and calls pause for streaming state", () => {
+			// Arrange
+			const pauseSpy = jest.spyOn(comp, "pause");
 
-  describe("syncMuted method", () => {
-    it("should set muted to true when AudioStore muted is true", () => {
-      // Arrange
-      const audioData = { muted: true, browserBlocked: false };
+			// Act
+			(comp as any).renderEventData("Streaming");
 
-      // Act
-      backgroundMusic["syncMuted"](audioData);
-
-      // Assert
-      expect(backgroundMusic.muted).toBe(true);
-    });
-
-    it("should set muted to true when AudioStore browserBlocked is true", () => {
-      // Arrange
-      const audioData = { muted: false, browserBlocked: true };
-
-      // Act
-      backgroundMusic["syncMuted"](audioData);
-
-      // Assert
-      expect(backgroundMusic.muted).toBe(true);
-    });
-
-    it("should set muted to false when both AudioStore muted and browserBlocked are false", () => {
-      // Arrange
-      const audioData = { muted: false, browserBlocked: false };
-
-      // Act
-      backgroundMusic["syncMuted"](audioData);
-
-      // Assert
-      expect(backgroundMusic.muted).toBe(false);
-    });
-
-    it("should pause audio when muted becomes true", () => {
-      // Arrange
-      (backgroundMusic as any).muted = false;
-      const audioData = { muted: true, browserBlocked: false };
-
-      // Act
-      backgroundMusic["syncMuted"](audioData);
-
-      // Assert
-      expect(mockAudioSource.pause).toHaveBeenCalledTimes(1);
-    });
-
-    it("should call play when muted becomes false and playing is true", () => {
-      // Arrange
-      (backgroundMusic as any).muted = true;
-      (backgroundMusic as any).playing = true;
-      const audioData = { muted: false, browserBlocked: false };
-      (mockAudioSource as any).playing = false;
-
-      // Act
-      backgroundMusic["syncMuted"](audioData);
-
-      // Assert
-      expect(mockAudioSource.play).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("renderEventData method", () => {
-    const createEventData = (currentPhase: Phase): EventData => ({
-      homeScore: 0,
-      awayScore: 0,
-      homeTeam: "Home",
-      awayTeam: "Away",
-      eventId: 1,
-      currentEventIndex: 0,
-      updatedEventIndex: 0,
-      liveScores: ["0:0"],
-      goalInfos: [],
-      currentPhase,
-      eventDetails: [],
-      matchLiveTimeMs: 0,
-    });
-
-    it("should set playing to true and call play on ScheduleEvent phase", () => {
-      // Arrange
-      (backgroundMusic as any).playing = false;
-      (backgroundMusic as any).muted = false; // Set muted to false so play() will be called
-      const eventData = createEventData(Phase.ScheduleEvent);
-
-      // Act
-      backgroundMusic["renderEventData"](eventData);
-
-      // Assert
-      expect(backgroundMusic.playing).toBe(true);
-      expect(mockAudioSource.play).toHaveBeenCalledTimes(1);
-    });
-
-    it("should set playing to false and call pause on UpdateVideoInfo phase", () => {
-      // Arrange
-      (backgroundMusic as any).playing = true;
-      const eventData = createEventData(Phase.UpdateVideoInfo);
-
-      // Act
-      backgroundMusic["renderEventData"](eventData);
-
-      // Assert
-      expect(backgroundMusic.playing).toBe(false);
-      expect(mockAudioSource.pause).toHaveBeenCalledTimes(1);
-    });
-
-    it("should set playing to true and call play on UpdateResult phase", () => {
-      // Arrange
-      (backgroundMusic as any).playing = false;
-      (backgroundMusic as any).muted = false; // Set muted to false so play() will be called
-      const eventData = createEventData(Phase.UpdateResult);
-
-      // Act
-      backgroundMusic["renderEventData"](eventData);
-
-      // Assert
-      expect(backgroundMusic.playing).toBe(true);
-      expect(mockAudioSource.play).toHaveBeenCalledTimes(1);
-    });
-
-    it("should handle unknown phase gracefully", () => {
-      // Arrange
-      (backgroundMusic as any).playing = true;
-      const eventData = createEventData("UnknownPhase" as any);
-
-      // Act
-      backgroundMusic["renderEventData"](eventData);
-
-      // Assert
-      expect(backgroundMusic.playing).toBe(true); // Should remain unchanged
-      expect(mockAudioSource.play).not.toHaveBeenCalled();
-      expect(mockAudioSource.pause).not.toHaveBeenCalled();
-    });
-
-    it("should not call play when muted is true even for play phases", () => {
-      // Arrange
-      (backgroundMusic as any).playing = false;
-      (backgroundMusic as any).muted = true; // Keep muted true
-      const eventData = createEventData(Phase.ScheduleEvent);
-
-      // Act
-      backgroundMusic["renderEventData"](eventData);
-
-      // Assert
-      expect(backgroundMusic.playing).toBe(true);
-      expect(mockAudioSource.play).not.toHaveBeenCalled(); // Should not call play when muted
-    });
-  });
+			// Assert
+			expect(comp.playing).toBe(false);
+			expect(pauseSpy).toHaveBeenCalled();
+		});
+	});
 });

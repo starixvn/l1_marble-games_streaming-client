@@ -17,7 +17,7 @@ export const inject = jest.fn().mockImplementation((token: any) => {
         if (propertyKey !== undefined) {
             // Property injection - store by constructor
             let propertyInjections = PROPERTY_INJECTION_STORE.get(target.constructor) || new Map();
-            propertyInjections.set(propertyKey, token);
+            propertyInjections.set(propertyKey, { token, isMulti: false });
             PROPERTY_INJECTION_STORE.set(target.constructor, propertyInjections);
         } else {
             // Constructor parameter injection (more complex, not implemented for now)
@@ -25,9 +25,26 @@ export const inject = jest.fn().mockImplementation((token: any) => {
     };
 });
 
+export const multiInject = jest.fn().mockImplementation((token: any) => {
+    return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+        if (propertyKey !== undefined) {
+            // Multi-property injection - store by constructor
+            let propertyInjections = PROPERTY_INJECTION_STORE.get(target.constructor) || new Map();
+            propertyInjections.set(propertyKey, { token, isMulti: true });
+            PROPERTY_INJECTION_STORE.set(target.constructor, propertyInjections);
+        } else {
+            // Constructor parameter injection for multiInject
+            let constructorInjections = METADATA_STORE.get(target) || { constructorParams: [] };
+            constructorInjections.constructorParams[parameterIndex] = { token, isMulti: true };
+            METADATA_STORE.set(target, constructorInjections);
+        }
+    };
+});
+
 export class Container {
     private bindings = new Map();
     private instances = new Map();
+    private multiBindings = new Map(); // Store multiple bindings for same token
 
     bind(serviceIdentifier: any) {
         const binding = {
@@ -37,6 +54,12 @@ export class Container {
                 return binding;
             }),
             toConstantValue: jest.fn().mockImplementation((value: any) => {
+                // Handle multi-binding
+                if (this.multiBindings.has(serviceIdentifier)) {
+                    this.multiBindings.get(serviceIdentifier).push(value);
+                } else {
+                    this.multiBindings.set(serviceIdentifier, [value]);
+                }
                 this.instances.set(serviceIdentifier, value);
                 return binding;
             }),
@@ -54,11 +77,12 @@ export class Container {
             }
         }
 
-        // Create new instance with real dependency injection
+        // Create new instance with constructor dependency injection
         try {
-            const instance = new serviceIdentifier();
+            const constructorArgs = this.resolveConstructorDependencies(serviceIdentifier);
+            const instance = new serviceIdentifier(...constructorArgs);
 
-            // Perform dependency injection based on metadata
+            // Perform property dependency injection based on metadata
             this.performDependencyInjection(instance, serviceIdentifier);
 
             this.instances.set(serviceIdentifier, instance);
@@ -68,14 +92,38 @@ export class Container {
         }
     }
 
+    private resolveConstructorDependencies(serviceIdentifier: any): any[] {
+        const metadata = METADATA_STORE.get(serviceIdentifier);
+        if (!metadata || !metadata.constructorParams) {
+            return [];
+        }
+
+        return metadata.constructorParams.map((param: any) => {
+            if (!param) return undefined;
+            
+            if (param.isMulti) {
+                // Return array of all bound instances for multi-injection
+                return this.multiBindings.get(param.token) || [];
+            } else {
+                return this.resolveDependency(param.token);
+            }
+        });
+    }
+
     private performDependencyInjection(instance: any, serviceIdentifier: any) {
         // Handle property injections
         const propertyInjections = PROPERTY_INJECTION_STORE.get(serviceIdentifier);
         if (propertyInjections) {
-            for (const [propertyKey, token] of propertyInjections.entries()) {
-                const dependency = this.resolveDependency(token);
-                if (dependency !== null) {
-                    instance[propertyKey] = dependency;
+            for (const [propertyKey, injection] of propertyInjections.entries()) {
+                if (injection.isMulti) {
+                    // Multi-injection: return array of all bound instances
+                    instance[propertyKey] = this.multiBindings.get(injection.token) || [];
+                } else {
+                    // Single injection
+                    const dependency = this.resolveDependency(injection.token);
+                    if (dependency !== null) {
+                        instance[propertyKey] = dependency;
+                    }
                 }
             }
         }
@@ -105,4 +153,4 @@ export class Container {
     }
 }
 
-export default { injectable, inject, Container };
+export default { injectable, inject, multiInject, Container };

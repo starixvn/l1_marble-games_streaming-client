@@ -26,7 +26,6 @@
   "moduleNameMapper": {
     "cc": "<rootDir>/tests/cocos-testing/cc",
     "^observer": "<rootDir>/tests/cocos-testing/observer",
-    "inversify": "<rootDir>/tests/cocos-testing/inversify",
     "db://assets/(.*)": "<rootDir>/assets/$1",
     "db://i18n/(.*)": "<rootDir>/extensions/i18n/assets/$1"
   },

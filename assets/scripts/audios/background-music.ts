@@ -1,9 +1,7 @@
 import { _decorator, AudioSource, Component } from "cc";
 import Observer from "observer";
-import { StreamingStore } from "../streaming/streaming-store";
-import type { EventData } from "../streaming/streaming-type";
-import { Phase } from "../streaming/streaming-type";
 import { AudioStore } from "./audio-store";
+import { GameFlowState, GameFlowStore } from "../features/game-flow/game-flow-store";
 
 const { ccclass, property } = _decorator;
 const { observer, render } = Observer;
@@ -31,7 +29,7 @@ export class BackgroundMusic extends Component {
     muted: store.muted,
     browserBlocked: store.browserBlocked,
   }))
-  private syncMuted({
+  syncMuted({
     muted,
     browserBlocked,
   }: {
@@ -47,15 +45,16 @@ export class BackgroundMusic extends Component {
     }
   }
 
-  @render(StreamingStore, (store) => store.eventData)
-  private renderEventData(eventData: EventData) {
-    switch (eventData.currentPhase) {
-      case Phase.ScheduleEvent:
-      case Phase.UpdateResult:
+  @render(GameFlowStore, (store) => store.data.state)
+  renderEventData(state: GameFlowState) {
+    switch (state) {
+      case GameFlowState.Prebet:
+      case GameFlowState.Result:
+      case GameFlowState.HalfTime:
         this.playing = true;
         this.play();
         break;
-      case Phase.UpdateVideoInfo:
+      case GameFlowState.Streaming:
         this.playing = false;
         this.pause();
         break;
