@@ -55,7 +55,6 @@ export class BackgroundVideoPlayer extends Component {
     timeToPlay: store.data.timeToPlay,
   }))
   playIntro({ currentTime, status, timeToPlay }: { currentTime: number; status: boolean; timeToPlay: number }) {
-    console.log(` play intro: ${this._introUrl} ${currentTime}  isPlaying: ${status} time to play ${timeToPlay}`)
     if (!this._introUrl || this._introUrl === "") {
       return;
     }
@@ -72,7 +71,6 @@ export class BackgroundVideoPlayer extends Component {
 
   @render(PreloadVideoStore, (store) => store.data.videoLink)
   setPreloadVideoLink(videoLink: string) {
-    console.log(` preload video link: ${videoLink}`)
     if (videoLink) {
       this.hlsPlayer.preload(videoLink);
     }
@@ -83,9 +81,6 @@ export class BackgroundVideoPlayer extends Component {
     currentTime: store.data.currentTime,
   }))
   playVideo({ videoLink, currentTime }: { videoLink: string; currentTime: number }) {
-    console.log(
-      ` play videoLink: ${videoLink}, currentTime: ${currentTime}`
-    )
 
     if (videoLink && videoLink !== "") {
       this.hlsPlayer.load(videoLink);

@@ -63,7 +63,6 @@ export class Winner extends Component {
     this.away.active = !homeWin;
 
     const key = getWinnerKey(this.operator, this.winner);
-    console.log(`get winner key operator : ${this.operator}, winner: ${this.winner}, key: ${key}`)
 
     if (t(key) === "") {
       this.label._key = `${this.operator}.${this.winner}`;

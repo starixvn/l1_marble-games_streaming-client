@@ -12,18 +12,18 @@ describe("BackgroundMusic", () => {
 		comp = new BackgroundMusic();
 		audioSource = {
 			play: jest.fn(),
-			pause: jest.fn(),
+			stop: jest.fn(),
 			playing: false,
 		} as any;
 		comp.audioSource = audioSource as any;
-		(comp as any).playing = true;
-		comp.muted = false;
+		comp.isPlaying = true;
 	});
 
 	describe("play", () => {
-		it("plays when not muted, playing true, and not already playing", () => {
+		it("plays when isPlaying is true and not already playing", () => {
 			// Arrange
 			(audioSource as any).playing = false;
+			comp.isPlaying = true;
 
 			// Act
 			comp.play();
@@ -32,9 +32,21 @@ describe("BackgroundMusic", () => {
 			expect(audioSource.play).toHaveBeenCalled();
 		});
 
-		it("does not play when muted", () => {
+		it("does not play when isPlaying is false", () => {
 			// Arrange
-			comp.muted = true;
+			comp.isPlaying = false;
+
+			// Act
+			comp.play();
+
+			// Assert
+			expect(audioSource.play).not.toHaveBeenCalled();
+		});
+
+		it("does not play when already playing", () => {
+			// Arrange
+			(audioSource as any).playing = true;
+			comp.isPlaying = true;
 
 			// Act
 			comp.play();
@@ -45,64 +57,38 @@ describe("BackgroundMusic", () => {
 	});
 
 	describe("pause", () => {
-		it("pauses audio source", () => {
+		it("stops audio source", () => {
 			// Arrange
 			// Act
 			comp.pause();
 
 			// Assert
-			expect(audioSource.pause).toHaveBeenCalled();
-		});
-	});
-
-	describe("syncMuted", () => {
-		it("pauses when muted true", () => {
-			// Arrange
-			const pauseSpy = jest.spyOn(comp, "pause");
-
-			// Act
-			(comp as any).syncMuted({ muted: true, browserBlocked: false });
-
-			// Assert
-			expect(pauseSpy).toHaveBeenCalled();
-			expect((comp as any).muted).toBe(true);
-		});
-
-		it("plays when not muted and not browserBlocked", () => {
-			// Arrange
-			const playSpy = jest.spyOn(comp, "play");
-
-			// Act
-			(comp as any).syncMuted({ muted: false, browserBlocked: false });
-
-			// Assert
-			expect(playSpy).toHaveBeenCalled();
-			expect((comp as any).muted).toBe(false);
+			expect(audioSource.stop).toHaveBeenCalled();
 		});
 	});
 
 	describe("renderEventData", () => {
-		it("sets playing true and calls play for non-streaming states", () => {
+		it("sets isPlaying true and calls play when isPlaying is true", () => {
 			// Arrange
 			const playSpy = jest.spyOn(comp, "play");
 
 			// Act
-			(comp as any).renderEventData("Prebet");
+			(comp as any).renderEventData(true);
 
 			// Assert
-			expect(comp.playing).toBe(true);
+			expect(comp.isPlaying).toBe(true);
 			expect(playSpy).toHaveBeenCalled();
 		});
 
-		it("sets playing false and calls pause for streaming state", () => {
+		it("sets isPlaying false and calls pause when isPlaying is false", () => {
 			// Arrange
 			const pauseSpy = jest.spyOn(comp, "pause");
 
 			// Act
-			(comp as any).renderEventData("Streaming");
+			(comp as any).renderEventData(false);
 
 			// Assert
-			expect(comp.playing).toBe(false);
+			expect(comp.isPlaying).toBe(false);
 			expect(pauseSpy).toHaveBeenCalled();
 		});
 	});

@@ -23,7 +23,6 @@ export class StageManager extends Component {
 
     @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
     syncStage(stage: FeatureStage) {
-        console.log("syncStage", STAGE_MAPPING[stage]);
         const enablingTargets = this.targets.filter((target) => target.stageName === stage);
         const disablingTargets = this.targets.filter((target) => target.stageName !== stage);
 

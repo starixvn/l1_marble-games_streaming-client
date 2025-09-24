@@ -12,6 +12,5 @@ export class ResultHandler extends BaseHandlerImpl<ResultData> {
 
     override update(data: ResultData): void {
         super.update(data);
-        console.log(`sync result data: ${JSON.stringify(data)}`);
     }
 }

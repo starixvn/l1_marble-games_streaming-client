@@ -1,12 +1,29 @@
 import { AudioClip } from "cc";
 import { SfxStore, loadSfx } from "../../../../assets/scripts/local-stores/sfx/sfx-store";
 import { bundleManager } from "../../../../assets/scripts/asset-loader/bundle-manager";
+import { AudioStore } from "../../../../assets/scripts/local-stores/audio/audio-store";
+import { VisibilityStore } from "../../../../assets/scripts/local-stores/visibility/visibility-store";
 
 // Mock bundleManager
 jest.mock("../../../../assets/scripts/asset-loader/bundle-manager", () => ({
 	bundleManager: {
 		loadResourcesAsset: jest.fn()
 	}
+}));
+
+// Mock AudioStore
+jest.mock("../../../../assets/scripts/local-stores/audio/audio-store", () => ({
+	AudioStore: jest.fn().mockImplementation(() => ({
+		muted: false,
+		browserBlocked: false
+	}))
+}));
+
+// Mock VisibilityStore
+jest.mock("../../../../assets/scripts/local-stores/visibility/visibility-store", () => ({
+	VisibilityStore: jest.fn().mockImplementation(() => ({
+		isVisible: true
+	}))
 }));
 
 describe("loadSfx", () => {
@@ -41,11 +58,22 @@ describe("loadSfx", () => {
 
 describe("SfxStore", () => {
 	let store: SfxStore;
+	let mockAudioStore: jest.Mocked<AudioStore>;
+	let mockVisibilityStore: jest.Mocked<VisibilityStore>;
 
 	beforeEach(() => {
 		jest.clearAllMocks();
 		// Arrange
 		store = new SfxStore();
+		mockAudioStore = {
+			muted: false,
+			browserBlocked: false
+		} as jest.Mocked<AudioStore>;
+		mockVisibilityStore = {
+			isVisible: true
+		} as jest.Mocked<VisibilityStore>;
+		store.audioStore = mockAudioStore;
+		store.visibilityStore = mockVisibilityStore;
 	});
 
 	describe("constructor", () => {
@@ -146,6 +174,64 @@ describe("SfxStore", () => {
 			expect(store.sfxCache.get(sfxNames[0])).toBe(mockAudioClips[0]);
 			expect(store.sfxCache.get(sfxNames[1])).toBe(mockAudioClips[1]);
 			expect(bundleManager.loadResourcesAsset).toHaveBeenCalledTimes(2);
+		});
+
+		it("does not play sfx when audio is muted", async () => {
+			// Arrange
+			const sfxName = "test-sfx";
+			const mockAudioClip = new AudioClip();
+			store.sfxCache.set(sfxName, mockAudioClip);
+			mockAudioStore.muted = true;
+
+			// Act
+			await store.playSfx(sfxName);
+
+			// Assert
+			expect(store.playingSfx).toEqual([]);
+		});
+
+		it("does not play sfx when browser is blocked", async () => {
+			// Arrange
+			const sfxName = "test-sfx";
+			const mockAudioClip = new AudioClip();
+			store.sfxCache.set(sfxName, mockAudioClip);
+			mockAudioStore.browserBlocked = true;
+
+			// Act
+			await store.playSfx(sfxName);
+
+			// Assert
+			expect(store.playingSfx).toEqual([]);
+		});
+
+		it("does not play sfx when page is not visible", async () => {
+			// Arrange
+			const sfxName = "test-sfx";
+			const mockAudioClip = new AudioClip();
+			store.sfxCache.set(sfxName, mockAudioClip);
+			mockVisibilityStore.isVisible = false;
+
+			// Act
+			await store.playSfx(sfxName);
+
+			// Assert
+			expect(store.playingSfx).toEqual([]);
+		});
+
+		it("does not play sfx when multiple conditions prevent playing", async () => {
+			// Arrange
+			const sfxName = "test-sfx";
+			const mockAudioClip = new AudioClip();
+			store.sfxCache.set(sfxName, mockAudioClip);
+			mockAudioStore.muted = true;
+			mockAudioStore.browserBlocked = true;
+			mockVisibilityStore.isVisible = false;
+
+			// Act
+			await store.playSfx(sfxName);
+
+			// Assert
+			expect(store.playingSfx).toEqual([]);
 		});
 	});
 

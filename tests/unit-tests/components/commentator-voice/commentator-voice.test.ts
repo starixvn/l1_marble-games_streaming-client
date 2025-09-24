@@ -3,6 +3,8 @@ import { CommentatorVoice } from "../../../../assets/scripts/components/commenta
 import { initializeMockContainer, cleanupMockObserver, createMockStore, spyOnStoreMethods, expectStoreMethodCalled } from "../../../utils/mock-store";
 import { Store } from "../../../../assets/scripts/store";
 import { SfxStore } from "../../../../assets/scripts/local-stores/sfx/sfx-store";
+import { AudioStore } from "../../../../assets/scripts/local-stores/audio/audio-store";
+import { VisibilityStore } from "../../../../assets/scripts/local-stores/visibility/visibility-store";
 import { CommentatorVoiceStore } from "../../../../assets/scripts/features/commentator-voice/commentator-voice-store";
 
 describe("CommentatorVoice", () => {
@@ -16,9 +18,23 @@ describe("CommentatorVoice", () => {
 			language: "en-US", 
 			operator: "common" 
 		} as any);
+		createMockStore(AudioStore as any, {
+			muted: false,
+			browserBlocked: false
+		} as any);
+		createMockStore(VisibilityStore as any, {
+			isVisible: true
+		} as any);
 		sfxStore = createMockStore(SfxStore as any, { 
 			sfxCache: new Map(), 
-			playingSfx: [] 
+			playingSfx: [],
+			audioStore: {
+				muted: false,
+				browserBlocked: false
+			},
+			visibilityStore: {
+				isVisible: true
+			}
 		} as any);
 		createMockStore(CommentatorVoiceStore as any, { 
 			data: { fileName: "" } 

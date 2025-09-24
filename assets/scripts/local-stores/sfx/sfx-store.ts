@@ -1,8 +1,10 @@
 import { AudioClip } from "cc";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { bundleManager } from "../../asset-loader/bundle-manager";
 import mobx from "mobx";
 import { store } from "../../store-decorator";
+import { AudioStore } from "../audio/audio-store";
+import { VisibilityStore } from "../visibility/visibility-store";
 
 export async function loadSfx(sfx: string) {
     const audioClip = await bundleManager.loadResourcesAsset(sfx, AudioClip, null);
@@ -18,6 +20,13 @@ export async function loadSfx(sfx: string) {
 @injectable()
 @store("SfxStore")
 export class SfxStore {
+
+    @inject(AudioStore)
+    audioStore: AudioStore;
+
+    @inject(VisibilityStore)
+    visibilityStore: VisibilityStore;
+
     constructor() {
         mobx.makeAutoObservable(this);
     }
@@ -32,6 +41,10 @@ export class SfxStore {
     }
 
     async playSfx(sfx: string | string[]) {
+        if (this.audioStore.muted || this.audioStore.browserBlocked || !this.visibilityStore.isVisible) {
+            return;
+        }
+
         if (Array.isArray(sfx)) {
             this.playingSfx = await Promise.all(sfx.map(this.playOneSfx.bind(this)));
         } else {
