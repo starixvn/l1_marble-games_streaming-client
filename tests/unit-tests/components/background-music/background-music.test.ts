@@ -1,5 +1,5 @@
-jest.mock("observer", () => require("../../utils/mock-store").createMockObserver());
-import { BackgroundMusic } from "../../../assets/scripts/audios/background-music";
+jest.mock("observer", () => require("../../../utils/mock-store").createMockObserver());
+import { BackgroundMusic } from "../../../../assets/scripts/components/background-music/background-music";
 import { AudioSource } from "cc";
 
 

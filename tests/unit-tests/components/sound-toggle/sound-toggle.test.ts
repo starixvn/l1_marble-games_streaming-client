@@ -1,8 +1,8 @@
-jest.mock("observer", () => require("../../utils/mock-store").createMockObserver());
-import { SoundToggle } from "../../../assets/scripts/audios/sound-toggle";
+jest.mock("observer", () => require("../../../utils/mock-store").createMockObserver());
+import { SoundToggle } from "../../../../assets/scripts/components/sound-toggle/sound-toggle";
 import { Toggle } from "cc";
-import { initializeMockContainer, cleanupMockObserver, createMockStore, spyOnStoreMethods, expectStoreMethodCalled } from "../../utils/mock-store";
-import { AudioStore } from "../../../assets/scripts/audios/audio-store";
+import { initializeMockContainer, cleanupMockObserver, createMockStore, spyOnStoreMethods, expectStoreMethodCalled } from "../../../utils/mock-store";
+import { AudioStore } from "../../../../assets/scripts/local-stores/audio/audio-store";
 
 
 describe("SoundToggle", () => {

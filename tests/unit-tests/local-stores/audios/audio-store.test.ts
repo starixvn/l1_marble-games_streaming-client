@@ -1,4 +1,4 @@
-import { AudioStore } from "../../../assets/scripts/audios/audio-store";
+import { AudioStore } from "../../../../assets/scripts/local-stores/audio/audio-store";
 
 
 describe("AudioStore", () => {

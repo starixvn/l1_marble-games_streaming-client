@@ -9,5 +9,7 @@ export interface CommentatorVoiceData {
 @injectable()
 @store("CommentatorVoiceStore")
 export class CommentatorVoiceStore extends BaseStoreImpl<CommentatorVoiceData> {
-
+    override data: CommentatorVoiceData = {
+        fileName: "",
+    };
 }

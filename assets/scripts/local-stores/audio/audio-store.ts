@@ -1,7 +1,6 @@
 import { injectable } from "inversify";
 import mobx from "mobx";
-import { store } from "../store-decorator";
-import "../local-stores/commentators-voices/commentator-voice-store";
+import { store } from "../../store-decorator";
 
 @injectable()
 @store("AudioStore")

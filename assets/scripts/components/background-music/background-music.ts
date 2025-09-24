@@ -1,7 +1,7 @@
 import { _decorator, AudioSource, Component } from "cc";
 import Observer from "observer";
-import { AudioStore } from "./audio-store";
-import { GameFlowState, GameFlowStore } from "../features/game-flow/game-flow-store";
+import { AudioStore } from "../../local-stores/audio/audio-store";
+import { GameFlowState, GameFlowStore } from "../../features/game-flow/game-flow-store";
 
 const { ccclass, property } = _decorator;
 const { observer, render } = Observer;

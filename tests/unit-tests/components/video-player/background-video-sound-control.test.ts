@@ -30,7 +30,7 @@ jest.mock("../../../../assets/scripts/components/video-player/background-video-p
 
 import { BackgroundVideoSoundControl } from "../../../../assets/scripts/components/video-player/background-video-sound-control";
 import { BackgroundVideoPlayer } from "../../../../assets/scripts/components/video-player/background-video-player";
-import { AudioStore } from "../../../../assets/scripts/audios/audio-store";
+import { AudioStore } from "../../../../assets/scripts/local-stores/audio/audio-store";
 
 describe("BackgroundVideoSoundControl", () => {
   let component: BackgroundVideoSoundControl;

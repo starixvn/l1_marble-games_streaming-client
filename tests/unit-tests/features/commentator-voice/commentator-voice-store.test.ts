@@ -19,12 +19,12 @@ jest.mock("mobx", () => ({
 describe("CommentatorVoiceStore", () => {
 
     describe("constructor", () => {
-        it("should initialize data as null", () => {
+        it("should initialize data as default value", () => {
             // Arrange & Act
             const store = new CommentatorVoiceStore();
 
             // Assert
-            expect(store.data).toBeNull();
+            expect(store.data).toEqual({ fileName: "" });
         });
     });
 

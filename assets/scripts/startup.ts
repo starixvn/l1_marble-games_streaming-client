@@ -15,9 +15,7 @@ import Observer from "observer";
 import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
 import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
-import { HANDLER_TYPES, handlerRegistry } from "./handler-registry";
-import { BaseHandler } from "./features/base/base-handler";
-import { FeatureHandler } from "./feature-handler/feature-handler";
+import { handlerRegistry } from "./handler-registry";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -35,12 +33,6 @@ Observer.configure({
     autobind: true,
   }) } },
 });
-
-console.log(container.getAll<BaseHandler<any>>(HANDLER_TYPES));
-
-const featureHandler = container.get(FeatureHandler);
-console.log("Injected handlers:", featureHandler["handlers"]);
-
 
 window.addEventListener("message", handleWindowMessage(container));
 

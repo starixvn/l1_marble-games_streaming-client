@@ -2,7 +2,7 @@ import { _decorator, Component, game } from "cc";
 import Observer from "observer";
 import { BackgroundVideoPlayer } from "./background-video-player";
 import { initializeAudio } from "./dom-audio-checker";
-import { AudioStore } from "../../audios/audio-store";
+import { AudioStore } from "../../local-stores/audio/audio-store";
 
 const { ccclass, requireComponent } = _decorator;
 const { observer, render, handle } = Observer;
