@@ -1,16 +1,15 @@
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { BaseHandlerImpl } from "../base/base-handler";
 import { IntroData, IntroStore } from "./intro-store";
 import { featureHandler } from "../../handler-registry";
 
-@injectable()
 @featureHandler
 export class IntroHandler extends BaseHandlerImpl<IntroData> {
     name = "intro";
 
     @inject(IntroStore) 
     set store(store: IntroStore) {
-        super.store = store;
+        this._store = store;
     }
   
     public override update(data: IntroData) {

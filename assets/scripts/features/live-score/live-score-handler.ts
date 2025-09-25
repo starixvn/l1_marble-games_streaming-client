@@ -1,15 +1,14 @@
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { BaseHandlerImpl } from "../base/base-handler";
 import { LiveScoreData, LiveScoreStore } from "./live-score-store";
 import { featureHandler } from "../../handler-registry";
 
-@injectable()
 @featureHandler
 export class LiveScoreHandler extends BaseHandlerImpl<LiveScoreData> {
     name = "liveScore";
 
     @inject(LiveScoreStore) 
     set store(store: LiveScoreStore) {
-        super.store = store;
+        this._store = store;
     }
 }

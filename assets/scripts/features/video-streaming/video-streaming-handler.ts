@@ -1,16 +1,15 @@
 import { BaseHandlerImpl } from "../base/base-handler";
 import { featureHandler } from "../../handler-registry";
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { VideoStreamingData, VideoStreamingStore } from "./video-streaming-store";
 
-@injectable()
 @featureHandler
 export class VideoStreamingHandler extends BaseHandlerImpl<VideoStreamingData> {
     name = "videoStreaming";
 
     @inject(VideoStreamingStore) 
     set store(store: VideoStreamingStore) {
-        super.store = store;
+        this._store = store;
     }
   
 

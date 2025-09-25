@@ -22,7 +22,6 @@ const { observer, handle, render } = Observer;
 
 const container = new Container({
   autobind: true,
-  autobind: true,
   defaultScope: "Singleton",
 });
 

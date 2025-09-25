@@ -1,17 +1,16 @@
-import { inject, injectable } from "inversify";
+import { inject } from "inversify";
 import { TeamNameData, TeamNameStore } from "./team-name-store";
 import { featureHandler } from "../../handler-registry";
 import { BaseHandlerImpl } from "../base/base-handler";
 
 
-@injectable()
 @featureHandler
 export class TeamNameHandler extends BaseHandlerImpl<TeamNameData> {
     name = "teamName";
 
     @inject(TeamNameStore) 
     set store(store: TeamNameStore) {
-        super.store = store;
+        this._store = store;
     }
 }
 
