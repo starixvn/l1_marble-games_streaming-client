@@ -47,6 +47,9 @@ export class BackgroundVideoPlayer extends Component {
 
   @render(IntroStore, (store) => store.data.resourceServer)
   setIntroUrl(url: string) {
+    if (!url || url === "") {
+      return;
+    }
     this._introUrl = `${url}${this._operator}_${this._game}_intro.m3u8`;
   }
 
