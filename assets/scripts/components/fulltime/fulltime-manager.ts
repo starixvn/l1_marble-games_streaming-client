@@ -41,8 +41,8 @@ export class FulltimeManager extends Component {
 
     @render(ResultStore, (store) => store.data)
     syncResult(data: ResultData) {
-        const homeScore = data.result[this.currentPhase]?.homeScore ?? 0;
-        const awayScore = data.result[this.currentPhase]?.awayScore ?? 0;
+        const homeScore = Object.values(data.result).reduce((acc, curr) => acc + curr.homeScore, 0);
+        const awayScore = Object.values(data.result).reduce((acc, curr) => acc + curr.awayScore, 0);
         this.isDraw = homeScore === awayScore;
     }
 

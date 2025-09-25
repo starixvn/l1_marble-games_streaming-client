@@ -32,7 +32,7 @@ describe("FulltimeManager", () => {
 		it("sets isDraw true when scores equal at current phase", () => {
 			// Arrange
 			(comp as any).currentPhase = 1;
-			const data: any = { result: { 0: { homeScore: 1, awayScore: 0 }, 1: { homeScore: 2, awayScore: 2 } } };
+			const data: any = { result: { 0: { homeScore: 0, awayScore: 0 }, 1: { homeScore: 2, awayScore: 2 } } };
 
 			// Act
 			comp.syncResult(data);
