@@ -36,6 +36,24 @@
 
   <link rel="stylesheet" type="text/css" href="<%= cssUrl %>"/>
 
+  <style>
+    html, body {
+      height: 100%;
+    }
+    body {
+      margin: 0;
+      background: #000 url('splash.jpg') no-repeat center center;
+      background-size: cover;
+    }
+    #GameDiv {
+      background: transparent url('splash.jpg') no-repeat center center;
+      background-size: cover;
+    }
+    #GameCanvas {
+      background-color: transparent !important;
+    }
+  </style>
+
 </head>
 <body>
   <div id="GameDiv" cc_exact_fit_screen="true">
@@ -44,7 +62,5 @@
       </div>
     </div>
   <%- include(cocosTemplate, {}) %>
-  <script type="text/javascript" src="./c/c.js?v=<%= Date.now() %>"></script>
-
 </body>
 </html>
