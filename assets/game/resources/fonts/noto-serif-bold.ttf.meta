@@ -2,10 +2,10 @@
   "ver": "1.0.1",
   "importer": "ttf-font",
   "imported": true,
-  "uuid": "61c85b54-d26c-4a37-adaa-986aacafaadd",
+  "uuid": "4ed5e562-54d8-4c4f-8c37-e014628fe4c1",
   "files": [
     ".json",
-    "NotoSerif-Regular.ttf"
+    "noto-serif-bold.ttf"
   ],
   "subMetas": {},
   "userData": {}
