@@ -16,6 +16,8 @@ import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
 import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
 import { handlerRegistry } from "./handler-registry";
+import { ReplayHandler } from "./replay/replay-handler";
+import { GameStore } from "./game/game-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -38,6 +40,8 @@ window.addEventListener("message", handleWindowMessage(container));
 @observer
 export class Startup extends Component {
 
+  private _isReplay = false;
+
   @property(Node)
   private readonly infoLayer: Node = null;
 
@@ -47,13 +51,38 @@ export class Startup extends Component {
   }
 
   @render(Store, (store) => store.game)
-  public loadGame(game: string) {
-    resources.load(`games/${game}`, Prefab, this.onLoadedInfoLayer());
+  public loadGame(game: string | null) {
+    if (!game) {
+      return;
+    }
+    console.log("load streaming ", game)
     this.loadStreaming();
+  }
+
+  @render(Store, (store) => store.eventId)
+  public loadEventId(eventId: string | null) {
+    if (!eventId) {
+      return;
+    }
+    console.log("load replay")
+    this.loadReplay();
+  }
+
+  @render(GameStore, (store) => store.data.gameId)
+  public openGame(gameId: string) {
+    if (!gameId) {
+      return;
+    }
+    resources.load(`games/${gameId}`, Prefab, this.onLoadedInfoLayer());
   }
 
   @handle(ServerSentEventHandler, (handler) => handler.connect())
   private loadStreaming() {
+    // trigger handler, no need function body
+  }
+
+  @handle(ReplayHandler, (handler) => handler.connect())
+  private loadReplay() {
     // trigger handler, no need function body
   }
 

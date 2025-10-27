@@ -29,5 +29,4 @@ export abstract class BaseHandlerImpl<T> implements BaseHandler<T> {
     public update(data: T) {
         this._store.update(data);
     }
-
 }
