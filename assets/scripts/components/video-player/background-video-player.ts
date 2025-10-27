@@ -8,6 +8,7 @@ import { Store } from "../../store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { FeatureStage, StageWatcher } from "../../watchers/stages/stage-watcher";
 import { BackgroundStore } from "../../local-stores/background/background-store";
+import { GameStore } from "../../game/game-store";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
@@ -38,11 +39,14 @@ export class BackgroundVideoPlayer extends Component {
 
   @render(Store, (store) => ({
     operator: store.operator,
-    game: store.game,
   }))
-  setStoreInfo({ operator, game }: { operator: string; game: string }) {
+  setStoreInfo({ operator }: { operator: string }) {
     this._operator = operator;
-    this._game = game;
+  }
+
+  @render(GameStore, (store) => store.data.gameId)
+  setGameId(gameId: string) {
+    this._game = gameId;
   }
 
   @render(IntroStore, (store) => store.data.resourceServer)

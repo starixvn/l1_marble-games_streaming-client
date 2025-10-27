@@ -2,6 +2,7 @@ import { inject, injectable } from "inversify";
 import { Store } from "../store";
 import { gameSettings } from "../game-settings";
 import { FeatureHandler } from "../feature-handler/feature-handler";
+import { GameStore } from "../game/game-store";
 
 @injectable()
 export class ServerSentEventHandler {
@@ -11,6 +12,7 @@ export class ServerSentEventHandler {
   private readonly reconnectDelay = gameSettings.reconnectDelay;
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private _store: Store;
+  private _gameStore: GameStore;
   private _featureHandler: FeatureHandler;
 
   @inject(Store) 
@@ -20,6 +22,11 @@ export class ServerSentEventHandler {
 
   get store(): Store {
     return this._store;
+  }
+
+    @inject(GameStore)
+    set gameStore(store: GameStore) {
+    this._gameStore = store;
   }
 
   @inject(FeatureHandler) 
@@ -37,6 +44,9 @@ export class ServerSentEventHandler {
     }
 
     try {
+      this._gameStore.update({
+        gameId: this.store.game,
+      });
       this.eventSource = new EventSource(this.store.serverUrl);
       this.setupEventListeners();
     } catch (err) {
