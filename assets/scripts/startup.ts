@@ -16,8 +16,8 @@ import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
 import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
 import { handlerRegistry } from "./handler-registry";
-import { ReplayHandler } from "./replay/replay-handler";
-import { GameStore } from "./game/game-store";
+import { ReplayHandler } from "./local-stores/replay/replay-handler";
+import { GameStore } from "./local-stores/game/game-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -40,7 +40,6 @@ window.addEventListener("message", handleWindowMessage(container));
 @observer
 export class Startup extends Component {
 
-  private _isReplay = false;
 
   @property(Node)
   private readonly infoLayer: Node = null;

@@ -1,11 +1,6 @@
 import { inject, injectable } from "inversify";
-import { Store } from "../store";
-import { FeatureHandler } from "../feature-handler/feature-handler";
+import { Store } from "../../store";
 import { ReplayPayload, ReplayStore } from "./replay-store";
-
- 
-
-
 
 @injectable()
 export class ReplayHandler {

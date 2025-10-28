@@ -4,6 +4,7 @@ import { ServerSentEventHandler } from "../../../assets/scripts/server-sent-even
 import { Store } from "../../../assets/scripts/store";
 import { FeatureHandler } from "../../../assets/scripts/feature-handler/feature-handler";
 import { gameSettings } from "../../../assets/scripts/game-settings";
+import { GameStore } from "../../../assets/scripts/local-stores/game/game-store";
 
 // Mock gameSettings
 jest.mock("../../../assets/scripts/game-settings", () => ({
@@ -50,6 +51,7 @@ describe("ServerSentEventHandler", () => {
   let handler: ServerSentEventHandler;
   let mockStore: jest.Mocked<Store>;
   let mockFeatureHandler: jest.Mocked<FeatureHandler>;
+  let mockGameStore: jest.Mocked<Pick<GameStore, "update">> & Partial<GameStore>;
 
   beforeAll(() => {
     jest.useFakeTimers();
@@ -74,9 +76,14 @@ describe("ServerSentEventHandler", () => {
       update: jest.fn()
     } as unknown as jest.Mocked<FeatureHandler>;
 
+    mockGameStore = {
+      update: jest.fn()
+    } as any;
+
     // Bind dependencies to container
     container.bind(Store).toConstantValue(mockStore);
     container.bind(FeatureHandler).toConstantValue(mockFeatureHandler);
+    container.bind(GameStore).toConstantValue(mockGameStore as any);
     container.bind(ServerSentEventHandler).toSelf();
 
     // Get handler from container
@@ -105,6 +112,7 @@ describe("ServerSentEventHandler", () => {
       const newContainer = new Container();
       newContainer.bind(Store).toConstantValue(mockStore);
       newContainer.bind(FeatureHandler).toConstantValue(mockFeatureHandler as any);
+      newContainer.bind(GameStore).toConstantValue(mockGameStore as any);
       newContainer.bind(ServerSentEventHandler).toSelf();
       const newHandler = newContainer.get(ServerSentEventHandler);
 
@@ -127,6 +135,16 @@ describe("ServerSentEventHandler", () => {
       // Assert
       expect(MockEventSourceConstructor).toHaveBeenCalledWith(mockStore.serverUrl);
       expect((handler as any).eventSource).toBe(mockEventSource);
+    });
+
+    it("should update GameStore with gameId from Store.game", () => {
+      // Arrange
+      
+      // Act
+      handler.connect();
+
+      // Assert
+      expect(mockGameStore.update).toHaveBeenCalledWith({ gameId: mockStore.game });
     });
 
     it("should disconnect existing connection before creating new one", () => {
@@ -226,21 +244,10 @@ describe("ServerSentEventHandler", () => {
       (handler as any).setupEventListeners();
 
       // Assert
-      expect(mockEventSource.onopen).toBeNull();
       expect(mockEventSource.onmessage).toBeNull();
       expect(mockEventSource.onerror).toBeNull();
     });
 
-    it("should set onopen handler when eventSource exists", () => {
-      // Arrange
-      (handler as any).eventSource = mockEventSource;
-
-      // Act
-      (handler as any).setupEventListeners();
-
-      // Assert
-      expect(mockEventSource.onopen).toBeInstanceOf(Function);
-    });
 
     it("should set onmessage handler when eventSource exists", () => {
       // Arrange

@@ -8,7 +8,7 @@ import { Store } from "../../store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { FeatureStage, StageWatcher } from "../../watchers/stages/stage-watcher";
 import { BackgroundStore } from "../../local-stores/background/background-store";
-import { GameStore } from "../../game/game-store";
+import { GameStore } from "../../local-stores/game/game-store";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
