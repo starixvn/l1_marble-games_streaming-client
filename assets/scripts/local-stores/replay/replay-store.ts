@@ -1,4 +1,4 @@
-import { store } from "../store-decorator";
+import { store } from "../../store-decorator";
 import mobx from "mobx";
 
 export interface ReplayPayload {

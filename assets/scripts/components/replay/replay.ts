@@ -1,10 +1,10 @@
 import { _decorator, Component } from "cc";
 import Observer from "observer";
-import { type ReplayMeta, type ReplayPayload, ReplayStore } from "../../replay/replay-store";
+import { type ReplayMeta, type ReplayPayload, ReplayStore } from "../../local-stores/replay/replay-store";
 import { FeatureHandler } from "../../feature-handler/feature-handler";
 import { IntroData } from "../../features/intro/intro-store";
 import { VideoStreamingData } from "../../features/video-streaming/video-streaming-store";
-import { GameHandler } from "../../game/game-handler";
+import { GameHandler } from "../../local-stores/game/game-handler";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
@@ -57,7 +57,7 @@ export class Replay extends Component {
         const now = Date.now();
         this.openGame(replayData.meta.gameId);
         for (const item of replayData.payload) {
-            const interceptedPayload = this.interceptEvent(item.payload, replayData?.meta, item.time, now)
+            const interceptedPayload = this.interceptEvent(item.payload, replayData.meta, item.time, now)
             this.scheduleOnce(() => {
                 this.replayEvent(interceptedPayload)
             }, item.time)

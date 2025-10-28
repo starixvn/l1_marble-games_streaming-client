@@ -2,7 +2,7 @@ import { inject, injectable } from "inversify";
 import { Store } from "../store";
 import { gameSettings } from "../game-settings";
 import { FeatureHandler } from "../feature-handler/feature-handler";
-import { GameStore } from "../game/game-store";
+import { GameStore } from "../local-stores/game/game-store";
 
 @injectable()
 export class ServerSentEventHandler {
@@ -74,10 +74,6 @@ export class ServerSentEventHandler {
     if (!this.eventSource) {
       return;
     }
-
-    this.eventSource.onopen = () => {
-      console.log("StreamingHandler: Connected to server");
-    };
 
     this.eventSource.onmessage = (event) => {
       try {

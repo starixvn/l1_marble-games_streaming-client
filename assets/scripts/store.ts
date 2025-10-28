@@ -4,7 +4,7 @@ import { store } from "./store-decorator";
 @store("Store")
 export class Store {
   constructor() {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(globalThis.location.search);
 
     this.game = params.get("game") || null;
     this.language = params.get("language") || "en-US";
@@ -23,7 +23,7 @@ export class Store {
   operator = "common";
 
   get replayUrl() {
-    let host = window.location.host;
+    let host = globalThis.location.host;
 
     if (host.includes("localhost")) {
       host = "mgtv.lumigame.com";
@@ -36,7 +36,7 @@ export class Store {
   }
 
   get serverUrl() {
-    let host = window.location.host;
+    let host = globalThis.location.host;
 
     if (host.includes("localhost")) {
       host = "mgtv.lumigame.com";

@@ -42,7 +42,8 @@ Date.now = mockDateNow;
 
 import { BackgroundVideoPlayer } from "../../../../assets/scripts/components/video-player/background-video-player";
 import { FeatureStage } from "../../../../assets/scripts/watchers/stages/stage-watcher";
-import { initializeMockContainer, cleanupMockObserver } from "../../../utils/mock-store";
+import { GameStore } from "../../../../assets/scripts/local-stores/game/game-store";
+import { initializeMockContainer, cleanupMockObserver, createMockStore } from "../../../utils/mock-store";
 
 
 describe("BackgroundVideoPlayer", () => {
@@ -51,6 +52,8 @@ describe("BackgroundVideoPlayer", () => {
 
 	beforeEach(() => {
 		// Arrange
+		initializeMockContainer();
+		createMockStore(GameStore, { data: { gameId: "gm" } } as any);
 		comp = new BackgroundVideoPlayer();
 		hls = {
 			initialized: true,
@@ -72,7 +75,6 @@ describe("BackgroundVideoPlayer", () => {
 		};
 		(comp as any).hlsPlayer = hls;
 		mockDateNow.mockClear();
-    initializeMockContainer();
   });
 
   afterAll(() => {
@@ -121,14 +123,24 @@ describe("BackgroundVideoPlayer", () => {
 	});
 
 	describe("setStoreInfo", () => {
-		it("stores operator and game", () => {
+		it("stores operator", () => {
 			// Arrange
 			// Act
-			(comp as any).setStoreInfo({ operator: "op", game: "gm" });
+			comp.setStoreInfo({ operator: "op" });
 
 			// Assert
 			expect((comp as any)._operator).toBe("op");
-			expect((comp as any)._game).toBe("gm");
+		});
+	});
+
+	describe("setGameId", () => {
+		it("stores game id from GameStore", () => {
+			// Arrange
+			// Act
+			(comp as any).setGameId("game-123");
+
+			// Assert
+			expect((comp as any)._game).toBe("game-123");
 		});
 	});
 

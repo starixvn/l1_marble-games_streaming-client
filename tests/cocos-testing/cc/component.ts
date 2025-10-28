@@ -16,4 +16,5 @@ export class Component {
 
     onDisable() {}
     schedule = jest.fn();
+    scheduleOnce = jest.fn();
 }
