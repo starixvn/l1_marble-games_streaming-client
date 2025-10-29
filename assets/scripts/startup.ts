@@ -40,6 +40,9 @@ window.addEventListener("message", handleWindowMessage(container));
 @observer
 export class Startup extends Component {
 
+  onLoad() {
+    this.initStore(globalThis.location);
+  }
 
   @property(Node)
   private readonly infoLayer: Node = null;
@@ -83,6 +86,11 @@ export class Startup extends Component {
   @handle(ReplayHandler, (handler) => handler.connect())
   private loadReplay() {
     // trigger handler, no need function body
+  }
+
+  @handle(Store, (store, location: typeof globalThis.location) => store.init(location)) 
+  private initStore(location: typeof globalThis.location) {
+    return location;
   }
 
   private onLoadedInfoLayer() {

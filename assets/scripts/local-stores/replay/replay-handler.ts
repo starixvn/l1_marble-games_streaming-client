@@ -22,8 +22,24 @@ export class ReplayHandler {
     }
 
     async fetchEventReplay() {
-        const response = await fetch(this._store.replayUrl);
-        const json: ReplayPayload = await response.json();
-        this._replayStore.update(json);
+
+        try {
+            const response = await fetch(this._store.replayUrl);
+            const json: ReplayPayload = await response.json();
+            this.validateReplayPayload(json);
+            this._replayStore.update(json);
+        } catch (error) {
+            console.error("Failed to fetch event replay", error.message);
+        }
+    }
+
+    private validateReplayPayload(json: any) {
+        if (json.error) {
+            throw new Error(json.error);
+        }
+        
+        if (!json.meta.gameId) {
+            throw new Error("Invalid payload")
+        }
     }
 }

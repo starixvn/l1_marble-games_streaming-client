@@ -4,13 +4,6 @@ import { store } from "./store-decorator";
 @store("Store")
 export class Store {
   constructor() {
-    const params = new URLSearchParams(globalThis.location.search);
-
-    this.game = params.get("game") || null;
-    this.language = params.get("language") || "en-US";
-    this.operator = params.get("operator") || "common";
-    this.eventId = params.get("eventId") || null;
-
     mobx.makeAutoObservable(this);
   }
 
@@ -21,6 +14,18 @@ export class Store {
   language = "en-US";
 
   operator = "common";
+
+  init(location: typeof globalThis.location) {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const decodedToken = atob(token);
+    const decodedParams = new URLSearchParams(decodedToken);
+
+    this.game = decodedParams.get("game") || null;
+    this.language = decodedParams.get("language") || "en-US";
+    this.operator = decodedParams.get("operator") || "common";
+    this.eventId = decodedParams.get("event") || null;
+  }
 
   get replayUrl() {
     let host = globalThis.location.host;
