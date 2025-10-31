@@ -1,11 +1,14 @@
-import { _decorator, Component, Enum, Label } from "cc";
+import { _decorator, Component, Enum, Label, log } from "cc";
 import { t } from "db://i18n/LanguageData";
 import { LocalizedLabel } from "db://i18n/LocalizedLabel";
 import Observer from "observer";
+import {
+  type TeamNameData,
+  TeamNameStore,
+} from "../../features/team-name/team-name-store";
 import { Store } from "../../store";
 import { Name } from "./name";
 import { Team } from "./team";
-import { type TeamNameData, TeamNameStore } from "../../features/team-name/team-name-store";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
@@ -26,6 +29,7 @@ export class NameManager extends Component {
 
   @render(Store, (store) => store.operator)
   private syncOperator(operator: string) {
+    log("syncOperator---", operator);
     this.operator = operator;
   }
 

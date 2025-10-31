@@ -1,97 +1,104 @@
 
 present-team.png
-size: 1732,965
+size: 1799,1545
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 Score-bg
   rotate: false
-  xy: 2, 143
-  size: 252, 112
-  orig: 252, 112
+  xy: 938, 133
+  size: 276, 122
+  orig: 276, 122
+  offset: 0, 0
+  index: -1
+Score-bg-sub
+  rotate: false
+  xy: 938, 81
+  size: 276, 50
+  orig: 276, 50
   offset: 0, 0
   index: -1
 VS-effect
   rotate: false
-  xy: 2, 787
+  xy: 2, 579
   size: 860, 176
   orig: 884, 181
   offset: 7, 4
   index: -1
 VS-text
   rotate: false
-  xy: 535, 2
+  xy: 1216, 6
   size: 177, 115
   orig: 181, 116
   offset: 2, 1
   index: -1
+background-gameplay
+  rotate: false
+  xy: 2, 757
+  size: 1398, 786
+  orig: 1398, 786
+  offset: 0, 0
+  index: -1
 bg-infotext
-  rotate: true
-  xy: 1665, 108
+  rotate: false
+  xy: 2, 2
   size: 267, 45
   orig: 267, 45
   offset: 0, 0
   index: -1
 bg-name-blue
   rotate: false
-  xy: 256, 119
+  xy: 864, 656
   size: 532, 99
   orig: 532, 99
   offset: 0, 0
   index: -1
 bg-name-red
-  rotate: false
-  xy: 2, 18
+  rotate: true
+  xy: 1299, 123
   size: 531, 99
   orig: 531, 99
   offset: 0, 0
   index: -1
 bg-team-blue
-  rotate: true
-  xy: 867, 74
+  rotate: false
+  xy: 938, 257
   size: 359, 397
   orig: 369, 408
   offset: 5, 6
   index: -1
 bg-team-red
   rotate: true
-  xy: 1266, 16
+  xy: 1400, 29
   size: 359, 397
   orig: 369, 408
   offset: 5, 6
   index: -1
 effect-blue
   rotate: false
-  xy: 470, 220
+  xy: 1402, 390
   size: 395, 565
   orig: 395, 590
   offset: 0, 25
   index: -1
 effect-blue-bg
   rotate: false
-  xy: 2, 257
+  xy: 2, 49
   size: 466, 528
   orig: 488, 575
   offset: 13, 32
   index: -1
 effect-red
   rotate: false
-  xy: 1335, 377
+  xy: 1402, 957
   size: 395, 586
   orig: 395, 639
   offset: 0, 25
   index: -1
 effect-red-bg
   rotate: false
-  xy: 867, 435
+  xy: 470, 49
   size: 466, 528
   orig: 488, 575
   offset: 13, 32
-  index: -1
-image/emplty
-  rotate: false
-  xy: 864, 962
-  size: 1, 1
-  orig: 1, 1
-  offset: 0, 0
   index: -1

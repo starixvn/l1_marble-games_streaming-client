@@ -1,0 +1,90 @@
+
+winner.png
+size: 2017,904
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+bg-name-blue
+  rotate: false
+  xy: 817, 397
+  size: 580, 108
+  orig: 580, 108
+  offset: 0, 0
+  index: -1
+bg-name-general
+  rotate: true
+  xy: 1893, 129
+  size: 579, 108
+  orig: 579, 108
+  offset: 0, 0
+  index: -1
+bg-name-red
+  rotate: false
+  xy: 2, 4
+  size: 580, 108
+  orig: 580, 108
+  offset: 0, 0
+  index: -1
+bg-team-blue
+  rotate: true
+  xy: 1062, 2
+  size: 393, 434
+  orig: 403, 445
+  offset: 5, 5
+  index: -1
+bg-team-red
+  rotate: false
+  xy: 1498, 3
+  size: 393, 434
+  orig: 403, 445
+  offset: 5, 5
+  index: -1
+effect-red
+  rotate: true
+  xy: 817, 507
+  size: 395, 586
+  orig: 395, 639
+  offset: 0, 25
+  index: -1
+effect-red-bg
+  rotate: false
+  xy: 349, 374
+  size: 466, 528
+  orig: 488, 575
+  offset: 13, 32
+  index: -1
+image/emplty
+  rotate: false
+  xy: 2014, 901
+  size: 1, 1
+  orig: 1, 1
+  offset: 0, 0
+  index: -1
+win-element
+  rotate: false
+  xy: 1405, 439
+  size: 484, 463
+  orig: 484, 463
+  offset: 0, 0
+  index: -1
+win-element2
+  rotate: false
+  xy: 349, 114
+  size: 711, 258
+  orig: 711, 258
+  offset: 0, 0
+  index: -1
+win-element3
+  rotate: true
+  xy: 1891, 710
+  size: 192, 121
+  orig: 192, 121
+  offset: 0, 0
+  index: -1
+win-firework
+  rotate: false
+  xy: 2, 217
+  size: 345, 685
+  orig: 348, 685
+  offset: 3, 0
+  index: -1

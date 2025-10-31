@@ -3,6 +3,7 @@ import {
   Component,
   error,
   instantiate,
+  log,
   Node,
   Prefab,
   resources,
@@ -12,12 +13,12 @@ import { Container } from "inversify";
 import mobx from "mobx";
 import Observer from "observer";
 
+import { handlerRegistry } from "./handler-registry";
+import { GameStore } from "./local-stores/game/game-store";
+import { ReplayHandler } from "./local-stores/replay/replay-handler";
+import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
 import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
-import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
-import { handlerRegistry } from "./handler-registry";
-import { ReplayHandler } from "./local-stores/replay/replay-handler";
-import { GameStore } from "./local-stores/game/game-store";
 
 const { ccclass, property } = _decorator;
 const { observer, handle, render } = Observer;
@@ -29,9 +30,11 @@ const container = new Container({
 
 handlerRegistry.bindAll(container);
 
-
 Observer.configure({
-  default: { mobx, container: { resolve: (ctor) => container.get(ctor, { autobind: true}) } },
+  default: {
+    mobx,
+    container: { resolve: (ctor) => container.get(ctor, { autobind: true }) },
+  },
 });
 
 window.addEventListener("message", handleWindowMessage(container));
@@ -39,13 +42,12 @@ window.addEventListener("message", handleWindowMessage(container));
 @ccclass
 @observer
 export class Startup extends Component {
-
-
   @property(Node)
   private readonly infoLayer: Node = null;
 
   @render(Store, (store) => store.language)
   initLanguage(language: string) {
+    log("initLanguage---", language);
     init(language);
   }
 
@@ -54,7 +56,7 @@ export class Startup extends Component {
     if (!game) {
       return;
     }
-    console.log("load streaming ", game)
+    console.log("load streaming ", game);
     this.loadStreaming();
   }
 
@@ -63,7 +65,7 @@ export class Startup extends Component {
     if (!eventId) {
       return;
     }
-    console.log("load replay")
+    console.log("load replay");
     this.loadReplay();
   }
 

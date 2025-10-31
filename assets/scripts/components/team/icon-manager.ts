@@ -7,10 +7,13 @@ import {
   SpriteFrame,
 } from "cc";
 import Observer from "observer";
+import {
+  type TeamNameData,
+  TeamNameStore,
+} from "../../features/team-name/team-name-store";
 import { Store } from "../../store";
 import { Icon } from "./icon";
 import { Team } from "./team";
-import { type TeamNameData, TeamNameStore } from "../../features/team-name/team-name-store";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
@@ -34,6 +37,7 @@ export class IconManager extends Component {
 
   @render(Store, (store) => store.operator)
   syncOperator(operator: string) {
+    console.log("syncOperator---", operator);
     this.operator = operator;
   }
 
