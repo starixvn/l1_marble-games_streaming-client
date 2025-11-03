@@ -1,76 +1,83 @@
-import { VideoStreamingStore, VideoStreamingData } from "../../../../assets/scripts/features/video-streaming/video-streaming-store";
+import {
+  VideoStreamingStore,
+  VideoStreamingData,
+} from "../../../../assets/scripts/features/video-streaming/video-streaming-store";
 
 // Mock the decorators and dependencies
 jest.mock("inversify", () => ({
-    injectable: () => (target: any) => target,
+  injectable: () => (target: any) => target,
 }));
 
 jest.mock("../../../../assets/scripts/store-decorator", () => ({
-    store: () => (target: any) => target,
+  store: () => (target: any) => target,
 }));
 
 jest.mock("mobx", () => ({
-    makeObservable: jest.fn(),
-    observable: {},
-    action: {},
+  makeObservable: jest.fn(),
+  observable: {},
+  action: {},
 }));
 
 describe("VideoStreamingStore", () => {
-    describe("constructor", () => {
-        it("should initialize data with default values", () => {
-            // Arrange & Act
-            const store = new VideoStreamingStore();
+  describe("constructor", () => {
+    it("should initialize data with default values", () => {
+      // Arrange & Act
+      const store = new VideoStreamingStore();
 
-            // Assert
-            expect(store.data).toEqual({
-                videoLink: "",
-                timeToStream: 0,
-                currentTime: 0,
-                phaseIndex: 0
-            });
-        });
+      // Assert
+      expect(store.data).toEqual({
+        videoLink: "",
+        streamingPhaseTime: 0,
+        timeToStream: 0,
+        currentTime: 0,
+        phaseIndex: 0,
+      });
+    });
+  });
+
+  describe("update", () => {
+    it("should update data with VideoStreamingData", () => {
+      // Arrange
+      const store = new VideoStreamingStore();
+      const testData: VideoStreamingData = {
+        videoLink: "https://example.com/video.mp4",
+        timeToStream: 1500,
+        streamingPhaseTime: 300,
+        currentTime: 300,
+        phaseIndex: 2,
+      };
+
+      // Act
+      store.update(testData);
+
+      // Assert
+      expect(store.data).toEqual(testData);
     });
 
-    describe("update", () => {
-        it("should update data with VideoStreamingData", () => {
-            // Arrange
-            const store = new VideoStreamingStore();
-            const testData: VideoStreamingData = {
-                videoLink: "https://example.com/video.mp4",
-                timeToStream: 1500,
-                currentTime: 300,
-                phaseIndex: 2
-            };
+    it("should overwrite previous VideoStreamingData", () => {
+      // Arrange
+      const store = new VideoStreamingStore();
+      const firstData: VideoStreamingData = {
+        videoLink: "https://example.com/first.mp4",
+        timeToStream: 1000,
+        streamingPhaseTime: 100,
+        currentTime: 100,
+        phaseIndex: 1,
+      };
+      const secondData: VideoStreamingData = {
+        videoLink: "https://example.com/second.mp4",
+        timeToStream: 2000,
+        streamingPhaseTime: 500,
+        currentTime: 500,
+        phaseIndex: 3,
+      };
+      store.data = firstData;
 
-            // Act
-            store.update(testData);
+      // Act
+      store.update(secondData);
 
-            // Assert
-            expect(store.data).toEqual(testData);
-        });
-
-        it("should overwrite previous VideoStreamingData", () => {
-            // Arrange
-            const store = new VideoStreamingStore();
-            const firstData: VideoStreamingData = {
-                videoLink: "https://example.com/first.mp4",
-                timeToStream: 1000,
-                currentTime: 100,
-                phaseIndex: 1
-            };
-            const secondData: VideoStreamingData = {
-                videoLink: "https://example.com/second.mp4",
-                timeToStream: 2000,
-                currentTime: 500,
-                phaseIndex: 3
-            };
-            store.data = firstData;
-
-            // Act
-            store.update(secondData);
-
-            // Assert
-            expect(store.data).toEqual(secondData);
-        });
+      // Assert
+      expect(store.data).toEqual(secondData);
     });
+  });
 });
