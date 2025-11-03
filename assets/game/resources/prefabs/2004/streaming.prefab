@@ -567,6 +567,8 @@
       "__id__": 25
     },
     "team": 0,
+    "bundleName": "resources",
+    "path": "small/",
     "_id": ""
   },
   {
@@ -761,6 +763,8 @@
       "__id__": 35
     },
     "team": 1,
+    "bundleName": "resources",
+    "path": "small/",
     "_id": ""
   },
   {

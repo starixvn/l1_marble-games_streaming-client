@@ -343,7 +343,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -345,
-      "y": 247.5,
+      "y": -12.835,
       "z": 0
     },
     "_lrot": {
@@ -507,7 +507,7 @@
       "__expectedType__": "sp.SkeletonData"
     },
     "defaultSkin": "default",
-    "defaultAnimation": "<None>",
+    "defaultAnimation": "prebet-in",
     "_premultipliedAlpha": false,
     "_timeScale": 1,
     "_preCacheMode": 0,
@@ -571,7 +571,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -345,
-      "y": -230.719,
+      "y": -249.126,
       "z": 0
     },
     "_lrot": {
@@ -800,7 +800,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 345,
-      "y": -247.5,
+      "y": -0.314,
       "z": 0
     },
     "_lrot": {
@@ -983,7 +983,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 345,
-      "y": -228.243,
+      "y": -238.762,
       "z": 0
     },
     "_lrot": {

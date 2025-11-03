@@ -1,4 +1,4 @@
-import { _decorator, Component, Enum } from "cc";
+import { _decorator, CCString, Component, Enum } from "cc";
 import { Team } from "./team";
 
 const { ccclass, property, menu } = _decorator;
@@ -8,4 +8,10 @@ const { ccclass, property, menu } = _decorator;
 export class Icon extends Component {
   @property({ type: Enum(Team) })
   team: Team = Team.HOME;
+
+  @property(CCString)
+  bundleName = "resources";
+
+  @property(CCString)
+  path = "";
 }

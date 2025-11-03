@@ -1,103 +1,96 @@
 
 present-team.png
-size: 1799,1545
+size: 1737,1018
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 Score-bg
-  rotate: false
-  xy: 938, 133
+  rotate: true
+  xy: 927, 233
   size: 276, 122
   orig: 276, 122
   offset: 0, 0
   index: -1
 Score-bg-sub
   rotate: false
-  xy: 938, 81
+  xy: 532, 2
   size: 276, 50
   orig: 276, 50
   offset: 0, 0
   index: -1
 VS-effect
-  rotate: false
-  xy: 2, 579
+  rotate: true
+  xy: 1559, 156
   size: 860, 176
   orig: 884, 181
   offset: 7, 4
   index: -1
 VS-text
-  rotate: false
-  xy: 1216, 6
+  rotate: true
+  xy: 927, 54
   size: 177, 115
   orig: 181, 116
   offset: 2, 1
   index: -1
-background-gameplay
-  rotate: false
-  xy: 2, 757
-  size: 1398, 786
-  orig: 1398, 786
-  offset: 0, 0
-  index: -1
 bg-infotext
   rotate: false
-  xy: 2, 2
+  xy: 810, 7
   size: 267, 45
   orig: 267, 45
   offset: 0, 0
   index: -1
 bg-name-blue
   rotate: false
-  xy: 864, 656
-  size: 532, 99
-  orig: 532, 99
+  xy: 470, 511
+  size: 580, 108
+  orig: 580, 108
   offset: 0, 0
   index: -1
 bg-name-red
   rotate: true
-  xy: 1299, 123
-  size: 531, 99
-  orig: 531, 99
+  xy: 1449, 41
+  size: 580, 108
+  orig: 580, 108
   offset: 0, 0
   index: -1
 bg-team-blue
   rotate: false
-  xy: 938, 257
-  size: 359, 397
-  orig: 369, 408
-  offset: 5, 6
+  xy: 532, 75
+  size: 393, 434
+  orig: 403, 445
+  offset: 5, 5
   index: -1
 bg-team-red
   rotate: true
-  xy: 1400, 29
-  size: 359, 397
-  orig: 369, 408
-  offset: 5, 6
+  xy: 1058, 623
+  size: 393, 434
+  orig: 403, 445
+  offset: 5, 5
   index: -1
 effect-blue
   rotate: false
-  xy: 1402, 390
+  xy: 1052, 54
   size: 395, 565
   orig: 395, 590
   offset: 0, 25
   index: -1
 effect-blue-bg
   rotate: false
-  xy: 2, 49
+  xy: 2, 488
   size: 466, 528
   orig: 488, 575
   offset: 13, 32
   index: -1
 effect-red
-  rotate: false
-  xy: 1402, 957
+  rotate: true
+  xy: 470, 621
   size: 395, 586
   orig: 395, 639
   offset: 0, 25
   index: -1
 effect-red-bg
-  rotate: false
-  xy: 470, 49
+  rotate: true
+  xy: 2, 20
   size: 466, 528
   orig: 488, 575
   offset: 13, 32

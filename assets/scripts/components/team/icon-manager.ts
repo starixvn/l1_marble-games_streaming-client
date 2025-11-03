@@ -1,12 +1,6 @@
-import {
-  _decorator,
-  Component,
-  Enum,
-  resources,
-  Sprite,
-  SpriteFrame,
-} from "cc";
+import { _decorator, Component, Enum, log, Sprite, SpriteFrame } from "cc";
 import Observer from "observer";
+import { bundleManager } from "../../asset-loader/bundle-manager";
 import {
   type TeamNameData,
   TeamNameStore,
@@ -30,6 +24,7 @@ export class IconManager extends Component {
 
   private sprites: Sprite[] = [];
   private operator = "";
+  private rootPath = "icons";
 
   onLoad() {
     this.sprites = this.targets.map((target) => target.getComponent(Sprite));
@@ -37,7 +32,7 @@ export class IconManager extends Component {
 
   @render(Store, (store) => store.operator)
   syncOperator(operator: string) {
-    console.log("syncOperator---", operator);
+    log("syncOperator---", operator);
     this.operator = operator;
   }
 
@@ -54,16 +49,17 @@ export class IconManager extends Component {
     if (this.operator === "") {
       return;
     }
+    // Load per Icon using its bundleName and path
+    for (let i = 0; i < this.targets.length; i++) {
+      const icon = this.targets[i];
+      const sprite = this.sprites[i];
 
-    const path = `icons/${this.operator}/${value}/spriteFrame`;
+      if (!icon || !sprite) {
+        continue;
+      }
 
-    const onError = () => {
-      const fallbackPath = `icons/common/${value}/spriteFrame`;
-
-      resources.load(fallbackPath, SpriteFrame, this.onLoadedSpriteFrame());
-    };
-
-    resources.load(path, SpriteFrame, this.onLoadedSpriteFrame(onError));
+      this.loadSpriteForIcon(icon, sprite, value);
+    }
   }
 
   get name() {
@@ -72,18 +68,41 @@ export class IconManager extends Component {
     return first ? first.spriteFrame.name : "";
   }
 
-  private onLoadedSpriteFrame(onError?: () => void) {
-    return (err: Error, spriteFrame: SpriteFrame) => {
-      if (err || !spriteFrame) {
-        onError?.();
+  private async loadSpriteForIcon(
+    icon: Icon,
+    sprite: Sprite,
+    teamName: string
+  ) {
+    const primaryPath = `${this.rootPath}/${this.operator}/${icon.path}${teamName}/spriteFrame`;
+    const fallbackPath = `${this.rootPath}/common/${icon.path}/${teamName}/spriteFrame`;
+    console.log("primaryPath---", primaryPath);
 
-        return;
-      }
+    try {
+      const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
+        icon.bundleName,
+        primaryPath,
+        SpriteFrame,
+        null
+      );
+      this.setSprite(sprite, spriteFrame);
+    } catch (e) {
+      log("loadSpriteForIcon error---", e);
+      const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
+        icon.bundleName,
+        fallbackPath,
+        SpriteFrame,
+        null
+      );
+      this.setSprite(sprite, spriteFrame);
+    }
+  }
 
-      this.sprites.forEach((sprite) => {
-        sprite.spriteFrame = spriteFrame;
-      });
-    };
+  protected setSprite(sprite: Sprite, spriteFrame: SpriteFrame) {
+    if (!sprite || !spriteFrame) {
+      return;
+    }
+
+    sprite.spriteFrame = spriteFrame;
   }
 
   onFocusInEditor(): void {

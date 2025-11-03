@@ -54,9 +54,9 @@ export class LocalizedFont extends Component {
   }
 
   updateFont() {
-    const { name, loadRemote } = this.getFontNameByLanguage();
+    const name = this.getFontNameByLanguage();
     if (this.label) {
-      this.loadFont(name, loadRemote)
+      this.loadFont(name)
         .then((font) => {
           if (this.label?.isValid) {
             this.label.font = font;
@@ -68,7 +68,7 @@ export class LocalizedFont extends Component {
         });
     }
     if (this.richText) {
-      this.loadFont(name, loadRemote)
+      this.loadFont(name)
         .then((font) => {
           if (this.richText?.isValid) {
             this.richText.font = font as TTFFont;
@@ -105,7 +105,7 @@ export class LocalizedFont extends Component {
     return overrideFont || this.fontBases["en"];
   }
 
-  loadFont(name: string, loadRemote: boolean) {
-    return bundleManager.loadSharedAsset<Font>(`fonts/${name}`, Font);
+  loadFont(name: string) {
+    return bundleManager.loadResourcesAsset<Font>(`fonts/${name}`, Font);
   }
 }
