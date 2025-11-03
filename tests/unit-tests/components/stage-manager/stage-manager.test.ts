@@ -2,30 +2,47 @@ import { StageManager } from "../../../../assets/scripts/components/stage-manage
 import { Stage } from "../../../../assets/scripts/components/stage/stage";
 import { FeatureStage } from "../../../../assets/scripts/watchers/stages/stage-watcher";
 
+jest.mock("../../../../assets/scripts/common/utils", () => {
+  const actual = jest.requireActual("../../../../assets/scripts/common/utils");
+  return {
+    ...actual,
+    AnimationUtils: {
+      ...actual.AnimationUtils,
+      fadeInAndActivate: jest.fn((node: any) => {
+        node.active = true;
+        return Promise.resolve();
+      }),
+      fadeOutAndDeactivate: jest.fn((node: any) => {
+        node.active = false;
+        return Promise.resolve();
+      }),
+    },
+  };
+});
 
 describe("StageManager", () => {
-	let manager: StageManager;
+  let manager: StageManager;
 
-	beforeEach(() => {
-		// Arrange
-		manager = new StageManager();
-	});
+  beforeEach(() => {
+    // Arrange
+    manager = new StageManager();
+  });
 
-	describe("syncStage", () => {
-		it("enables targets matching the stage and disables others", () => {
-			// Arrange
-			const a = new Stage();
-			const b = new Stage();
-			a.stageName = FeatureStage.Prebet;
-			b.stageName = FeatureStage.Streaming;
-			manager.targets = [a, b];
+  describe("syncStage", () => {
+    it("enables targets matching the stage and disables others", () => {
+      // Arrange
+      const a = new Stage();
+      const b = new Stage();
+      a.stageName = FeatureStage.Prebet;
+      b.stageName = FeatureStage.Streaming;
+      manager.targets = [a, b];
 
-			// Act
-			(manager as any).syncStage(FeatureStage.Streaming);
+      // Act
+      (manager as any).syncStage(FeatureStage.Streaming);
 
-			// Assert
-			expect(a.node.active).toBe(false);
-			expect(b.node.active).toBe(true);
-		});
-	});
+      // Assert
+      expect(a.node.active).toBe(false);
+      expect(b.node.active).toBe(true);
+    });
+  });
 });
