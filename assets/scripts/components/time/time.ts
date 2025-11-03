@@ -20,7 +20,7 @@ import { Store } from "../../store";
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
 
-const SPLIT_SECONDS_PER_SECOND = 60;
+const SECONDS_PER_MINUTE = 60;
 
 @ccclass
 @menu("Time/Time")
@@ -35,16 +35,17 @@ export class Time extends Component {
   @property(Label)
   secondsLabel: Label = null;
 
-  private _timeToStream = 0;
-  private _halfIndex = 0;
+  private _streamingPhaseTime = 0;
+  private _phaseIndex = 0;
 
   game = "";
+  minutes = 0;
   seconds = 0;
-  splitSeconds = 0;
   paused = true;
   videoDuration = gameSettings.videoDuration.default;
 
   protected update(dt: number): void {
+    this._streamingPhaseTime += dt;
     this.updateSecondTimer();
   }
 
@@ -62,35 +63,34 @@ export class Time extends Component {
 
   @render(VideoStreamingStore, (store) => store.data)
   syncMatchLiveTime(data: VideoStreamingData) {
-    this._timeToStream = data.timeToStream;
+    this._streamingPhaseTime = data.streamingPhaseTime / 1000;
   }
 
   @render(CurrentEventStore, (store) => store.data)
   syncHalf(data: CurrentEventData) {
-    this._halfIndex = data.phase;
+    this._phaseIndex = data.phase;
     this.halfLabel.string =
-      this._halfIndex === 0 ? t("Common.1st_half") : t("Common.2nd_half");
+      this._phaseIndex === 0 ? t("Common.1st_half") : t("Common.2nd_half");
   }
 
   private updateSecondTimer() {
     if (this.paused) {
-      this.splitSeconds = 0;
-      this.seconds = this._halfIndex * gameSettings.halfDuration;
+      this.seconds = 0;
       this.ensureMatchTimeValid();
       this.updateDisplayUI();
       return;
     }
 
-    const currentTime = (Date.now() - this._timeToStream) / 1000;
+    const relativePhaseTime =
+      (this._streamingPhaseTime / this.videoDuration) *
+      gameSettings.phaseDuration;
 
     const relativeMatchTime =
-      (currentTime / this.videoDuration) * gameSettings.halfDuration;
-    const relativeMatchTimeWithHalf =
-      this._halfIndex * gameSettings.halfDuration + relativeMatchTime;
+      this._phaseIndex * gameSettings.phaseDuration + relativePhaseTime;
 
-    this.seconds = Math.floor(relativeMatchTimeWithHalf);
-    this.splitSeconds = Math.floor(
-      this.getDecimal(relativeMatchTimeWithHalf) * SPLIT_SECONDS_PER_SECOND
+    this.minutes = Math.floor(relativeMatchTime);
+    this.seconds = Math.floor(
+      this.getDecimal(relativeMatchTime) * SECONDS_PER_MINUTE
     );
 
     this.ensureMatchTimeValid();
@@ -98,19 +98,19 @@ export class Time extends Component {
   }
 
   private updateDisplayUI() {
-    this.secondsLabel.string = this.splitSeconds.toString().padStart(2, "0");
-    this.minutesLabel.string = this.seconds.toString().padStart(2, "0") + ":";
+    this.secondsLabel.string = this.seconds.toString().padStart(2, "0");
+    this.minutesLabel.string = this.minutes.toString().padStart(2, "0") + ":";
   }
 
   private ensureMatchTimeValid() {
-    if (this.seconds >= this.getMaxMatchTime()) {
-      this.seconds = this.getMaxMatchTime();
-      this.splitSeconds = 0;
+    if (this.minutes >= this.getMaxMatchTime()) {
+      this.minutes = this.getMaxMatchTime();
+      this.seconds = 0;
     }
   }
 
   private getMaxMatchTime() {
-    return (this._halfIndex + 1) * gameSettings.halfDuration;
+    return (this._phaseIndex + 1) * gameSettings.phaseDuration;
   }
 
   private getDecimal(value: number) {

@@ -5,7 +5,7 @@ const streamingUrl =
 export const gameSettings = {
   maxReconnectAttempts: 10,
   reconnectDelay: 5000,
-  halfDuration: 45,
+  phaseDuration: 45,
   videoDuration: {
     default: 30,
     "2004": 40,
