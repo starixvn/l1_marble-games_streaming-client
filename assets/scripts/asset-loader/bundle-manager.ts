@@ -55,7 +55,10 @@ export class BundleManager {
       return new Promise<AssetType>((resolve) => {
         bundle.load(assetPath, assetType, onProgress, (err, asset) => {
           if (err) {
-            log(`Cannot load asset ${assetPath} from bundle ${bundleName}`);
+            log(
+              `Cannot load asset ${assetPath} from bundle ${bundleName}`,
+              err
+            );
             resolve(null);
           } else {
             if (isCached) {

@@ -24,7 +24,7 @@ export class IconManager extends Component {
 
   private sprites: Sprite[] = [];
   private operator = "";
-  private rootPath = "icons";
+  private rootPath = "/icons";
 
   onLoad() {
     this.sprites = this.targets.map((target) => target.getComponent(Sprite));
@@ -75,11 +75,10 @@ export class IconManager extends Component {
   ) {
     const primaryPath = `${this.rootPath}/${this.operator}/${icon.path}${teamName}/spriteFrame`;
     const fallbackPath = `${this.rootPath}/common/${icon.path}/${teamName}/spriteFrame`;
-    console.log("primaryPath---", primaryPath);
 
     try {
       const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
-        icon.bundleName,
+        "resources",
         primaryPath,
         SpriteFrame,
         null
@@ -88,7 +87,7 @@ export class IconManager extends Component {
     } catch (e) {
       log("loadSpriteForIcon error---", e);
       const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
-        icon.bundleName,
+        "resources",
         fallbackPath,
         SpriteFrame,
         null
@@ -107,7 +106,6 @@ export class IconManager extends Component {
 
   onFocusInEditor(): void {
     const icons = this.node.getComponentsInChildren(Icon);
-
     this.targets = icons.filter((icon) => icon.team === this.team);
   }
 }

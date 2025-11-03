@@ -392,8 +392,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 261,
-      "height": 261
+      "width": 268,
+      "height": 268
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -431,7 +431,7 @@
     "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 0,
+    "_sizeMode": 2,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -439,7 +439,7 @@
     },
     "_fillStart": 0,
     "_fillRange": 0,
-    "_isTrimmedMode": true,
+    "_isTrimmedMode": false,
     "_useGrayscale": false,
     "_atlas": null,
     "_id": ""
@@ -461,6 +461,8 @@
       "__id__": 17
     },
     "team": 0,
+    "bundleName": "resources",
+    "path": "",
     "_id": ""
   },
   {
@@ -858,8 +860,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 261,
-      "height": 261
+      "width": 268,
+      "height": 268
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -897,7 +899,7 @@
     "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 0,
+    "_sizeMode": 2,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -905,7 +907,7 @@
     },
     "_fillStart": 0,
     "_fillRange": 0,
-    "_isTrimmedMode": true,
+    "_isTrimmedMode": false,
     "_useGrayscale": false,
     "_atlas": null,
     "_id": ""
@@ -927,6 +929,8 @@
       "__id__": 42
     },
     "team": 1,
+    "bundleName": "resources",
+    "path": "",
     "_id": ""
   },
   {
