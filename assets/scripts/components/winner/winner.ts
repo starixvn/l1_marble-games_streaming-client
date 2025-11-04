@@ -1,7 +1,7 @@
 import { _decorator, Component, Node } from "cc";
-import { t } from "db://i18n/LanguageData";
 import { LocalizedLabel } from "db://i18n/LocalizedLabel";
 import Observer from "observer";
+import { FunctionUtils } from "../../common/utils/function-utils";
 import {
   type ResultData,
   ResultStore,
@@ -71,19 +71,11 @@ export class Winner extends Component {
     this.home.active = homeWin;
     this.away.active = !homeWin;
 
-    const key = this.getWinnerKey(this.operator, this.winner);
+    const key = FunctionUtils.getLocalizedKey(this.operator, this.winner);
     this.setLabelKey(key);
   }
 
   protected setLabelKey(key: string) {
-    if (t(key) === "") {
-      this.label._key = `${this.operator}.${this.winner}`;
-    } else {
-      this.label._key = key;
-    }
-  }
-
-  getWinnerKey(operator: string, winner: string) {
-    return `Common.${winner}`;
+    this.label._key = key;
   }
 }

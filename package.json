@@ -2,7 +2,7 @@
   "name": "streaming-client",
   "type": "module",
   "scripts": {
-    "tolgee": "node scripts/tolgee.js",
+    "tolgee": "node scripts/tolgee.cjs",
     "obfuscator-config-file": "node ./site-configs/obfuscator.js",
     "install-dependencies": "npm install",
     "test": "jest --testPathPatterns=tests/unit-tests/",

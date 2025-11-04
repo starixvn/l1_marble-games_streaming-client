@@ -78,7 +78,7 @@ export class IconManager extends Component {
 
     try {
       const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
-        "resources",
+        icon.bundleName,
         primaryPath,
         SpriteFrame,
         null
@@ -87,7 +87,7 @@ export class IconManager extends Component {
     } catch (e) {
       log("loadSpriteForIcon error---", e);
       const spriteFrame = await bundleManager.loadAssetsFromBundle<SpriteFrame>(
-        "resources",
+        icon.bundleName,
         fallbackPath,
         SpriteFrame,
         null

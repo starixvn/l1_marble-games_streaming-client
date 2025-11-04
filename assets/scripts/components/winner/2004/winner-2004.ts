@@ -1,5 +1,4 @@
 import { _decorator } from "cc";
-import { t } from "db://i18n/LanguageData";
 import { LocalizedLabel } from "db://i18n/LocalizedLabel";
 import { Winner } from "../winner";
 
@@ -17,12 +16,7 @@ export class Winner2004 extends Winner {
   awayTextLabel: LocalizedLabel = null;
 
   protected setLabelKey(key: string) {
-    if (t(key) === "") {
-      this.homeTextLabel._key = `${this.operator}.${this.winner}`;
-      this.awayTextLabel._key = `${this.operator}.${this.winner}`;
-    } else {
-      this.homeTextLabel._key = key;
-      this.awayTextLabel._key = key;
-    }
+    this.homeTextLabel._key = `Common.${this.winner}`;
+    this.awayTextLabel._key = `Common.${this.winner}`;
   }
 }
