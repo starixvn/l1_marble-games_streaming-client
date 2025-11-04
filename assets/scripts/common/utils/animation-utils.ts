@@ -1,7 +1,6 @@
 import {
   Animation,
   Component,
-  Label,
   math,
   Node,
   sp,
@@ -18,20 +17,6 @@ import { ComponentUtils } from "./component-utils";
 export namespace AnimationUtils {
   export const FadeTag = 1001;
   export const ScaleTag = 1002;
-
-  /**
-   * Deprecated: Use ComponentUtils.getUiOpacity instead
-   */
-  export const getUiOpacity = (node: Node) => {
-    return ComponentUtils.getUiOpacity(node);
-  };
-
-  /**
-   * Deprecated: Use ComponentUtils.setOpacityNode instead
-   */
-  export const setOpacityNode = (node: Node, opacity: number) => {
-    ComponentUtils.setOpacityNode(node, opacity);
-  };
 
   export const stopFade = (node: Node) => {
     const uiOpacity = ComponentUtils.getUiOpacity(node);

@@ -24,7 +24,7 @@ export class IconManager extends Component {
 
   private sprites: Sprite[] = [];
   private operator = "";
-  private rootPath = "/icons";
+  private readonly rootPath = "/icons";
 
   onLoad() {
     this.sprites = this.targets.map((target) => target.getComponent(Sprite));

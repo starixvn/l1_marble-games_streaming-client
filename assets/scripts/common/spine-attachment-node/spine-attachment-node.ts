@@ -1,6 +1,6 @@
 import { _decorator, Component, sp, UITransform, v3 } from "cc";
 
-import { AnimationUtils } from "../utils";
+import { ComponentUtils } from "../utils";
 
 const { ccclass, property } = _decorator;
 
@@ -37,7 +37,7 @@ export class SpineAttachmentNode extends Component {
       .convertToNodeSpaceAR(wPos);
     this.node.position = localPos;
     this.slot?.color &&
-      AnimationUtils.setOpacityNode(this.node, this.slot.color.a * 255);
+      ComponentUtils.setOpacityNode(this.node, this.slot.color.a * 255);
     this.node.setScale(this.bone.scaleX, this.bone.scaleY);
     this.node.angle = this.bone.rotation;
   }

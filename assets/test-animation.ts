@@ -2,8 +2,8 @@ import { _decorator, Component, sp } from "cc";
 
 const { ccclass, property } = _decorator;
 
-@ccclass("test")
-export class test extends Component {
+@ccclass("TestAnimation")
+export class TestAnimation extends Component {
   @property(sp.Skeleton)
   skeleton: sp.Skeleton = null;
 
