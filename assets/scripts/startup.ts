@@ -15,7 +15,7 @@ import Observer from "observer";
 
 import { handlerRegistry } from "./handler-registry";
 import { GameStore } from "./local-stores/game/game-store";
-import { ReplayHandler } from "./local-stores/replay/replay-handler";
+import { ReplayMatchHandler } from "./local-stores/replay-match/replay-match-handler";
 import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
 import { Store } from "./store";
 import { handleWindowMessage } from "./store-decorator";
@@ -56,7 +56,7 @@ export class Startup extends Component {
     if (!game) {
       return;
     }
-    console.log("load streaming ", game);
+    log("load streaming ", game);
     this.loadStreaming();
   }
 
@@ -65,8 +65,8 @@ export class Startup extends Component {
     if (!eventId) {
       return;
     }
-    console.log("load replay");
-    this.loadReplay();
+    log("load replay match ", eventId);
+    this.loadReplayMatch();
   }
 
   @render(GameStore, (store) => store.data.gameId)
@@ -82,8 +82,8 @@ export class Startup extends Component {
     // trigger handler, no need function body
   }
 
-  @handle(ReplayHandler, (handler) => handler.connect())
-  private loadReplay() {
+  @handle(ReplayMatchHandler, (handler) => handler.connect())
+  private loadReplayMatch() {
     // trigger handler, no need function body
   }
 

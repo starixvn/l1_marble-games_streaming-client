@@ -1,24 +1,29 @@
-import { ReplayHandler } from "../../../../assets/scripts/local-stores/replay/replay-handler";
-import { ReplayStore, type ReplayPayload } from "../../../../assets/scripts/local-stores/replay/replay-store";
+import { ReplayMatchHandler } from "../../../../assets/scripts/local-stores/replay-match/replay-match-handler";
+import {
+  ReplayMatchStore,
+  type ReplayMatchPayload,
+} from "../../../../assets/scripts/local-stores/replay-match/replay-match-store";
 import { Store } from "../../../../assets/scripts/store";
 
 describe("ReplayHandler", () => {
   describe("fetchEventReplay", () => {
     it("fetches replay and updates ReplayStore", async () => {
       // Arrange
-      const handler = new ReplayHandler();
-      const replayStore = new ReplayStore();
+      const handler = new ReplayMatchHandler();
+      const replayStore = new ReplayMatchStore();
       const store = new Store();
       store.eventId = "replay.json";
       const updateSpy = jest.spyOn(replayStore, "update");
       (handler as any).replayStore = replayStore;
       (handler as any).store = store;
 
-      const responseBody: ReplayPayload = {
+      const responseBody: ReplayMatchPayload = {
         meta: { fromTime: 100, gameId: "gm" },
         payload: [{ time: 0, payload: { k: { v: 1 } } }],
       };
-      globalThis.fetch = jest.fn().mockResolvedValue({ json: jest.fn().mockResolvedValue(responseBody) } as any) as any;
+      globalThis.fetch = jest.fn().mockResolvedValue({
+        json: jest.fn().mockResolvedValue(responseBody),
+      } as any) as any;
 
       // Act
       await handler.fetchEventReplay();
@@ -33,8 +38,10 @@ describe("ReplayHandler", () => {
   describe("connect", () => {
     it("triggers fetchEventReplay without awaiting", () => {
       // Arrange
-      const handler = new ReplayHandler();
-      const spy = jest.spyOn(handler as any, "fetchEventReplay").mockResolvedValue(undefined as any);
+      const handler = new ReplayMatchHandler();
+      const spy = jest
+        .spyOn(handler as any, "fetchEventReplay")
+        .mockResolvedValue(undefined as any);
 
       // Act
       handler.connect();
@@ -44,5 +51,3 @@ describe("ReplayHandler", () => {
     });
   });
 });
-
-
