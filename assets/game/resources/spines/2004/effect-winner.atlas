@@ -1,0 +1,62 @@
+
+effect-winner.png
+size: 1757,1081
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+effect-blue
+  rotate: true
+  xy: 648, 61
+  size: 435, 621
+  orig: 435, 649
+  offset: 0, 28
+  index: -1
+effect-blue-bg
+  rotate: false
+  xy: 2, 498
+  size: 513, 581
+  orig: 537, 633
+  offset: 14, 35
+  index: -1
+effect-red
+  rotate: true
+  xy: 2, 61
+  size: 435, 644
+  orig: 435, 703
+  offset: 0, 28
+  index: -1
+effect-red-bg
+  rotate: false
+  xy: 517, 498
+  size: 513, 581
+  orig: 537, 633
+  offset: 14, 35
+  index: -1
+win-element
+  rotate: false
+  xy: 1271, 269
+  size: 484, 463
+  orig: 484, 463
+  offset: 0, 0
+  index: -1
+win-element2B
+  rotate: true
+  xy: 1271, 2
+  size: 265, 258
+  orig: 265, 258
+  offset: 0, 0
+  index: -1
+win-element3
+  rotate: true
+  xy: 1032, 540
+  size: 192, 121
+  orig: 192, 121
+  offset: 0, 0
+  index: -1
+win-firework
+  rotate: true
+  xy: 1032, 734
+  size: 345, 685
+  orig: 348, 685
+  offset: 3, 0
+  index: -1

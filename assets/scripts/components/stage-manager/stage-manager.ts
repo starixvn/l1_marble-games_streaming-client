@@ -9,15 +9,6 @@ import { Stage } from "../stage/stage";
 const { ccclass, menu, property } = _decorator;
 const { observer, render } = Observer;
 
-const STAGE_MAPPING = {
-  [FeatureStage.Prebet]: "prebetting",
-  [FeatureStage.Streaming]: "streaming",
-  [FeatureStage.PhaseChange]: "halftime",
-  [FeatureStage.Result]: "result",
-  [FeatureStage.Intro]: "intro",
-  [FeatureStage.Unknown]: "unknown",
-};
-
 @ccclass
 @menu("Stages/StageManager")
 @observer

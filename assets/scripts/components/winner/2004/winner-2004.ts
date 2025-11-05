@@ -15,8 +15,8 @@ export class Winner2004 extends Winner {
   @property(LocalizedLabel)
   awayTextLabel: LocalizedLabel = null;
 
-  protected setLabelKey(key: string) {
-    this.homeTextLabel._key = `Common.${this.winner}`;
-    this.awayTextLabel._key = `Common.${this.winner}`;
+  protected override setLabelKey(key: string) {
+    this.homeTextLabel._key = key;
+    this.awayTextLabel._key = key;
   }
 }
