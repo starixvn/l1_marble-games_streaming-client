@@ -14,6 +14,9 @@ export class HLSVideoPlayer {
   private _onPlayStateChanged: (play: boolean) => void = () => {};
   private _onHlsLoaded: () => void = () => {};
   private _onHlsPlayed: () => void = () => {};
+  private durationReplay = 3;
+  private _durationInSeconds = 0;
+  private _isManifestParsed = false;
 
   constructor(options: HLSVideoPlayerOptions) {
     this._id = options.id;
@@ -48,7 +51,7 @@ export class HLSVideoPlayer {
       this._video.currentTime = value;
     }
   }
-  
+
   get currentTime() {
     return this._video.currentTime;
   }
@@ -57,7 +60,6 @@ export class HLSVideoPlayer {
     return this._url;
   }
 
-
   get currentLevel() {
     return this._hls.currentLevel;
   }
@@ -65,7 +67,7 @@ export class HLSVideoPlayer {
   get bandwidthEstimate() {
     return this._hls.bandwidthEstimate;
   }
-  
+
   set muted(value: boolean) {
     this._intentionallyMuted = value;
     this._video.muted = value;
@@ -75,7 +77,7 @@ export class HLSVideoPlayer {
     this._video = DOMBackgroundVideo.createOrLoadVideoElement(this._id);
     if (!Hls.isSupported()) {
       throw new Error("Hls.js is not supported.");
-    };
+    }
 
     this._hls = new Hls({
       startLevel: -1,
@@ -88,15 +90,22 @@ export class HLSVideoPlayer {
 
     this._hls.attachMedia(this._video);
     this.registerVisibilityChangeEvent();
+    this._hls.on(Hls.Events.MANIFEST_PARSED, () => {
+      this._isManifestParsed = true;
+    });
   }
 
-  load(url: string, options: {
-    play?: boolean;
-  } = {
-    play: false,
-  }) {
+  load(
+    url: string,
+    options: {
+      play?: boolean;
+    } = {
+      play: false,
+    }
+  ) {
     if (url && this._url !== url) {
       this._url = url;
+      this._isManifestParsed = false;
       this._hls.loadSource(this._url);
       if (!options.play) {
         this._video.pause();
@@ -105,9 +114,49 @@ export class HLSVideoPlayer {
     }
   }
 
-  play() {
-    if (this.initialized) {
-      this.playWithRetry(0, 3);
+  play(isReplay?: boolean, durationInSeconds?: number) {
+    if (!this.initialized) {
+      return;
+    }
+    if (isReplay) {
+      this.handlePlayReplay(isReplay, durationInSeconds);
+      return;
+    }
+
+    this.playWithRetry(0, 3);
+  }
+
+  handlePlayReplay(isReplay: boolean, durationInSeconds: number) {
+    this._durationInSeconds = durationInSeconds ?? 0;
+
+    const doPlay = () => {
+      if (isReplay && this._durationInSeconds > 0) {
+        const target = Math.max(
+          0,
+          this._durationInSeconds - this.durationReplay
+        );
+        console.log("seek target", target);
+
+        // Awaind seek to finish
+        this._video.pause();
+
+        // After seek to finish, play
+        const handleSeeked = () => {
+          console.log("✅ Seeked to", this._video.currentTime);
+          this._video.removeEventListener("seeked", handleSeeked);
+          this.playWithRetry(0, 3);
+        };
+        this._video.addEventListener("seeked", handleSeeked, { once: true });
+        this._video.currentTime = target;
+      } else {
+        this.playWithRetry(0, 3);
+      }
+    };
+
+    if (!this._isManifestParsed) {
+      this._hls.once(Hls.Events.MANIFEST_PARSED, () => doPlay());
+    } else {
+      doPlay();
     }
   }
 
@@ -141,21 +190,30 @@ export class HLSVideoPlayer {
   }
 
   private playWithRetry(retry = 0, maxRetry = 3) {
-    this._video.play().then(() => {
-      this._onPlayStateChanged(true);
-    }).catch(() => {
-      if (retry < maxRetry) {
-        this.playWithRetry(retry + 1, maxRetry);
-      }
-    });
+    this._video
+      .play()
+      .then(() => {
+        this._onPlayStateChanged(true);
+      })
+      .catch(() => {
+        if (retry < maxRetry) {
+          this.playWithRetry(retry + 1, maxRetry);
+        }
+      });
   }
 
   private registerVisibilityChangeEvent() {
-    document.addEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+    document.addEventListener(
+      "visibilitychange",
+      this.handleVisibilityChange.bind(this)
+    );
   }
 
   private unregisterVisibilityChangeEvent() {
-    document.removeEventListener("visibilitychange", this.handleVisibilityChange.bind(this));
+    document.removeEventListener(
+      "visibilitychange",
+      this.handleVisibilityChange.bind(this)
+    );
   }
 
   private handleVisibilityChange() {

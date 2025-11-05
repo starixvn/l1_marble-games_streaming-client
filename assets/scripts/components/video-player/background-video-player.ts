@@ -1,14 +1,17 @@
-import { _decorator, Component } from "cc";
+import { _decorator, Component, log } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
-import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 import { IntroStore } from "../../features/intro/intro-store";
-import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
-import { Store } from "../../store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
-import { FeatureStage, StageWatcher } from "../../watchers/stages/stage-watcher";
+import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
 import { BackgroundStore } from "../../local-stores/background/background-store";
 import { GameStore } from "../../local-stores/game/game-store";
+import { Store } from "../../store";
+import {
+  FeatureStage,
+  StageWatcher,
+} from "../../watchers/stages/stage-watcher";
+import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
@@ -25,6 +28,8 @@ export class BackgroundVideoPlayer extends Component {
   private _introUrl = "";
   private _operator = "";
   private _game = "";
+  private _videoLink = "";
+  private _durationInSeconds = 0;
 
   @render(StageWatcher, (watcher) => watcher.stage)
   syncPlayVideo(stage: FeatureStage) {
@@ -62,7 +67,15 @@ export class BackgroundVideoPlayer extends Component {
     status: store.data.isPlaying,
     timeToPlay: store.data.timeToPlay,
   }))
-  playIntro({ currentTime, status, timeToPlay }: { currentTime: number; status: boolean; timeToPlay: number }) {
+  playIntro({
+    currentTime,
+    status,
+    timeToPlay,
+  }: {
+    currentTime: number;
+    status: boolean;
+    timeToPlay: number;
+  }) {
     if (!this._introUrl || this._introUrl === "" || !status) {
       return;
     }
@@ -85,10 +98,22 @@ export class BackgroundVideoPlayer extends Component {
     videoLink: store.data.videoLink,
     currentTime: store.data.currentTime,
     timeToStream: store.data.timeToStream,
+    durationInSeconds: store.data.durationInSeconds,
   }))
-  playVideo({ videoLink, currentTime, timeToStream }: { videoLink: string; currentTime: number; timeToStream: number }) {
-
+  playVideo({
+    videoLink,
+    currentTime,
+    timeToStream,
+    durationInSeconds,
+  }: {
+    videoLink: string;
+    currentTime: number;
+    timeToStream: number;
+    durationInSeconds: number;
+  }) {
     if (videoLink && videoLink !== "") {
+      this._videoLink = videoLink;
+      this._durationInSeconds = durationInSeconds;
       this.hlsPlayer.load(videoLink);
       this.play();
       this.syncCurrentTime();
@@ -105,7 +130,16 @@ export class BackgroundVideoPlayer extends Component {
 
   play() {
     if (this.initialized) {
-      this.hlsPlayer.play();
+      this.hlsPlayer.play(false, this._durationInSeconds);
+      this.showBackground(true);
+    }
+  }
+
+  playReplay() {
+    if (this.initialized) {
+      log("link playReplay", this._videoLink);
+      this.hlsPlayer.load(this._videoLink);
+      this.hlsPlayer.play(true, this._durationInSeconds);
       this.showBackground(true);
     }
   }
@@ -166,13 +200,16 @@ export class BackgroundVideoPlayer extends Component {
       }
     };
 
-    this.hlsPlayer.addEventListener("timeupdate", this.syncCurrentTime.bind(this));
+    this.hlsPlayer.addEventListener(
+      "timeupdate",
+      this.syncCurrentTime.bind(this)
+    );
 
     Object.values(Hls.Events).forEach((event) => {
       this.hlsPlayer.addEventListener(event, this.node.emit.bind(this.node));
     });
   }
-  
+
   @handle(BackgroundStore, (store, data: boolean) => store.showBackground(data))
   showBackground(play: boolean) {
     return play;

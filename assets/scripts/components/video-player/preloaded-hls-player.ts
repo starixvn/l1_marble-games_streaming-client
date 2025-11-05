@@ -1,12 +1,13 @@
 import { HlsListeners } from "hls.js";
-import { DOMBackgroundVideo, GenericBackgroundVideoEvents } from "./dom-background-video";
+import {
+  DOMBackgroundVideo,
+  GenericBackgroundVideoEvents,
+} from "./dom-background-video";
 import { HLSVideoPlayer } from "./hls-video-player";
-
 
 interface BackgroundSwitchEventData {
   url: string;
 }
-
 
 export class HLSPreloadedVideoPlayer {
   private readonly _preloadPlayer: HLSVideoPlayer = null;
@@ -59,7 +60,7 @@ export class HLSPreloadedVideoPlayer {
   off(event: keyof HlsListeners) {
     this._videoPlayer.off(event);
   }
-  
+
   init() {
     this._preloadPlayer.init();
     this._videoPlayer.init();
@@ -76,10 +77,13 @@ export class HLSPreloadedVideoPlayer {
 
     this._preloadPlayer.muted = true;
 
-    DOMBackgroundVideo.genericEventNotifier.addEventListener(GenericBackgroundVideoEvents.SWITCH_BACKGROUND, (event: CustomEvent<BackgroundSwitchEventData>) => {
-      const { url } = event.detail;
-      DOMBackgroundVideo.changeBackground(this._videoPlayer.id, url);
-    });
+    DOMBackgroundVideo.genericEventNotifier.addEventListener(
+      GenericBackgroundVideoEvents.SWITCH_BACKGROUND,
+      (event: CustomEvent<BackgroundSwitchEventData>) => {
+        const { url } = event.detail;
+        DOMBackgroundVideo.changeBackground(this._videoPlayer.id, url);
+      }
+    );
     DOMBackgroundVideo.toFront(this._videoPlayer.id);
     this._videoPlayer.onPlayStateChanged = (play: boolean) => {
       this._onPlayStateChanged(play);
@@ -114,14 +118,14 @@ export class HLSPreloadedVideoPlayer {
     this._videoPlayer.load(url, { play: false });
   }
 
-  play() {
-    this._videoPlayer.play();
+  play(isReplay?: boolean, durationInSeconds?: number) {
+    this._videoPlayer.play(isReplay, durationInSeconds);
   }
 
   pause() {
     this._videoPlayer.pause();
   }
-  
+
   destroy() {
     this._preloadPlayer.destroy();
     this._videoPlayer.destroy();

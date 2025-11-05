@@ -1,5 +1,5 @@
-import { store } from "../../store-decorator";
 import { injectable } from "inversify";
+import { store } from "../../store-decorator";
 import { BaseStoreImpl } from "../base/base-store";
 
 export type VideoStreamingData = {
@@ -8,6 +8,7 @@ export type VideoStreamingData = {
   currentTime: number;
   streamingPhaseTime: number;
   phaseIndex: number;
+  durationInSeconds?: number;
 };
 
 @injectable()
@@ -19,5 +20,6 @@ export class VideoStreamingStore extends BaseStoreImpl<VideoStreamingData> {
     timeToStream: 0,
     currentTime: 0,
     phaseIndex: 0,
+    durationInSeconds: 0,
   };
 }
