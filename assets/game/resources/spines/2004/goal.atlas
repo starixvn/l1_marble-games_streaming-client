@@ -1,187 +1,250 @@
 
 goal.png
-size: 1292,1095
+size: 1000,1032
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 Source/FW 01/FW 01_00001
   rotate: false
-  xy: 2, 659
-  size: 213, 217
+  xy: 818, 616
+  size: 17, 17
   orig: 213, 217
-  offset: 0, 0
+  offset: 98, 100
+  index: -1
+Source/FW 01/FW 01_00003
+  rotate: false
+  xy: 935, 316
+  size: 17, 17
+  orig: 213, 217
+  offset: 98, 100
   index: -1
 Source/FW 01/FW 01_00005
   rotate: true
-  xy: 1015, 880
-  size: 213, 217
+  xy: 429, 710
+  size: 16, 17
   orig: 213, 217
-  offset: 0, 0
+  offset: 98, 100
+  index: -1
+Source/FW 01/FW 01_00007
+  rotate: false
+  xy: 536, 607
+  size: 25, 26
+  orig: 213, 217
+  offset: 93, 96
   index: -1
 Source/FW 01/FW 01_00009
   rotate: false
-  xy: 2, 440
-  size: 213, 217
+  xy: 613, 399
+  size: 43, 44
   orig: 213, 217
-  offset: 0, 0
+  offset: 85, 87
+  index: -1
+Source/FW 01/FW 01_00011
+  rotate: true
+  xy: 405, 2
+  size: 54, 55
+  orig: 213, 217
+  offset: 79, 81
   index: -1
 Source/FW 01/FW 01_00013
   rotate: false
-  xy: 217, 659
-  size: 213, 217
+  xy: 935, 335
+  size: 62, 62
   orig: 213, 217
-  offset: 0, 0
+  offset: 75, 78
+  index: -1
+Source/FW 01/FW 01_00015
+  rotate: true
+  xy: 520, 28
+  size: 68, 69
+  orig: 213, 217
+  offset: 73, 74
   index: -1
 Source/FW 01/FW 01_00017
   rotate: false
-  xy: 2, 221
-  size: 213, 217
+  xy: 520, 98
+  size: 76, 78
   orig: 213, 217
-  offset: 0, 0
+  offset: 69, 70
+  index: -1
+Source/FW 01/FW 01_00019
+  rotate: false
+  xy: 536, 635
+  size: 84, 85
+  orig: 213, 217
+  offset: 64, 67
   index: -1
 Source/FW 01/FW 01_00021
-  rotate: false
-  xy: 217, 440
-  size: 213, 217
+  rotate: true
+  xy: 432, 728
+  size: 90, 93
   orig: 213, 217
-  offset: 0, 0
+  offset: 62, 63
+  index: -1
+Source/FW 01/FW 01_00023
+  rotate: true
+  xy: 536, 722
+  size: 96, 101
+  orig: 213, 217
+  offset: 58, 58
   index: -1
 Source/FW 01/FW 01_00025
   rotate: false
-  xy: 432, 659
-  size: 213, 217
+  xy: 429, 599
+  size: 105, 109
   orig: 213, 217
-  offset: 0, 0
+  offset: 53, 54
+  index: -1
+Source/FW 01/FW 01_00027
+  rotate: false
+  xy: 405, 58
+  size: 113, 117
+  orig: 213, 217
+  offset: 50, 51
   index: -1
 Source/FW 01/FW 01_00029
-  rotate: false
-  xy: 2, 2
-  size: 213, 217
+  rotate: true
+  xy: 797, 2
+  size: 120, 126
   orig: 213, 217
-  offset: 0, 0
+  offset: 46, 45
+  index: -1
+Source/FW 01/FW 01_00031
+  rotate: true
+  xy: 798, 124
+  size: 128, 135
+  orig: 213, 217
+  offset: 42, 41
   index: -1
 Source/FW 01/FW 01_00033
   rotate: false
-  xy: 217, 221
-  size: 213, 217
+  xy: 798, 254
+  size: 135, 143
   orig: 213, 217
-  offset: 0, 0
+  offset: 38, 38
+  index: -1
+Source/FW 01/FW 01_00035
+  rotate: true
+  xy: 838, 566
+  size: 142, 151
+  orig: 213, 217
+  offset: 35, 32
   index: -1
 Source/FW 01/FW 01_00037
-  rotate: false
-  xy: 432, 440
-  size: 213, 217
+  rotate: true
+  xy: 839, 880
+  size: 150, 159
   orig: 213, 217
-  offset: 0, 0
+  offset: 32, 29
+  index: -1
+Source/FW 01/FW 01_00039
+  rotate: false
+  xy: 839, 710
+  size: 158, 168
+  orig: 213, 217
+  offset: 27, 25
   index: -1
 Source/FW 01/FW 01_00041
-  rotate: false
-  xy: 647, 659
-  size: 213, 217
+  rotate: true
+  xy: 818, 399
+  size: 165, 175
   orig: 213, 217
-  offset: 0, 0
+  offset: 24, 21
+  index: -1
+Source/FW 01/FW 01_00043
+  rotate: true
+  xy: 219, 2
+  size: 173, 184
+  orig: 213, 217
+  offset: 20, 17
   index: -1
 Source/FW 01/FW 01_00045
-  rotate: false
-  xy: 217, 2
-  size: 213, 217
+  rotate: true
+  xy: 604, 7
+  size: 178, 191
   orig: 213, 217
-  offset: 0, 0
+  offset: 17, 14
+  index: -1
+Source/FW 01/FW 01_00047
+  rotate: true
+  xy: 639, 635
+  size: 186, 197
+  orig: 213, 217
+  offset: 13, 11
   index: -1
 Source/FW 01/FW 01_00049
   rotate: false
-  xy: 432, 221
-  size: 213, 217
+  xy: 604, 187
+  size: 192, 203
   orig: 213, 217
-  offset: 0, 0
+  offset: 10, 7
+  index: -1
+Source/FW 01/FW 01_00051
+  rotate: false
+  xy: 639, 823
+  size: 198, 207
+  orig: 213, 217
+  offset: 7, 5
   index: -1
 Source/FW 01/FW 01_00053
   rotate: false
-  xy: 647, 440
-  size: 213, 217
+  xy: 219, 384
+  size: 200, 213
   orig: 213, 217
-  offset: 0, 0
+  offset: 6, 2
+  index: -1
+Source/FW 01/FW 01_00055
+  rotate: false
+  xy: 432, 820
+  size: 205, 210
+  orig: 213, 217
+  offset: 4, 4
   index: -1
 Source/FW 01/FW 01_00057
   rotate: false
-  xy: 432, 2
-  size: 213, 217
+  xy: 219, 815
+  size: 211, 215
   orig: 213, 217
-  offset: 0, 0
+  offset: 1, 1
+  index: -1
+Source/FW 01/FW 01_00059
+  rotate: false
+  xy: 219, 599
+  size: 208, 214
+  orig: 213, 217
+  offset: 2, 2
   index: -1
 Source/FW 01/FW 01_00061
-  rotate: false
-  xy: 647, 221
-  size: 213, 217
+  rotate: true
+  xy: 219, 177
+  size: 205, 192
   orig: 213, 217
-  offset: 0, 0
+  offset: 4, 13
+  index: -1
+Source/FW 01/FW 01_00063
+  rotate: true
+  xy: 421, 392
+  size: 205, 190
+  orig: 213, 217
+  offset: 4, 14
   index: -1
 Source/FW 01/FW 01_00065
-  rotate: false
-  xy: 647, 2
-  size: 213, 217
+  rotate: true
+  xy: 413, 178
+  size: 204, 189
   orig: 213, 217
-  offset: 0, 0
+  offset: 4, 14
   index: -1
-Source/FW 01/FW 01_00069
+Source/FW 01/FW 01_00067
   rotate: false
-  xy: 862, 659
-  size: 213, 217
+  xy: 613, 445
+  size: 203, 188
   orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00073
-  rotate: false
-  xy: 862, 440
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00077
-  rotate: false
-  xy: 862, 221
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00081
-  rotate: false
-  xy: 862, 2
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00085
-  rotate: false
-  xy: 1077, 661
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00089
-  rotate: false
-  xy: 1077, 442
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00093
-  rotate: false
-  xy: 1077, 223
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
-  index: -1
-Source/FW 01/FW 01_00097
-  rotate: false
-  xy: 1077, 4
-  size: 213, 217
-  orig: 213, 217
-  offset: 0, 0
+  offset: 3, 14
   index: -1
 home/home_70
-  rotate: false
-  xy: 2, 878
+  rotate: true
+  xy: 2, 19
   size: 1011, 215
   orig: 1280, 720
   offset: 124, 0
