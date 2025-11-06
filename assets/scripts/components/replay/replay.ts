@@ -1,7 +1,10 @@
 import { _decorator, Component, find, log, Node, sp } from "cc";
 import Observer from "observer";
 import { AnimationUtils } from "../../common/utils";
-import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
+import {
+  type LiveScoreData,
+  LiveScoreStore,
+} from "../../features/live-score/live-score-store";
 import {
   FeatureStage,
   StageWatcher,
@@ -12,7 +15,8 @@ const { ccclass, property } = _decorator;
 const { observer, render } = Observer;
 
 enum AnimationName {
-  Goal = "Goal-Away",
+  GoalAway = "Goal-Away",
+  GoalHome = "Goal-Home",
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
 }
@@ -30,7 +34,9 @@ export class Replay extends Component {
   afterGoalEffectSpine: sp.Skeleton = null;
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
-  protected videoLink = "";
+  protected isHomeScoreChanged = false;
+  protected readonly durationDelayAfterGoal = 1.5;
+  protected readonly durationDelayShowReplay = 3;
 
   async onLoad() {
     AnimationUtils.delayTime(0.2);
@@ -55,11 +61,9 @@ export class Replay extends Component {
     log("init backgroundVideoPlayer", backgroundVideoPlayer);
   }
 
-  @render(VideoStreamingStore, (store) => ({
-    videoLink: store.data.videoLink,
-  }))
-  renderVideoLink({ videoLink }) {
-    this.videoLink = videoLink;
+  @render(LiveScoreStore, (store) => store.data)
+  syncScoreData(data: LiveScoreData) {
+    this.isHomeScoreChanged = data?.isHomeScoreChanged;
   }
 
   @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
@@ -67,9 +71,10 @@ export class Replay extends Component {
     const isActive = stage === FeatureStage.EventDetailChange;
     if (isActive) {
       this.playReplayVideo();
-      await AnimationUtils.delayTime(3);
+      await AnimationUtils.delayTime(this.durationDelayShowReplay);
       this.playGoalAnimation();
       this.playAfterGoalAnimation();
+      return;
     }
 
     this.inActiveAnimations();
@@ -94,7 +99,7 @@ export class Replay extends Component {
     this.setNodeAction(this.goalSpine.node, true);
     await AnimationUtils.playSpine(
       this.goalSpine,
-      AnimationName.Goal,
+      this.isHomeScoreChanged ? AnimationName.GoalHome : AnimationName.GoalAway,
       false,
       3
     );
@@ -102,6 +107,7 @@ export class Replay extends Component {
   }
 
   protected async playAfterGoalAnimation() {
+    await AnimationUtils.delayTime(this.durationDelayAfterGoal);
     this.setNodeAction(this.afterGoalSpine.node, true);
     this.setNodeAction(this.afterGoalEffectSpine.node, true);
     AnimationUtils.playSpine(

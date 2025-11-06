@@ -1,4 +1,4 @@
-import { _decorator, Component, log } from "cc";
+import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { IntroStore } from "../../features/intro/intro-store";
@@ -30,6 +30,8 @@ export class BackgroundVideoPlayer extends Component {
   private _game = "";
   private _videoLink = "";
   private _durationInSeconds = 0;
+  private _isReplay = false;
+  private readonly durationVideoReplay = 3;
 
   @render(StageWatcher, (watcher) => watcher.stage)
   syncPlayVideo(stage: FeatureStage) {
@@ -130,16 +132,19 @@ export class BackgroundVideoPlayer extends Component {
 
   play() {
     if (this.initialized) {
-      this.hlsPlayer.play(false, this._durationInSeconds);
+      this._isReplay = false;
+      this.hlsPlayer.play();
       this.showBackground(true);
     }
   }
 
   playReplay() {
     if (this.initialized) {
-      log("link playReplay", this._videoLink);
+      this._isReplay = true;
+      this.hlsPlayer.currentTime =
+        this._durationInSeconds - this.durationVideoReplay;
       this.hlsPlayer.load(this._videoLink);
-      this.hlsPlayer.play(true, this._durationInSeconds);
+      this.hlsPlayer.play();
       this.showBackground(true);
     }
   }
@@ -183,7 +188,7 @@ export class BackgroundVideoPlayer extends Component {
       this.currentTime >= 0 &&
       Math.abs(this.currentTime - this.hlsPlayer.currentTime) > 1;
 
-    if (this.initialized && needSync) {
+    if (this.initialized && needSync && !this._isReplay) {
       this.hlsPlayer.currentTime = this.currentTime;
     }
   }

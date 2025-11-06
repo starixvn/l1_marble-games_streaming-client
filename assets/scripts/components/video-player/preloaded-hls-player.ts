@@ -118,8 +118,8 @@ export class HLSPreloadedVideoPlayer {
     this._videoPlayer.load(url, { play: false });
   }
 
-  play(isReplay?: boolean, durationInSeconds?: number) {
-    this._videoPlayer.play(isReplay, durationInSeconds);
+  play() {
+    this._videoPlayer.play();
   }
 
   pause() {

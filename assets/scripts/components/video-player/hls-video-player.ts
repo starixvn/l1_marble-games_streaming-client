@@ -14,9 +14,6 @@ export class HLSVideoPlayer {
   private _onPlayStateChanged: (play: boolean) => void = () => {};
   private _onHlsLoaded: () => void = () => {};
   private _onHlsPlayed: () => void = () => {};
-  private durationReplay = 3;
-  private _durationInSeconds = 0;
-  private _isManifestParsed = false;
 
   constructor(options: HLSVideoPlayerOptions) {
     this._id = options.id;
@@ -90,9 +87,6 @@ export class HLSVideoPlayer {
 
     this._hls.attachMedia(this._video);
     this.registerVisibilityChangeEvent();
-    this._hls.on(Hls.Events.MANIFEST_PARSED, () => {
-      this._isManifestParsed = true;
-    });
   }
 
   load(
@@ -105,7 +99,6 @@ export class HLSVideoPlayer {
   ) {
     if (url && this._url !== url) {
       this._url = url;
-      this._isManifestParsed = false;
       this._hls.loadSource(this._url);
       if (!options.play) {
         this._video.pause();
@@ -114,50 +107,12 @@ export class HLSVideoPlayer {
     }
   }
 
-  play(isReplay?: boolean, durationInSeconds?: number) {
+  play() {
     if (!this.initialized) {
-      return;
-    }
-    if (isReplay) {
-      this.handlePlayReplay(isReplay, durationInSeconds);
       return;
     }
 
     this.playWithRetry(0, 3);
-  }
-
-  handlePlayReplay(isReplay: boolean, durationInSeconds: number) {
-    this._durationInSeconds = durationInSeconds ?? 0;
-
-    const doPlay = () => {
-      if (isReplay && this._durationInSeconds > 0) {
-        const target = Math.max(
-          0,
-          this._durationInSeconds - this.durationReplay
-        );
-        console.log("seek target", target);
-
-        // Awaind seek to finish
-        this._video.pause();
-
-        // After seek to finish, play
-        const handleSeeked = () => {
-          console.log("✅ Seeked to", this._video.currentTime);
-          this._video.removeEventListener("seeked", handleSeeked);
-          this.playWithRetry(0, 3);
-        };
-        this._video.addEventListener("seeked", handleSeeked, { once: true });
-        this._video.currentTime = target;
-      } else {
-        this.playWithRetry(0, 3);
-      }
-    };
-
-    if (!this._isManifestParsed) {
-      this._hls.once(Hls.Events.MANIFEST_PARSED, () => doPlay());
-    } else {
-      doPlay();
-    }
   }
 
   pause() {
