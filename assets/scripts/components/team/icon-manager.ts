@@ -20,7 +20,7 @@ export class IconManager extends Component {
   team: Team = Team.HOME;
 
   @property([Icon])
-  private targets: Icon[] = [];
+  targets: Icon[] = [];
 
   private sprites: Sprite[] = [];
   private operator = "";

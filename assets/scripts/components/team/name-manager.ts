@@ -21,7 +21,7 @@ export class NameManager extends Component {
   team: Team = Team.HOME;
 
   @property([Name])
-  private targets: Name[] = [];
+  targets: Name[] = [];
 
   private longLabels: LocalizedLabel[] = [];
   private shortLabels: Label[] = [];
