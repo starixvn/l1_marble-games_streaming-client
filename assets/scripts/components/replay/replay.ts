@@ -19,11 +19,15 @@ enum AnimationName {
   GoalHome = "Goal-Home",
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
+  Transition = "transition",
 }
 
 @ccclass("Replay")
 @observer
 export class Replay extends Component {
+  @property(sp.Skeleton)
+  transitionSpine: sp.Skeleton = null;
+
   @property(sp.Skeleton)
   goalSpine: sp.Skeleton = null;
 
@@ -44,6 +48,7 @@ export class Replay extends Component {
     this.initBackgroundVideoPlayer();
     this.setNodesActive(
       [
+        this.transitionSpine.node,
         this.goalSpine.node,
         this.afterGoalSpine.node,
         this.afterGoalEffectSpine.node,
@@ -70,6 +75,7 @@ export class Replay extends Component {
   protected async syncStage(stage: FeatureStage) {
     const isActive = stage === FeatureStage.EventDetailChange;
     if (isActive) {
+      await this.playTransitionAnimation();
       this.playReplayVideo();
       await AnimationUtils.delayTime(this.durationDelayShowReplay);
       this.playGoalAnimation();
@@ -80,15 +86,16 @@ export class Replay extends Component {
     this.inActiveAnimations();
   }
 
-  inActiveAnimations() {
-    this.setNodesActive(
-      [
-        this.goalSpine.node,
-        this.afterGoalSpine.node,
-        this.afterGoalEffectSpine.node,
-      ],
-      false
+  protected async playTransitionAnimation() {
+    this.setNodeAction(this.transitionSpine.node, true);
+    await AnimationUtils.playSpine(
+      this.transitionSpine,
+      AnimationName.Transition,
+      false,
+      1
     );
+
+    this.setNodeAction(this.transitionSpine.node, false);
   }
 
   protected async playReplayVideo() {
@@ -101,7 +108,7 @@ export class Replay extends Component {
       this.goalSpine,
       this.isHomeScoreChanged ? AnimationName.GoalHome : AnimationName.GoalAway,
       false,
-      3
+      2
     );
     this.setNodeAction(this.goalSpine.node, false);
   }
@@ -118,6 +125,17 @@ export class Replay extends Component {
     AnimationUtils.playSpine(
       this.afterGoalSpine,
       AnimationName.AfterGoal,
+      false
+    );
+  }
+
+  inActiveAnimations() {
+    this.setNodesActive(
+      [
+        this.goalSpine.node,
+        this.afterGoalSpine.node,
+        this.afterGoalEffectSpine.node,
+      ],
       false
     );
   }
