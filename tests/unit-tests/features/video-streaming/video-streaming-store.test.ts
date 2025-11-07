@@ -1,6 +1,6 @@
 import {
-  VideoStreamingStore,
   VideoStreamingData,
+  VideoStreamingStore,
 } from "../../../../assets/scripts/features/video-streaming/video-streaming-store";
 
 // Mock the decorators and dependencies
@@ -31,6 +31,7 @@ describe("VideoStreamingStore", () => {
         timeToStream: 0,
         currentTime: 0,
         phaseIndex: 0,
+        durationInSeconds: 0,
       });
     });
   });
@@ -45,6 +46,7 @@ describe("VideoStreamingStore", () => {
         streamingPhaseTime: 300,
         currentTime: 300,
         phaseIndex: 2,
+        durationInSeconds: 0,
       };
 
       // Act
@@ -63,6 +65,7 @@ describe("VideoStreamingStore", () => {
         streamingPhaseTime: 100,
         currentTime: 100,
         phaseIndex: 1,
+        durationInSeconds: 0,
       };
       const secondData: VideoStreamingData = {
         videoLink: "https://example.com/second.mp4",
@@ -70,6 +73,7 @@ describe("VideoStreamingStore", () => {
         streamingPhaseTime: 500,
         currentTime: 500,
         phaseIndex: 3,
+        durationInSeconds: 0,
       };
       store.data = firstData;
 

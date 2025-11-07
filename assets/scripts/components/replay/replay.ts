@@ -39,7 +39,7 @@ export class Replay extends Component {
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected isHomeScoreChanged = false;
-  protected readonly durationDelayAfterGoal = 1.5;
+  protected readonly durationDelayAfterGoal = 0.5;
   protected readonly durationDelayShowReplay = 3;
 
   async onLoad() {

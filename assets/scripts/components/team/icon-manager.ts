@@ -55,6 +55,7 @@ export class IconManager extends Component {
       const sprite = this.sprites[i];
 
       if (!icon || !sprite) {
+        console.log("icon or sprite is null---", icon, sprite);
         continue;
       }
 
