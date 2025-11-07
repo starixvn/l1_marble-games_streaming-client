@@ -104,9 +104,4 @@ export class IconManager extends Component {
 
     sprite.spriteFrame = spriteFrame;
   }
-
-  onFocusInEditor(): void {
-    const icons = this.node.getComponentsInChildren(Icon);
-    this.targets = icons.filter((icon) => icon.team === this.team);
-  }
 }

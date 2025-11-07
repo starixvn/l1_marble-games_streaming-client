@@ -70,10 +70,4 @@ export class NameManager extends Component {
       label.string = name;
     }
   }
-
-  onFocusInEditor(): void {
-    const names = this.node.getComponentsInChildren(Name);
-
-    this.targets = names.filter((name) => name.team === this.team);
-  }
 }
