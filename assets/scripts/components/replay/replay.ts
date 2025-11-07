@@ -37,6 +37,9 @@ export class Replay extends Component {
   @property(sp.Skeleton)
   afterGoalEffectSpine: sp.Skeleton = null;
 
+  @property(Node)
+  replayIcon: Node = null;
+
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected isHomeScoreChanged = false;
   protected readonly durationDelayAfterGoal = 0.5;
@@ -52,6 +55,7 @@ export class Replay extends Component {
         this.goalSpine.node,
         this.afterGoalSpine.node,
         this.afterGoalEffectSpine.node,
+        this.replayIcon,
       ],
       false
     );
@@ -100,9 +104,11 @@ export class Replay extends Component {
 
   protected async playReplayVideo() {
     this.backgroundVideoPlayer?.playReplay();
+    this.setNodeAction(this.replayIcon, true);
   }
 
   protected async playGoalAnimation() {
+    this.setNodeAction(this.replayIcon, false);
     this.setNodeAction(this.goalSpine.node, true);
     await AnimationUtils.playSpine(
       this.goalSpine,
