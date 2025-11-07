@@ -38,12 +38,13 @@ export class Replay extends Component {
   afterGoalEffectSpine: sp.Skeleton = null;
 
   @property(Node)
-  replayIcon: Node = null;
+  info: Node = null;
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected isHomeScoreChanged = false;
+  protected readonly durationAnimTransition = 1;
   protected readonly durationAnimGoal = 2;
-  protected readonly durationDelayShowReplay = 3;
+  protected readonly durationShowReplay = 2.5;
 
   async onLoad() {
     AnimationUtils.delayTime(0.2);
@@ -55,7 +56,7 @@ export class Replay extends Component {
         this.goalSpine.node,
         this.afterGoalSpine.node,
         this.afterGoalEffectSpine.node,
-        this.replayIcon,
+        this.info,
       ],
       false
     );
@@ -81,7 +82,7 @@ export class Replay extends Component {
     if (isActive) {
       await this.playTransitionAnimation();
       this.playReplayVideo();
-      await AnimationUtils.delayTime(this.durationDelayShowReplay);
+      await AnimationUtils.delayTime(this.durationShowReplay);
       this.playGoalAnimation();
       this.playAfterGoalAnimation();
       return;
@@ -96,7 +97,7 @@ export class Replay extends Component {
       this.transitionSpine,
       AnimationName.Transition,
       false,
-      1
+      this.durationAnimTransition
     );
 
     this.setNodeAction(this.transitionSpine.node, false);
@@ -104,11 +105,11 @@ export class Replay extends Component {
 
   protected async playReplayVideo() {
     this.backgroundVideoPlayer?.playReplay();
-    this.setNodeAction(this.replayIcon, true);
+    this.setNodeAction(this.info, true);
   }
 
   protected async playGoalAnimation() {
-    this.setNodeAction(this.replayIcon, false);
+    this.setNodeAction(this.info, false);
     this.setNodeAction(this.goalSpine.node, true);
     await AnimationUtils.playSpine(
       this.goalSpine,
