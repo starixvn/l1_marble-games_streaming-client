@@ -85,7 +85,6 @@ export class Replay extends Component {
     const isActive = stage === FeatureStage.EventDetailChange;
     if (isActive) {
       await this.playTransitionAnimation();
-
       this.playReplayVideo();
       await this.playGoalAnimation();
       await this.playAfterGoalAnimation();
@@ -98,16 +97,14 @@ export class Replay extends Component {
   protected async playTransitionAnimation() {
     this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
     this.setNodeAction(this.transitionSpine.node, true);
+
     await AnimationUtils.playSpine(
       this.transitionSpine,
       AnimationName.TransitionIn,
       false
     );
 
-    AnimationUtils.fadeOutAndDeactivate(
-      this.transitionSpine.node,
-      this.durationAnimNode
-    );
+    this.setNodeAction(this.transitionSpine.node, false);
   }
 
   protected async playReplayVideo() {
