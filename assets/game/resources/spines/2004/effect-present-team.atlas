@@ -1,34 +1,34 @@
 
 effect-present-team.png
-size: 929,1058
+size: 1022,1163
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 effect-blue
   rotate: false
-  xy: 532, 23
-  size: 395, 565
-  orig: 395, 590
-  offset: 0, 25
+  xy: 585, 25
+  size: 435, 621
+  orig: 435, 649
+  offset: 0, 28
   index: -1
 effect-blue-bg
   rotate: true
   xy: 2, 2
-  size: 466, 528
-  orig: 488, 575
-  offset: 13, 32
+  size: 513, 581
+  orig: 537, 633
+  offset: 14, 35
   index: -1
 effect-red
   rotate: false
-  xy: 2, 470
-  size: 395, 586
-  orig: 395, 639
-  offset: 0, 25
+  xy: 2, 517
+  size: 435, 644
+  orig: 435, 703
+  offset: 0, 28
   index: -1
 effect-red-bg
   rotate: true
-  xy: 399, 590
-  size: 466, 528
-  orig: 488, 575
-  offset: 13, 32
+  xy: 439, 648
+  size: 513, 581
+  orig: 537, 633
+  offset: 14, 35
   index: -1

@@ -1,11 +1,13 @@
 import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
+import { SoundUtils } from "../../common/utils";
 import { IntroStore } from "../../features/intro/intro-store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
 import { BackgroundStore } from "../../local-stores/background/background-store";
 import { GameStore } from "../../local-stores/game/game-store";
+import { SfxStore } from "../../local-stores/sfx/sfx-store";
 import { Store } from "../../store";
 import {
   FeatureStage,
@@ -15,6 +17,10 @@ import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
+
+enum SoundName {
+  WHISTLE_START = "whistle_start",
+}
 
 @ccclass("BackgroundVideoPlayer")
 @observer
@@ -134,6 +140,7 @@ export class BackgroundVideoPlayer extends Component {
     if (this.initialized) {
       this._isReplay = false;
       this.hlsPlayer.play();
+      this.playSfx(SoundUtils.getCommentPath() + SoundName.WHISTLE_START);
       this.showBackground(true);
     }
   }
@@ -218,5 +225,10 @@ export class BackgroundVideoPlayer extends Component {
   @handle(BackgroundStore, (store, data: boolean) => store.showBackground(data))
   showBackground(play: boolean) {
     return play;
+  }
+
+  @handle(SfxStore, (store, sfx: string) => store.playSfx(sfx))
+  protected playSfx(sfx: string) {
+    return sfx;
   }
 }

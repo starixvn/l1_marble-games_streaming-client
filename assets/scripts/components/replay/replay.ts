@@ -1,10 +1,11 @@
 import { _decorator, Component, find, log, Node, sp } from "cc";
 import Observer from "observer";
-import { AnimationUtils } from "../../common/utils";
+import { AnimationUtils, SoundUtils } from "../../common/utils";
 import {
   type LiveScoreData,
   LiveScoreStore,
 } from "../../features/live-score/live-score-store";
+import { SfxStore } from "../../local-stores/sfx/sfx-store";
 import {
   FeatureStage,
   StageWatcher,
@@ -12,7 +13,7 @@ import {
 import { BackgroundVideoPlayer } from "../video-player/background-video-player";
 const { ccclass, property } = _decorator;
 
-const { observer, render } = Observer;
+const { observer, render, handle } = Observer;
 
 enum AnimationName {
   GoalAway = "Goal-Away",
@@ -20,6 +21,10 @@ enum AnimationName {
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
   TransitionIn = "transition",
+}
+
+enum SoundName {
+  GOAL = "goal_01",
 }
 
 @ccclass("Replay")
@@ -42,12 +47,12 @@ export class Replay extends Component {
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected isHomeScoreChanged = false;
-  protected readonly durationAnimGoal = 2;
-  protected readonly durationShowReplay = 2.5;
+  protected readonly durationAnimGoal = 3;
+  protected readonly durationHideNode = 0.2;
+  protected readonly durationDelayAfterGoal = 0.4;
 
   async onLoad() {
     AnimationUtils.delayTime(0.2);
-    console.log("replay onLoad--");
     this.initBackgroundVideoPlayer();
     this.setNodesActive(
       [
@@ -80,10 +85,10 @@ export class Replay extends Component {
     const isActive = stage === FeatureStage.EventDetailChange;
     if (isActive) {
       await this.playTransitionAnimation();
+
       this.playReplayVideo();
-      await AnimationUtils.delayTime(this.durationShowReplay);
-      this.playGoalAnimation();
-      this.playAfterGoalAnimation();
+      await this.playGoalAnimation();
+      await this.playAfterGoalAnimation();
       return;
     }
 
@@ -91,6 +96,7 @@ export class Replay extends Component {
   }
 
   protected async playTransitionAnimation() {
+    this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
     this.setNodeAction(this.transitionSpine.node, true);
     await AnimationUtils.playSpine(
       this.transitionSpine,
@@ -98,7 +104,10 @@ export class Replay extends Component {
       false
     );
 
-    this.setNodeAction(this.transitionSpine.node, false);
+    AnimationUtils.fadeOutAndDeactivate(
+      this.transitionSpine.node,
+      this.durationHideNode
+    );
   }
 
   protected async playReplayVideo() {
@@ -107,7 +116,6 @@ export class Replay extends Component {
   }
 
   protected async playGoalAnimation() {
-    this.setNodeAction(this.info, false);
     this.setNodeAction(this.goalSpine.node, true);
     await AnimationUtils.playSpine(
       this.goalSpine,
@@ -115,11 +123,16 @@ export class Replay extends Component {
       false,
       this.durationAnimGoal
     );
-    this.setNodeAction(this.goalSpine.node, false);
+
+    AnimationUtils.fadeInAndActivate(
+      this.goalSpine.node,
+      this.durationHideNode
+    );
+    AnimationUtils.fadeOutAndDeactivate(this.info, this.durationHideNode);
   }
 
   protected async playAfterGoalAnimation() {
-    await AnimationUtils.delayTime(this.durationAnimGoal);
+    await AnimationUtils.delayTime(this.durationDelayAfterGoal);
     this.setNodeAction(this.afterGoalSpine.node, true);
     this.setNodeAction(this.afterGoalEffectSpine.node, true);
     AnimationUtils.playSpine(
@@ -149,7 +162,12 @@ export class Replay extends Component {
     nodes?.forEach((node) => this.setNodeAction(node, active));
   }
 
-  setNodeAction(node: Node, active: boolean) {
+  protected setNodeAction(node: Node, active: boolean) {
     node && (node.active = active);
+  }
+
+  @handle(SfxStore, (store, sfx: string) => store.playSfx(sfx))
+  protected playSfx(sfx: string) {
+    return sfx;
   }
 }
