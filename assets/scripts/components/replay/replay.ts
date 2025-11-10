@@ -19,7 +19,7 @@ enum AnimationName {
   GoalHome = "Goal-Home",
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
-  Transition = "transition",
+  TransitionIn = "transition",
 }
 
 @ccclass("Replay")
@@ -42,7 +42,6 @@ export class Replay extends Component {
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected isHomeScoreChanged = false;
-  protected readonly durationAnimTransition = 1;
   protected readonly durationAnimGoal = 2;
   protected readonly durationShowReplay = 2.5;
 
@@ -95,9 +94,8 @@ export class Replay extends Component {
     this.setNodeAction(this.transitionSpine.node, true);
     await AnimationUtils.playSpine(
       this.transitionSpine,
-      AnimationName.Transition,
-      false,
-      this.durationAnimTransition
+      AnimationName.TransitionIn,
+      false
     );
 
     this.setNodeAction(this.transitionSpine.node, false);
