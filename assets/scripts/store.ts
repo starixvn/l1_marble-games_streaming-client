@@ -22,6 +22,28 @@ export class Store {
 
   operator = "common";
 
+  init(location: typeof globalThis.location) {
+    const params = new URLSearchParams(location.search);
+    const token = params.get("token");
+    const decodedToken = atob(token);
+    const decodedParams = new URLSearchParams(decodedToken);
+
+    const gameFromToken = decodedParams.get("game");
+    const languageFromToken = decodedParams.get("language");
+    const operatorFromToken = decodedParams.get("operator");
+    const eventIdFromToken = decodedParams.get("event");
+
+    const gameFromParam = params.get("game");
+    const languageFromParam = params.get("language");
+    const operatorFromParam = params.get("operator");
+    const eventIdFromParam = params.get("event");
+
+    this.game = gameFromToken ?? gameFromParam ?? null;
+    this.language = languageFromToken ?? languageFromParam ?? "en-US";
+    this.operator = operatorFromToken ?? operatorFromParam ?? "common";
+    this.eventId = eventIdFromToken ?? eventIdFromParam ?? null;
+  }
+
   get replayUrl() {
     let host = globalThis.location.host;
 
