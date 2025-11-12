@@ -43,15 +43,6 @@ window.addEventListener("message", handleWindowMessage(container));
 @observer
 export class Startup extends Component {
 
-  protected onLoad(): void {
-    this.initStore(globalThis.location);
-  }
-
-  @handle(Store, (store) => store.init(globalThis.location))
-  initStore(location: typeof globalThis.location) {
-    return location;
-  }
-
   @property(Node)
   private readonly infoLayer: Node = null;
 
@@ -61,22 +52,14 @@ export class Startup extends Component {
     init(language);
   }
 
-  @render(Store, (store) => store.game)
-  public loadGame(game: string | null) {
-    if (!game) {
+  @render(Store, (store) => store.isReplay)
+  initIsReplay(isReplay: boolean) {
+    console.log("initIsReplay---", isReplay);
+    if (isReplay) {
+      this.loadReplayMatch();
       return;
     }
-    log("load streaming ", game);
     this.loadStreaming();
-  }
-
-  @render(Store, (store) => store.eventId)
-  public loadEventId(eventId: string | null) {
-    if (!eventId) {
-      return;
-    }
-    log("load replay match ", eventId);
-    this.loadReplayMatch();
   }
 
   @render(GameStore, (store) => store.data.gameId)
@@ -84,6 +67,7 @@ export class Startup extends Component {
     if (!gameId) {
       return;
     }
+    console.log("openGame---", gameId);
     resources.load(`games/${gameId}`, Prefab, this.onLoadedInfoLayer());
   }
 

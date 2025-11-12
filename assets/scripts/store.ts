@@ -4,14 +4,12 @@ import { store } from "./store-decorator";
 @store("Store")
 export class Store {
   constructor() {
-    const params = new URLSearchParams(globalThis.location.search);
-
-    this.game = params.get("game") || null;
-    this.language = params.get("language") || "en-US";
-    this.operator = params.get("operator") || "common";
-    this.eventId = params.get("eventId") || null;
-
     mobx.makeAutoObservable(this);
+    this.init(globalThis.location);
+  }
+
+  get isReplay() {
+    return this.eventId !== null;
   }
 
   eventId: string | null = null;
@@ -42,6 +40,9 @@ export class Store {
     this.language = languageFromToken ?? languageFromParam ?? "en-US";
     this.operator = operatorFromToken ?? operatorFromParam ?? "common";
     this.eventId = eventIdFromToken ?? eventIdFromParam ?? null;
+    console.log("decoded token ", decodedToken);
+    console.log("params ", params);
+    console.log("init---", this.game, this.language, this.operator, this.eventId);
   }
 
   get replayUrl() {
