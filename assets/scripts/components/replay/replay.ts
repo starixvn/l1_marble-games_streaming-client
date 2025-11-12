@@ -17,15 +17,16 @@ export class Replay extends Component {
   info: Node = null;
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
-  protected isHomeScoreChanged = false;
-  protected readonly durationAnimGoal = 3;
-  protected readonly durationAnimNode = 0.2;
-  protected readonly durationDelayAfterGoal = 0.4;
 
   async onLoad() {
     AnimationUtils.delayTime(0.2);
     this.initBackgroundVideoPlayer();
-    this.setStatusNode(this.transitionSpine.node, false);
+    this?.transitionSpine &&
+      this.setStatusNode(this.transitionSpine.node, false);
+  }
+
+  onDestroy() {
+    this.unscheduleAllCallbacks();
   }
 
   initBackgroundVideoPlayer() {
@@ -37,8 +38,8 @@ export class Replay extends Component {
     log("init backgroundVideoPlayer", backgroundVideoPlayer);
   }
 
-  protected setNodesActive(nodes: Node[], active: boolean) {
-    nodes?.forEach((node) => this.setStatusNode(node, active));
+  protected setStatusNodes(nodes: Node[], active: boolean) {
+    nodes?.forEach((node) => node && this.setStatusNode(node, active));
   }
 
   protected setStatusNode(node: Node, active: boolean) {

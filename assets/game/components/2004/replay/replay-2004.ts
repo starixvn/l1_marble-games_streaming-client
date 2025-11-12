@@ -1,10 +1,11 @@
-import { _decorator, sp } from "cc";
+import { _decorator, Node, sp } from "cc";
 import { AnimationUtils, SoundUtils } from "db://assets/scripts/common/utils";
 import { Replay } from "db://assets/scripts/components/replay/replay";
 import {
   type LiveScoreData,
   LiveScoreStore,
 } from "db://assets/scripts/features/live-score/live-score-store";
+import { VideoStreamingStore } from "db://assets/scripts/features/video-streaming/video-streaming-store";
 import {
   FeatureStage,
   StageWatcher,
@@ -19,7 +20,7 @@ enum AnimationName {
   GoalHome = "Goal-Home",
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
-  TransitionIn = "transition",
+  TransitionIn = "transition3s",
 }
 
 enum SoundName {
@@ -38,101 +39,138 @@ export class Replay2004 extends Replay {
   @property(sp.Skeleton)
   afterGoalEffectSpine: sp.Skeleton = null;
 
+  @property(Node)
+  infoStreaming: Node = null;
+
   protected isHomeScoreChanged = false;
   protected readonly durationAnimGoal = 3;
   protected readonly durationAnimNode = 0.2;
-  protected readonly durationDelayAfterGoal = 0.4;
+  protected readonly durationTransition = 3;
+  protected readonly durationAfterGoal = 2;
+  protected readonly delayShowReplay = 0.5;
+  private _preloadDurationSeconds = 0;
+  private _currentStage = FeatureStage.Unknown;
 
   async onLoad() {
     super.onLoad();
-    this.setNodesActive(
-      [
-        this.goalSpine.node,
-        this.afterGoalSpine.node,
-        this.afterGoalEffectSpine.node,
-        this.info,
-      ],
-      false
-    );
+    let nodes: Node[] = [];
+    this.goalSpine?.node && nodes.push(this.goalSpine?.node);
+    this.afterGoalSpine?.node && nodes.push(this.afterGoalSpine?.node);
+    this.afterGoalEffectSpine?.node &&
+      nodes.push(this.afterGoalEffectSpine?.node);
+    this?.info && nodes.push(this?.info);
+    this.setStatusNodes(nodes, false);
+  }
+
+  @render(VideoStreamingStore, (store) => store.data.preloadDurationMs)
+  playVideo(preloadDurationMs: number) {
+    this._preloadDurationSeconds = preloadDurationMs / 1000;
   }
 
   @render(LiveScoreStore, (store) => store.data)
-  syncScoreData(data: LiveScoreData) {
+  protected async syncScoreData(data: LiveScoreData) {
     this.isHomeScoreChanged = data?.isHomeScoreChanged;
+    if (
+      data?.homeScore > 0 ||
+      (data?.awayScore > 0 && this._currentStage === FeatureStage.Streaming)
+    ) {
+      AnimationUtils.delayTime(this.delayShowReplay);
+      this?.infoStreaming && this.setStatusNode(this.infoStreaming, false);
+      this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
+      this?.info &&
+        AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
+      await this.playGoalAnimation();
+      this.setStatusNodes([this?.info, this.goalSpine?.node], false);
+    }
   }
 
   @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
   protected async syncStage(stage: FeatureStage) {
-    const isActive = stage === FeatureStage.EventDetailChange;
-    if (isActive) {
+    this._currentStage = stage;
+    if (stage === FeatureStage.EventDetailChange) {
+      this.setStatusNodes(
+        [
+          this.goalSpine?.node,
+          this.afterGoalSpine?.node,
+          this.afterGoalEffectSpine?.node,
+        ],
+        false
+      );
+      this.scheduleRunTransition();
       await this.playTransitionAnimation();
-      this.playReplayVideo();
-      await this.playGoalAnimation();
       await this.playAfterGoalAnimation();
-      return;
     }
+    if (stage === FeatureStage.Streaming) {
+      this?.infoStreaming && this.setStatusNode(this.infoStreaming, true);
+    }
+  }
 
-    this.inActiveAnimations();
+  protected scheduleRunTransition() {
+    if (
+      this.durationTransition +
+        this.durationAfterGoal +
+        this.durationTransition <=
+      this._preloadDurationSeconds
+    ) {
+      this.scheduleOnce(() => {
+        this.setStatusNode(this.afterGoalSpine?.node, false);
+        this.setStatusNode(this.afterGoalEffectSpine?.node, false);
+        this.playTransitionAnimation();
+      }, this._preloadDurationSeconds - this.durationTransition);
+    }
   }
 
   protected async playTransitionAnimation() {
-    this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
-    this.setStatusNode(this.transitionSpine.node, true);
+    this.setStatusNode(this.transitionSpine?.node, true);
 
-    await AnimationUtils.playSpine(
-      this.transitionSpine,
-      AnimationName.TransitionIn,
-      false
-    );
+    this?.transitionSpine &&
+      (await AnimationUtils.playSpine(
+        this.transitionSpine,
+        AnimationName.TransitionIn,
+        false,
+        this.durationTransition
+      ));
 
-    this.setStatusNode(this.transitionSpine.node, false);
-  }
-
-  protected async playReplayVideo() {
-    this.backgroundVideoPlayer?.playReplay();
-    AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
+    this?.transitionSpine &&
+      this.setStatusNode(this.transitionSpine?.node, false);
   }
 
   protected async playGoalAnimation() {
-    this.setStatusNode(this.goalSpine.node, true);
-    await AnimationUtils.playSpine(
-      this.goalSpine,
-      this.isHomeScoreChanged ? AnimationName.GoalHome : AnimationName.GoalAway,
-      false,
-      this.durationAnimGoal
-    );
+    this.setStatusNode(this.goalSpine?.node, true);
+    this?.goalSpine &&
+      (await AnimationUtils.playSpine(
+        this.goalSpine,
+        this.isHomeScoreChanged
+          ? AnimationName.GoalHome
+          : AnimationName.GoalAway,
+        false,
+        this.durationAnimGoal
+      ));
 
-    AnimationUtils.fadeInAndActivate(
-      this.goalSpine.node,
-      this.durationAnimNode
-    );
+    this?.goalSpine &&
+      AnimationUtils.fadeInAndActivate(
+        this?.goalSpine?.node,
+        this.durationAnimNode
+      );
   }
 
   protected async playAfterGoalAnimation() {
-    await AnimationUtils.delayTime(this.durationDelayAfterGoal);
-    AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
-    this.setStatusNode(this.afterGoalSpine.node, true);
-    this.setStatusNode(this.afterGoalEffectSpine.node, true);
-    AnimationUtils.playSpine(
-      this.afterGoalEffectSpine,
-      AnimationName.AfterGoalEffect,
-      true
-    );
-    AnimationUtils.playSpine(
-      this.afterGoalSpine,
-      AnimationName.AfterGoal,
-      false
-    );
-  }
-
-  inActiveAnimations() {
-    this.setNodesActive(
-      [
-        this.goalSpine.node,
-        this.afterGoalSpine.node,
-        this.afterGoalEffectSpine.node,
-      ],
-      false
-    );
+    this?.info &&
+      AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
+    this.setStatusNode(this.afterGoalSpine?.node, true);
+    this.setStatusNode(this.afterGoalEffectSpine?.node, true);
+    this?.afterGoalEffectSpine &&
+      AnimationUtils.playSpine(
+        this.afterGoalEffectSpine,
+        AnimationName.AfterGoalEffect,
+        true
+      );
+    this?.afterGoalSpine &&
+      AnimationUtils.playSpine(
+        this.afterGoalSpine,
+        AnimationName.AfterGoal,
+        false,
+        this.durationAfterGoal
+      );
   }
 }

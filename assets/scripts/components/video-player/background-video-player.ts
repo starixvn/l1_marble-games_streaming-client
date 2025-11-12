@@ -34,10 +34,6 @@ export class BackgroundVideoPlayer extends Component {
   private _introUrl = "";
   private _operator = "";
   private _game = "";
-  private _videoLink = "";
-  private _durationInSeconds = 0;
-  private _isReplay = false;
-  private readonly durationVideoReplay = 3;
 
   @render(StageWatcher, (watcher) => watcher.stage)
   syncPlayVideo(stage: FeatureStage) {
@@ -106,22 +102,18 @@ export class BackgroundVideoPlayer extends Component {
     videoLink: store.data.videoLink,
     currentTime: store.data.currentTime,
     timeToStream: store.data.timeToStream,
-    durationInSeconds: store.data.durationInSeconds,
   }))
   playVideo({
     videoLink,
     currentTime,
     timeToStream,
-    durationInSeconds,
   }: {
     videoLink: string;
     currentTime: number;
     timeToStream: number;
-    durationInSeconds: number;
+    videoLengthMs: number;
   }) {
     if (videoLink && videoLink !== "") {
-      this._videoLink = videoLink;
-      this._durationInSeconds = durationInSeconds;
       this.hlsPlayer.load(videoLink);
       this.play();
       this.syncCurrentTime();
@@ -138,20 +130,8 @@ export class BackgroundVideoPlayer extends Component {
 
   play() {
     if (this.initialized) {
-      this._isReplay = false;
       this.hlsPlayer.play();
       this.playSfx(SoundUtils.getCommentPath() + SoundName.WHISTLE_START);
-      this.showBackground(true);
-    }
-  }
-
-  playReplay() {
-    if (this.initialized) {
-      this._isReplay = true;
-      this.hlsPlayer.currentTime =
-        this._durationInSeconds - this.durationVideoReplay;
-      this.hlsPlayer.load(this._videoLink);
-      this.hlsPlayer.play();
       this.showBackground(true);
     }
   }
@@ -195,7 +175,7 @@ export class BackgroundVideoPlayer extends Component {
       this.currentTime >= 0 &&
       Math.abs(this.currentTime - this.hlsPlayer.currentTime) > 1;
 
-    if (this.initialized && needSync && !this._isReplay) {
+    if (this.initialized && needSync) {
       this.hlsPlayer.currentTime = this.currentTime;
     }
   }

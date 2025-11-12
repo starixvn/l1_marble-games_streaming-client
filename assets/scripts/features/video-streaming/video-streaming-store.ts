@@ -8,7 +8,8 @@ export type VideoStreamingData = {
   currentTime: number;
   streamingPhaseTime: number;
   phaseIndex: number;
-  durationInSeconds?: number;
+  videoLengthMs?: number;
+  preloadDurationMs?: number;
 };
 
 @injectable()
@@ -20,6 +21,7 @@ export class VideoStreamingStore extends BaseStoreImpl<VideoStreamingData> {
     timeToStream: 0,
     currentTime: 0,
     phaseIndex: 0,
-    durationInSeconds: 0,
+    videoLengthMs: 0,
+    preloadDurationMs: 0,
   };
 }
