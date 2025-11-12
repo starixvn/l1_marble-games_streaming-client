@@ -42,6 +42,16 @@ window.addEventListener("message", handleWindowMessage(container));
 @ccclass
 @observer
 export class Startup extends Component {
+
+  protected onLoad(): void {
+    this.initStore(globalThis.location);
+  }
+
+  @handle(Store, (store) => store.init(globalThis.location))
+  initStore(location: typeof globalThis.location) {
+    return location;
+  }
+
   @property(Node)
   private readonly infoLayer: Node = null;
 
