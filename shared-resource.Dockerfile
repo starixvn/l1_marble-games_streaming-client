@@ -5,7 +5,7 @@ ARG PGID=1000
 COPY ./.nginx/config.conf /etc/nginx/conf.d/default.conf
 COPY ./shared-resources/ /usr/share/nginx/html
 
-RUN addgroup -g $PGID nginx && adduser -u $PUID -G nginx -s /bin/false -D nginx && \
+RUN groupadd -r nginx && useradd -r -g nginx -s /sbin/nologin nginx \
     chown -R nginx:nginx /var/cache/nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
     chmod -R 755 /usr/share/nginx/html && \
