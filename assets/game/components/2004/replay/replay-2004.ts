@@ -53,7 +53,7 @@ export class Replay2004 extends Replay {
 
   async onLoad() {
     super.onLoad();
-    let nodes: Node[] = [];
+    const nodes: Node[] = [];
     this.goalSpine?.node && nodes.push(this.goalSpine?.node);
     this.afterGoalSpine?.node && nodes.push(this.afterGoalSpine?.node);
     this.afterGoalEffectSpine?.node &&
