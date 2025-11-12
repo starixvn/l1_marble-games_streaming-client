@@ -1,6 +1,6 @@
 import { _decorator } from "cc";
+import { Winner } from "db://assets/scripts/components/winner/winner";
 import { LocalizedLabel } from "db://i18n/LocalizedLabel";
-import { Winner } from "../winner";
 
 const { ccclass, property } = _decorator;
 
