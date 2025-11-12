@@ -26,21 +26,6 @@ export function handleWindowMessage(container: Container) {
 
     const [name, value] = data;
 
-    if (name === "click") {
-      const element = document.getElementById("GameCanvas");
-      const data = Object.assign(
-        {},
-        {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-        },
-        value,
-      );
-
-      element.dispatchEvent(new MouseEvent("click", data));
-    }
-
     if (!Stores.has(name)) {
       return;
     }

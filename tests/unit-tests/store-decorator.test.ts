@@ -1,5 +1,9 @@
 import { Container } from "inversify";
-import { store, Stores, handleWindowMessage } from "../../assets/scripts/store-decorator";
+import {
+  store,
+  Stores,
+  handleWindowMessage,
+} from "../../assets/scripts/store-decorator";
 
 // Test store classes
 class TestStore {
@@ -24,26 +28,26 @@ class AnotherTestStore {
 // Mock DOM elements
 const mockGameCanvas = {
   dispatchEvent: jest.fn(),
-  id: "GameCanvas"
+  id: "GameCanvas",
 };
 
-Object.defineProperty(document, 'getElementById', {
+Object.defineProperty(document, "getElementById", {
   value: jest.fn().mockImplementation((id: string) => {
     if (id === "GameCanvas") {
       return mockGameCanvas;
     }
     return null;
   }),
-  writable: true
+  writable: true,
 });
 
 // Mock MouseEvent constructor
-Object.defineProperty(global, 'MouseEvent', {
+Object.defineProperty(global, "MouseEvent", {
   value: jest.fn().mockImplementation((type: string, options: any) => ({
     type,
-    ...options
+    ...options,
   })),
-  writable: true
+  writable: true,
 });
 
 describe("store-decorator", () => {
@@ -54,7 +58,7 @@ describe("store-decorator", () => {
   beforeEach(() => {
     // Clear the stores map before each test
     Stores.clear();
-    
+
     // Reset DOM mocks
     mockGameCanvas.dispatchEvent.mockClear();
     (document.getElementById as jest.Mock).mockClear();
@@ -62,17 +66,17 @@ describe("store-decorator", () => {
 
     // Setup container
     container = new Container();
-    
+
     // Create test store instances
     testStoreInstance = new TestStore();
     anotherStoreInstance = new AnotherTestStore();
-    
+
     // Bind stores to container
     container.bind(TestStore).toConstantValue(testStoreInstance);
     container.bind(AnotherTestStore).toConstantValue(anotherStoreInstance);
-    
+
     // Spy on container.get method
-    jest.spyOn(container, 'get');
+    jest.spyOn(container, "get");
   });
 
   afterEach(() => {
@@ -125,14 +129,14 @@ describe("store-decorator", () => {
     });
   });
 
-describe("handleWindowMessage", () => {
+  describe("handleWindowMessage", () => {
     let messageHandler: (event: MessageEvent) => void;
 
     beforeEach(() => {
       // Register test stores
       store("testStore")(TestStore);
       store("anotherStore")(AnotherTestStore);
-      
+
       messageHandler = handleWindowMessage(container);
     });
 
@@ -140,7 +144,7 @@ describe("handleWindowMessage", () => {
       it("should ignore non-array messages", () => {
         // Condition: Send non-array message data
         const event = { data: "not an array" } as MessageEvent;
-        
+
         // Expectation: Handler should return early without processing
         expect(() => messageHandler(event)).not.toThrow();
         expect(container.get).not.toHaveBeenCalled();
@@ -150,7 +154,7 @@ describe("handleWindowMessage", () => {
         // Condition: Send array with length other than 2
         const shortArray = { data: ["single"] } as MessageEvent;
         const longArray = { data: ["one", "two", "three"] } as MessageEvent;
-        
+
         // Expectation: Both should be ignored
         expect(() => messageHandler(shortArray)).not.toThrow();
         expect(() => messageHandler(longArray)).not.toThrow();
@@ -160,7 +164,7 @@ describe("handleWindowMessage", () => {
       it("should ignore messages where first element is not a string", () => {
         // Condition: Send array where first element is not string
         const event = { data: [123, { prop: "value" }] } as MessageEvent;
-        
+
         // Expectation: Should be ignored
         expect(() => messageHandler(event)).not.toThrow();
         expect(container.get).not.toHaveBeenCalled();
@@ -168,10 +172,12 @@ describe("handleWindowMessage", () => {
 
       it("should ignore messages where second element is not an object", () => {
         // Condition: Send array where second element is not object
-        const stringSecond = { data: ["storeName", "not an object"] } as MessageEvent;
+        const stringSecond = {
+          data: ["storeName", "not an object"],
+        } as MessageEvent;
         const numberSecond = { data: ["storeName", 42] } as MessageEvent;
         const nullSecond = { data: ["storeName", null] } as MessageEvent;
-        
+
         // Expectation: All should be ignored
         expect(() => messageHandler(stringSecond)).not.toThrow();
         expect(() => messageHandler(numberSecond)).not.toThrow();
@@ -181,65 +187,12 @@ describe("handleWindowMessage", () => {
 
       it("should accept valid message format", () => {
         // Condition: Send properly formatted message
-        const event = { 
-          data: ["testStore", { name: "updated" }] 
+        const event = {
+          data: ["testStore", { name: "updated" }],
         } as MessageEvent;
-        
+
         // Expectation: Should not throw and should process
         expect(() => messageHandler(event)).not.toThrow();
-      });
-    });
-
-    describe("click event handling", () => {
-      it("should dispatch click event to GameCanvas when name is 'click'", () => {
-        // Condition: Send click message with event data
-        const clickData = {
-          clientX: 100,
-          clientY: 200,
-          button: 0
-        };
-        const event = { 
-          data: ["click", clickData] 
-        } as MessageEvent;
-
-        // Expectation: Should create and dispatch MouseEvent to GameCanvas
-        messageHandler(event);
-
-        expect(document.getElementById).toHaveBeenCalledWith("GameCanvas");
-        expect(global.MouseEvent).toHaveBeenCalledWith("click", {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-          clientX: 100,
-          clientY: 200,
-          button: 0
-        });
-        expect(mockGameCanvas.dispatchEvent).toHaveBeenCalledWith({
-          type: "click",
-          bubbles: true,
-          cancelable: true,
-          view: window,
-          clientX: 100,
-          clientY: 200,
-          button: 0
-        });
-      });
-
-      it("should handle click event with minimal data", () => {
-        // Condition: Send click message with empty object
-        const event = { 
-          data: ["click", {}] 
-        } as MessageEvent;
-
-        // Expectation: Should still create event with default properties
-        messageHandler(event);
-
-        expect(global.MouseEvent).toHaveBeenCalledWith("click", {
-          bubbles: true,
-          cancelable: true,
-          view: window
-        });
-        expect(mockGameCanvas.dispatchEvent).toHaveBeenCalled();
       });
     });
 
@@ -247,8 +200,8 @@ describe("handleWindowMessage", () => {
       it("should update store instance when valid store message is received", () => {
         // Condition: Send valid message for registered store
         const updateData = { name: "updated name", value: 42 };
-        const event = { 
-          data: ["testStore", updateData] 
+        const event = {
+          data: ["testStore", updateData],
         } as MessageEvent;
 
         // Expectation: Store instance should be updated with new values
@@ -262,8 +215,8 @@ describe("handleWindowMessage", () => {
         // Condition: Send message with only some properties
         const originalName = testStoreInstance.name;
         const updateData = { value: 99 };
-        const event = { 
-          data: ["testStore", updateData] 
+        const event = {
+          data: ["testStore", updateData],
         } as MessageEvent;
 
         // Expectation: Only specified properties should be updated
@@ -275,8 +228,8 @@ describe("handleWindowMessage", () => {
 
       it("should ignore messages for unregistered stores", () => {
         // Condition: Send message for store that wasn't registered
-        const event = { 
-          data: ["unknownStore", { someProperty: "value" }] 
+        const event = {
+          data: ["unknownStore", { someProperty: "value" }],
         } as MessageEvent;
 
         // Expectation: Should not throw and should not affect any stores
@@ -287,11 +240,11 @@ describe("handleWindowMessage", () => {
 
       it("should handle multiple different store updates", () => {
         // Condition: Send updates for different stores
-        const testStoreUpdate = { 
-          data: ["testStore", { name: "test updated" }] 
+        const testStoreUpdate = {
+          data: ["testStore", { name: "test updated" }],
         } as MessageEvent;
-        const anotherStoreUpdate = { 
-          data: ["anotherStore", { id: "new id", active: true }] 
+        const anotherStoreUpdate = {
+          data: ["anotherStore", { id: "new id", active: true }],
         } as MessageEvent;
 
         // Expectation: Both stores should be updated correctly
@@ -306,8 +259,8 @@ describe("handleWindowMessage", () => {
       it("should handle null values in update data", () => {
         // Condition: Send message with null values
         const updateData = { name: null, data: null };
-        const event = { 
-          data: ["testStore", updateData] 
+        const event = {
+          data: ["testStore", updateData],
         } as MessageEvent;
 
         // Expectation: Store should accept null values
@@ -322,13 +275,13 @@ describe("handleWindowMessage", () => {
         const complexData = {
           data: {
             nested: {
-              property: "value"
+              property: "value",
             },
-            array: [1, 2, 3]
-          }
+            array: [1, 2, 3],
+          },
         };
-        const event = { 
-          data: ["testStore", complexData] 
+        const event = {
+          data: ["testStore", complexData],
         } as MessageEvent;
 
         // Expectation: Store should receive the complex object
@@ -336,9 +289,9 @@ describe("handleWindowMessage", () => {
 
         expect(testStoreInstance.data).toEqual({
           nested: {
-            property: "value"
+            property: "value",
           },
-          array: [1, 2, 3]
+          array: [1, 2, 3],
         });
       });
     });
@@ -347,11 +300,11 @@ describe("handleWindowMessage", () => {
       it("should handle case when container.get returns null", () => {
         // Condition: Container returns null for registered store
         const mockContainer = {
-          get: jest.fn().mockReturnValue(null)
+          get: jest.fn().mockReturnValue(null),
         } as any;
         const handler = handleWindowMessage(mockContainer);
-        const event = { 
-          data: ["testStore", { name: "update" }] 
+        const event = {
+          data: ["testStore", { name: "update" }],
         } as MessageEvent;
 
         // Expectation: Should not throw error
@@ -362,13 +315,13 @@ describe("handleWindowMessage", () => {
       it("should handle case when Stores.get returns undefined", () => {
         // Condition: Store is registered but Stores.get returns undefined
         Stores.set("testStore", undefined as any);
-        const event = { 
-          data: ["testStore", { name: "update" }] 
+        const event = {
+          data: ["testStore", { name: "update" }],
         } as MessageEvent;
 
         // Expectation: Should return early without calling container
         messageHandler(event);
-        
+
         // The container.get should not be called since store is undefined
         expect(container.get).not.toHaveBeenCalled();
       });

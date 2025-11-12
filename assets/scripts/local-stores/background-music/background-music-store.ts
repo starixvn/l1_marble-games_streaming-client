@@ -54,11 +54,7 @@ export class BackgroundMusicStore {
   }
 
   isAudioAllowed() {
-    return (
-      !this.audioStore.muted &&
-      !this.audioStore.browserBlocked &&
-      this.visibilityStore.isVisible
-    );
+    return !this.audioStore.muted && this.visibilityStore.isVisible;
   }
 
   isPlayingFlowState(state: GameFlowState) {

@@ -1,8 +1,8 @@
 import { _decorator, Component, game } from "cc";
 import Observer from "observer";
+import { AudioStore } from "../../local-stores/audio/audio-store";
 import { BackgroundVideoPlayer } from "./background-video-player";
 import { initializeAudio } from "./dom-audio-checker";
-import { AudioStore } from "../../local-stores/audio/audio-store";
 
 const { ccclass, requireComponent } = _decorator;
 const { observer, render, handle } = Observer;
@@ -32,23 +32,14 @@ export class BackgroundVideoSoundControl extends Component {
   }
 
   @handle(AudioStore, (store, browserBlocked: boolean) =>
-    store.setBrowserBlocked(browserBlocked)
+    store.setBrowserBlocked(browserBlocked),
   )
   private setBrowserBlocked(browserBlocked: boolean) {
     return browserBlocked;
   }
 
-  @render(AudioStore, (store) => ({
-    muted: store.muted,
-    browserBlocked: store.browserBlocked,
-  }))
-  private syncAudioMuted({
-    muted,
-    browserBlocked,
-  }: {
-    muted: boolean;
-    browserBlocked: boolean;
-  }) {
-    this.videoPlayer.muted = muted || browserBlocked;
+  @render(AudioStore, (store) => store.muted)
+  private syncAudioMuted(muted: boolean) {
+    this.videoPlayer.muted = muted;
   }
 }
