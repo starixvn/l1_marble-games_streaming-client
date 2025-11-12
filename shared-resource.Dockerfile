@@ -2,3 +2,5 @@ FROM hub.lumigame.com/base/nginx:brotli-1.20.2-zlib@sha256:da65e2f9beb9cc2e87f94
 
 COPY ./.nginx/config.conf /etc/nginx/conf.d/default.conf
 COPY ./shared-resources/ /usr/share/nginx/html
+
+USER nginx
