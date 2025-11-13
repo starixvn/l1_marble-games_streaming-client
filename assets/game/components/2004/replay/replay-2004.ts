@@ -39,13 +39,10 @@ export class Replay2004 extends Replay {
   @property(sp.Skeleton)
   afterGoalEffectSpine: sp.Skeleton = null;
 
-  @property(Node)
-  infoStreaming: Node = null;
-
   protected isHomeScoreChanged = false;
   protected readonly durationAnimGoal = 3;
   protected readonly durationAnimNode = 0.2;
-  protected readonly durationTransition = 3;
+  protected readonly durationTransition = 1.5;
   protected readonly durationAfterGoal = 2;
   protected readonly delayShowReplay = 0.5;
   private _preloadDurationSeconds = 0;
@@ -75,7 +72,6 @@ export class Replay2004 extends Replay {
       (data?.awayScore > 0 && this._currentStage === FeatureStage.Streaming)
     ) {
       AnimationUtils.delayTime(this.delayShowReplay);
-      this?.infoStreaming && this.setStatusNode(this.infoStreaming, false);
       this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
       this?.info &&
         AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
@@ -97,27 +93,21 @@ export class Replay2004 extends Replay {
         false
       );
       this.scheduleRunTransition();
-      await this.playTransitionAnimation();
       await this.playAfterGoalAnimation();
-    }
-    if (stage === FeatureStage.Streaming) {
-      this?.infoStreaming && this.setStatusNode(this.infoStreaming, true);
     }
   }
 
   protected scheduleRunTransition() {
-    if (
-      this.durationTransition +
-        this.durationAfterGoal +
-        this.durationTransition <=
-      this._preloadDurationSeconds
-    ) {
-      this.scheduleOnce(() => {
-        this.setStatusNode(this.afterGoalSpine?.node, false);
-        this.setStatusNode(this.afterGoalEffectSpine?.node, false);
-        this.playTransitionAnimation();
-      }, this._preloadDurationSeconds - this.durationTransition);
-    }
+    this.scheduleOnce(() => {
+      AnimationUtils.fadeOutAndDeactivate(
+        this.afterGoalSpine?.node,
+        this.durationAnimNode
+      );
+      AnimationUtils.fadeOutAndDeactivate(
+        this.afterGoalEffectSpine?.node,
+        this.durationAnimNode
+      );
+    }, this._preloadDurationSeconds - 1);
   }
 
   protected async playTransitionAnimation() {
@@ -157,8 +147,14 @@ export class Replay2004 extends Replay {
   protected async playAfterGoalAnimation() {
     this?.info &&
       AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
-    this.setStatusNode(this.afterGoalSpine?.node, true);
-    this.setStatusNode(this.afterGoalEffectSpine?.node, true);
+    AnimationUtils.fadeInAndActivate(
+      this.afterGoalSpine?.node,
+      this.durationAnimNode
+    );
+    AnimationUtils.fadeInAndActivate(
+      this.afterGoalEffectSpine?.node,
+      this.durationAnimNode
+    );
     this?.afterGoalEffectSpine &&
       AnimationUtils.playSpine(
         this.afterGoalEffectSpine,

@@ -5,30 +5,30 @@ import shutil
 import subprocess
 import sys
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    project_dir = os.path.join(current_dir, '')
-    first_arg = sys.argv[1]
+    project_dir = os.path.join(current_dir, "")
+    gameId = sys.argv[1]
 
-    images_dir = os.path.join(first_arg)
-
-    # Pack.
-    packer_path = os.path.join(
-        project_dir,
-        'pack.js'
+    images_dir = os.path.join(gameId)
+    outputPath = os.path.join(
+        project_dir, "..\\", f"assets\\game\\resources\\textures\\{gameId}"
     )
 
-    outputPath = os.path.join(project_dir, '..\\', 'assets\\game\\resources\\textures')
-    subprocess.Popen([
-        'node',
-        packer_path,
-        '-t',
-        'remote',
-        '-a',
-        'http://10.10.50.17:3456',
-        '-i',
-        os.path.join(project_dir, images_dir, 'texture_packer.json'),
-        '-o',
-        outputPath
-    ]).wait()
+    # Pack.
+    packer_path = os.path.join(project_dir, "pack.js")
 
+    subprocess.Popen(
+        [
+            "node",
+            packer_path,
+            "-t",
+            "remote",
+            "-a",
+            "http://10.10.50.17:3456",
+            "-i",
+            os.path.join(project_dir, images_dir, "texture_packer.json"),
+            "-o",
+            outputPath,
+        ]
+    ).wait()
