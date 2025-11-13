@@ -1,3 +1,10 @@
 {
-  "vgaming": {}
+  "features": {
+    "common": {
+      "AUDIO_INDICATOR": true
+    },
+    "vgaming": {
+      "AUDIO_INDICATOR": false
+    }
+  }
 }

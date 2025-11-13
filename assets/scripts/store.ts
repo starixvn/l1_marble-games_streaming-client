@@ -1,11 +1,13 @@
 import mobx from "mobx";
 import { store } from "./store-decorator";
+import { log } from "cc";
 
 @store("Store")
 export class Store {
   constructor() {
     mobx.makeAutoObservable(this);
     this.init(globalThis.location);
+    this.loadFeature();
   }
 
   get isReplay() {
@@ -19,6 +21,8 @@ export class Store {
   language = "en-US";
 
   operator = "common";
+
+  features: Record<string, boolean> = {};
 
   init(location: typeof globalThis.location) {
     const params = new URLSearchParams(location.search);
@@ -42,32 +46,56 @@ export class Store {
     this.eventId = eventIdFromToken ?? eventIdFromParam ?? null;
     console.log("decoded token ", decodedToken);
     console.log("params ", params);
-    console.log("init---", this.game, this.language, this.operator, this.eventId);
+    console.log(
+      "init---",
+      this.game,
+      this.language,
+      this.operator,
+      this.eventId,
+    );
+  }
+
+  async loadFeature() {
+    try {
+      const response = await fetch(this.operatorConfigurationURL);
+      const operators = await response.json();
+      const features = Object.assign(
+        {},
+        operators.features.common,
+        operators.features[this.operator],
+      );
+
+      this.features = features;
+    } catch (error) {
+      log(error);
+    }
   }
 
   get replayUrl() {
-    let host = globalThis.location.host;
-
-    if (host.includes("localhost")) {
-      host = "mgtv.lumigame.com";
-    }
-
-    const root = host.split(".").slice(-2).join(".");
+    const root = this.host.split(".").slice(-2).join(".");
     const domain = `mgstreaming.${root}`;
 
     return `https://${domain}/replay/${this.eventId}`;
   }
 
   get serverUrl() {
-    let host = globalThis.location.host;
-
-    if (host.includes("localhost")) {
-      host = "mgtv.lumigame.com";
-    }
-
-    const root = host.split(".").slice(-2).join(".");
+    const root = this.host.split(".").slice(-2).join(".");
     const domain = `mgstreaming.${root}`;
 
     return `https://${domain}/live/${this.game}`;
+  }
+
+  get operatorConfigurationURL() {
+    return `https://${this.host}/shared-resource/operators.json`;
+  }
+
+  get host() {
+    let host = globalThis.location.host;
+
+    if (host.includes("localhost")) {
+      host = "streaming-client.lumigame.com";
+    }
+
+    return host;
   }
 }
