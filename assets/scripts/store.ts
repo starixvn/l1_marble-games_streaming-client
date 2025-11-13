@@ -44,15 +44,6 @@ export class Store {
     this.language = languageFromToken ?? languageFromParam ?? "en-US";
     this.operator = operatorFromToken ?? operatorFromParam ?? "common";
     this.eventId = eventIdFromToken ?? eventIdFromParam ?? null;
-    console.log("decoded token ", decodedToken);
-    console.log("params ", params);
-    console.log(
-      "init---",
-      this.game,
-      this.language,
-      this.operator,
-      this.eventId,
-    );
   }
 
   async loadFeature() {

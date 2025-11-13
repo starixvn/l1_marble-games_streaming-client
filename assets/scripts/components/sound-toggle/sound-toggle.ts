@@ -1,6 +1,7 @@
 import { _decorator, Component, Toggle } from "cc";
 import Observer from "observer";
 import { AudioStore } from "../../local-stores/audio/audio-store";
+import { Store } from "../../store";
 
 const { ccclass, property } = _decorator;
 const { observer, render, handle } = Observer;
@@ -24,5 +25,10 @@ export class SoundToggle extends Component {
   @render(AudioStore, (store) => store.muted)
   private renderMuted(muted: boolean) {
     this.soundToggle.isChecked = !muted;
+  }
+
+  @render(Store, (store) => store.features.AUDIO_INDICATOR)
+  private renderIndicator(enabled: boolean) {
+    this.node.active = enabled;
   }
 }
