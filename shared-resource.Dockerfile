@@ -5,7 +5,8 @@ COPY ./shared-resources/ /usr/share/nginx/html
 
 RUN chown -R nginx:nginx /var/cache/nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
+    chown -R nginx:nginx /etc/nginx && \
     chmod -R 755 /usr/share/nginx/html && \
-    touch /var/run/nginx.pid && chown nginx:nginx /var/run/nginx.pid
+    touch /var/run/nginx.pid && chown nginx:nginx /var/run/nginx.pid /run/nginx.pid
 
 USER nginx
