@@ -1,12 +1,12 @@
-import mobx from "mobx";
-import { store } from "../../store-decorator";
 import { inject, injectable } from "inversify";
-import { AudioStore } from "../audio/audio-store";
-import { VisibilityStore } from "../visibility/visibility-store";
+import mobx from "mobx";
 import {
   GameFlowState,
   GameFlowStore,
 } from "../../features/game-flow/game-flow-store";
+import { store } from "../../store-decorator";
+import { AudioStore } from "../audio/audio-store";
+import { VisibilityStore } from "../visibility/visibility-store";
 
 @injectable()
 @store("BackgroundMusicStore")
@@ -62,6 +62,7 @@ export class BackgroundMusicStore {
       GameFlowState.Prebet,
       GameFlowState.Result,
       GameFlowState.PhaseChange,
+      GameFlowState.EventDetailChange,
     ].includes(state);
   }
 }
