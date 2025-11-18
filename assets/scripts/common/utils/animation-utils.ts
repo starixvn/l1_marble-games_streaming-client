@@ -39,7 +39,7 @@ export namespace AnimationUtils {
     opacity = 1
   ) => {
     if (!node) {
-      return null;
+      return;
     }
 
     await fadeTo(node, duration, opacity);
@@ -52,7 +52,7 @@ export namespace AnimationUtils {
     opacity = 255
   ) => {
     if (!node) {
-      return null;
+      return;
     }
 
     await fadeIn(node, duration, opacity);
