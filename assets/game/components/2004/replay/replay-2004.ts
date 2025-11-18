@@ -76,6 +76,10 @@ export class Replay2004 extends Replay {
 
       await this.playAfterGoalAnimation();
     }
+
+    if (stage === FeatureStage.Streaming) {
+      this?.info && AnimationUtils.fadeOutAndDeactivate(this.info, 0);
+    }
   }
 
   protected async playAfterGoalAnimation() {
