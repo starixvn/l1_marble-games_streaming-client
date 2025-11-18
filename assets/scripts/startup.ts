@@ -42,7 +42,6 @@ window.addEventListener("message", handleWindowMessage(container));
 @ccclass
 @observer
 export class Startup extends Component {
-
   @property(Node)
   private readonly infoLayer: Node = null;
 
@@ -54,7 +53,6 @@ export class Startup extends Component {
 
   @render(Store, (store) => store.isReplay)
   initIsReplay(isReplay: boolean) {
-    console.log("initIsReplay---", isReplay);
     if (isReplay) {
       this.loadReplayMatch();
       return;
@@ -67,7 +65,7 @@ export class Startup extends Component {
     if (!gameId) {
       return;
     }
-    console.log("openGame---", gameId);
+
     resources.load(`games/${gameId}`, Prefab, this.onLoadedInfoLayer());
   }
 

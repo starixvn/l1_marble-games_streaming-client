@@ -38,6 +38,10 @@ export namespace AnimationUtils {
     duration: number,
     opacity = 1
   ) => {
+    if (!node) {
+      return null;
+    }
+
     await fadeTo(node, duration, opacity);
     node.active = false;
   };
@@ -47,6 +51,10 @@ export namespace AnimationUtils {
     duration: number,
     opacity = 255
   ) => {
+    if (!node) {
+      return null;
+    }
+
     await fadeIn(node, duration, opacity);
   };
 

@@ -53,8 +53,7 @@ export class Replay2004 extends Replay {
   protected handleFinalGoal(isFirstGoal: boolean) {
     if (isFirstGoal) {
       this.scheduleOnce(() => {
-        this?.info &&
-          AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
+        AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
       }, this.durationEffectAndReplay);
     }
   }
@@ -70,8 +69,8 @@ export class Replay2004 extends Replay {
     ) {
       this.handleFinalGoal(data?.final);
       AnimationUtils.delayTime(this.durationGoalEffect);
-      this?.info &&
-        AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
+
+      AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
     }
   }
 
@@ -79,7 +78,7 @@ export class Replay2004 extends Replay {
   protected async syncStage(stage: FeatureStage) {
     this._currentStage = stage;
     if (stage === FeatureStage.EventDetailChange) {
-      this?.info && AnimationUtils.fadeOutAndDeactivate(this.info, 0);
+      AnimationUtils.fadeOutAndDeactivate(this.info, 0);
       this.setStatusNodes(
         [this.afterGoalSpine?.node, this.afterGoalEffectSpine?.node],
         false
@@ -89,13 +88,12 @@ export class Replay2004 extends Replay {
     }
 
     if (stage === FeatureStage.Streaming) {
-      this?.info && AnimationUtils.fadeOutAndDeactivate(this.info, 0);
+      AnimationUtils.fadeOutAndDeactivate(this.info, 0);
     }
   }
 
   protected async playAfterGoalAnimation() {
-    this?.info &&
-      AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
+    AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
     AnimationUtils.fadeInAndActivate(
       this.afterGoalSpine?.node,
       this.durationAnimNode
