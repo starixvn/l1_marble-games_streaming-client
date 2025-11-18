@@ -14,6 +14,10 @@ import {
   type CurrentEventData,
   CurrentEventStore,
 } from "../../features/current-event/current-event-store";
+import {
+  type LiveScoreData,
+  LiveScoreStore,
+} from "../../features/live-score/live-score-store";
 import { gameSettings } from "../../game-settings";
 import { Store } from "../../store";
 
@@ -59,6 +63,11 @@ export class Time extends Component {
   @render(GameFlowStore, (store) => store.data)
   syncPaused(data: GameFlowData) {
     this.paused = data.state !== GameFlowState.Streaming;
+  }
+
+  @render(LiveScoreStore, (store) => store.data)
+  syncPausedWithLiveScore(data: LiveScoreData) {
+    this.paused = data.final !== true;
   }
 
   @render(VideoStreamingStore, (store) => store.data)

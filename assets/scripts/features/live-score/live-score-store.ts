@@ -5,6 +5,7 @@ import { BaseStoreImpl } from "../base/base-store";
 export interface LiveScoreData {
   homeScore: number;
   awayScore: number;
+  final?: boolean;
   isHomeScoreChanged?: boolean;
 }
 
