@@ -237,8 +237,8 @@
       "__expectedType__": "sp.SkeletonData"
     },
     "defaultSkin": "default",
-    "defaultAnimation": "",
-    "_premultipliedAlpha": false,
+    "defaultAnimation": "show",
+    "_premultipliedAlpha": true,
     "_timeScale": 1,
     "_preCacheMode": 0,
     "_cacheMode": 0,
@@ -553,7 +553,7 @@
     },
     "defaultSkin": "default",
     "defaultAnimation": "<None>",
-    "_premultipliedAlpha": false,
+    "_premultipliedAlpha": true,
     "_timeScale": 1,
     "_preCacheMode": 0,
     "_cacheMode": 0,
@@ -1516,7 +1516,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398.0000000000002,
+      "width": 1398,
       "height": 786
     },
     "_anchorPoint": {
@@ -1593,7 +1593,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398.0000000000002,
+      "width": 1398,
       "height": 786
     },
     "_anchorPoint": {
