@@ -33,6 +33,7 @@ export class Replay2004 extends Replay {
   protected readonly durationAnimNode = 0.2;
   protected readonly durationAfterGoal = 1.5;
   protected readonly durationGoalEffect = 3;
+  protected readonly durationEffectAndReplay = 6;
   private _currentStage = FeatureStage.Unknown;
 
   async onLoad() {
@@ -45,8 +46,17 @@ export class Replay2004 extends Replay {
     this.setStatusNodes(nodes, false);
   }
 
-  isFirstGoal(data: LiveScoreData) {
+  protected isFirstGoal(data: LiveScoreData) {
     return data?.homeScore === 0 && data?.awayScore === 0;
+  }
+
+  protected handleFinalGoal(isFirstGoal: boolean) {
+    if (isFirstGoal) {
+      this.scheduleOnce(() => {
+        this?.info &&
+          AnimationUtils.fadeOutAndDeactivate(this.info, this.durationAnimNode);
+      }, this.durationEffectAndReplay);
+    }
   }
 
   @render(LiveScoreStore, (store) => store.data)
@@ -58,6 +68,7 @@ export class Replay2004 extends Replay {
         !this.isFirstGoal(data) &&
         this._currentStage === FeatureStage.Streaming)
     ) {
+      this.handleFinalGoal(data?.final);
       AnimationUtils.delayTime(this.durationGoalEffect);
       this?.info &&
         AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
