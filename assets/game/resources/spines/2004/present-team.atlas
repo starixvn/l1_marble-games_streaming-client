@@ -1,26 +1,26 @@
 
 present-team.png
-size: 701,1041
+size: 703,1045
 format: RGBA8888
 filter: Linear,Linear
 repeat: none
 Score-bg
   rotate: true
   xy: 575, 181
-  size: 276, 122
-  orig: 276, 122
+  size: 280, 126
+  orig: 280, 126
   offset: 0, 0
   index: -1
 Score-bg-sub
   rotate: false
   xy: 293, 9
-  size: 276, 48
-  orig: 276, 48
+  size: 280, 52
+  orig: 280, 52
   offset: 0, 0
   index: -1
 VS-effect
   rotate: true
-  xy: 2, 179
+  xy: 2, 183
   size: 860, 176
   orig: 884, 181
   offset: 7, 4
@@ -34,35 +34,35 @@ VS-text
   index: -1
 bg-infotext
   rotate: false
-  xy: 2, 11
-  size: 289, 46
-  orig: 289, 46
+  xy: 2, 14
+  size: 289, 47
+  orig: 289, 47
   offset: 0, 0
   index: -1
 bg-name-blue
   rotate: true
-  xy: 575, 459
+  xy: 575, 463
   size: 580, 108
   orig: 580, 108
   offset: 0, 0
   index: -1
 bg-name-red
   rotate: false
-  xy: 2, 59
+  xy: 2, 63
   size: 580, 108
   orig: 580, 108
   offset: 0, 0
   index: -1
 bg-team-blue
   rotate: false
-  xy: 180, 605
+  xy: 180, 609
   size: 393, 434
   orig: 403, 445
   offset: 5, 5
   index: -1
 bg-team-red
   rotate: false
-  xy: 180, 169
+  xy: 180, 173
   size: 393, 434
   orig: 403, 445
   offset: 5, 5
