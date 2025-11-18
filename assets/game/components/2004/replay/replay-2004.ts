@@ -5,7 +5,6 @@ import {
   type LiveScoreData,
   LiveScoreStore,
 } from "db://assets/scripts/features/live-score/live-score-store";
-import { VideoStreamingStore } from "db://assets/scripts/features/video-streaming/video-streaming-store";
 import {
   FeatureStage,
   StageWatcher,
@@ -13,11 +12,9 @@ import {
 import Observer from "observer";
 const { ccclass, property } = _decorator;
 
-const { observer, render, handle } = Observer;
+const { observer, render } = Observer;
 
 enum AnimationName {
-  GoalAway = "Goal-Away",
-  GoalHome = "Goal-Home",
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
   TransitionIn = "transition3s",
@@ -31,37 +28,24 @@ enum SoundName {
 @observer
 export class Replay2004 extends Replay {
   @property(sp.Skeleton)
-  goalSpine: sp.Skeleton = null;
-
-  @property(sp.Skeleton)
   afterGoalSpine: sp.Skeleton = null;
 
   @property(sp.Skeleton)
   afterGoalEffectSpine: sp.Skeleton = null;
 
   protected isHomeScoreChanged = false;
-  protected readonly durationAnimGoal = 3;
   protected readonly durationAnimNode = 0.2;
-  protected readonly durationTransition = 1.5;
-  protected readonly durationAfterGoal = 2;
-  protected readonly delayShowReplay = 0.5;
-  private _preloadDurationSeconds = 0;
+  protected readonly durationAfterGoal = 1.5;
   private _currentStage = FeatureStage.Unknown;
 
   async onLoad() {
     super.onLoad();
     const nodes: Node[] = [];
-    this.goalSpine?.node && nodes.push(this.goalSpine?.node);
     this.afterGoalSpine?.node && nodes.push(this.afterGoalSpine?.node);
     this.afterGoalEffectSpine?.node &&
       nodes.push(this.afterGoalEffectSpine?.node);
     this?.info && nodes.push(this?.info);
     this.setStatusNodes(nodes, false);
-  }
-
-  @render(VideoStreamingStore, (store) => store.data.preloadDurationMs)
-  playVideo(preloadDurationMs: number) {
-    this._preloadDurationSeconds = preloadDurationMs / 1000;
   }
 
   @render(LiveScoreStore, (store) => store.data)
@@ -71,12 +55,9 @@ export class Replay2004 extends Replay {
       data?.homeScore > 0 ||
       (data?.awayScore > 0 && this._currentStage === FeatureStage.Streaming)
     ) {
-      AnimationUtils.delayTime(this.delayShowReplay);
       this.playSfx(SoundUtils.getCommentPath() + SoundName.GOAL);
       this?.info &&
         AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
-      await this.playGoalAnimation();
-      this.setStatusNodes([this?.info, this.goalSpine?.node], false);
     }
   }
 
@@ -85,63 +66,12 @@ export class Replay2004 extends Replay {
     this._currentStage = stage;
     if (stage === FeatureStage.EventDetailChange) {
       this.setStatusNodes(
-        [
-          this.goalSpine?.node,
-          this.afterGoalSpine?.node,
-          this.afterGoalEffectSpine?.node,
-        ],
+        [this.afterGoalSpine?.node, this.afterGoalEffectSpine?.node],
         false
       );
-      this.scheduleRunTransition();
+
       await this.playAfterGoalAnimation();
     }
-  }
-
-  protected scheduleRunTransition() {
-    this.scheduleOnce(() => {
-      AnimationUtils.fadeOutAndDeactivate(
-        this.afterGoalSpine?.node,
-        this.durationAnimNode
-      );
-      AnimationUtils.fadeOutAndDeactivate(
-        this.afterGoalEffectSpine?.node,
-        this.durationAnimNode
-      );
-    }, this._preloadDurationSeconds - 1);
-  }
-
-  protected async playTransitionAnimation() {
-    this.setStatusNode(this.transitionSpine?.node, true);
-
-    this?.transitionSpine &&
-      (await AnimationUtils.playSpine(
-        this.transitionSpine,
-        AnimationName.TransitionIn,
-        false,
-        this.durationTransition
-      ));
-
-    this?.transitionSpine &&
-      this.setStatusNode(this.transitionSpine?.node, false);
-  }
-
-  protected async playGoalAnimation() {
-    this.setStatusNode(this.goalSpine?.node, true);
-    this?.goalSpine &&
-      (await AnimationUtils.playSpine(
-        this.goalSpine,
-        this.isHomeScoreChanged
-          ? AnimationName.GoalHome
-          : AnimationName.GoalAway,
-        false,
-        this.durationAnimGoal
-      ));
-
-    this?.goalSpine &&
-      AnimationUtils.fadeInAndActivate(
-        this?.goalSpine?.node,
-        this.durationAnimNode
-      );
   }
 
   protected async playAfterGoalAnimation() {

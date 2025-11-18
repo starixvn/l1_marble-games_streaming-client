@@ -1,4 +1,4 @@
-import { _decorator, Component, find, log, Node, sp } from "cc";
+import { _decorator, Component, find, log, Node } from "cc";
 import Observer from "observer";
 import { AnimationUtils } from "../../common/utils";
 import { SfxStore } from "../../local-stores/sfx/sfx-store";
@@ -10,9 +10,6 @@ const { observer, handle } = Observer;
 @ccclass("Replay")
 @observer
 export class Replay extends Component {
-  @property(sp.Skeleton)
-  transitionSpine: sp.Skeleton = null;
-
   @property(Node)
   info: Node = null;
 
@@ -21,8 +18,6 @@ export class Replay extends Component {
   async onLoad() {
     AnimationUtils.delayTime(0.2);
     this.initBackgroundVideoPlayer();
-    this?.transitionSpine &&
-      this.setStatusNode(this.transitionSpine.node, false);
   }
 
   onDestroy() {
