@@ -77,6 +77,8 @@ export class Time extends Component {
 
   @render(StopTimerStore, (store) => store.data)
   syncStopTimer(data: STopTimerData) {
+    if (this.game !== "2004") return;
+
     const fadeOutDuration = 3;
 
     if (data.stopTimer) {
@@ -87,6 +89,8 @@ export class Time extends Component {
 
   @render(LiveScoreStore, (store) => store.data)
   syncLiveScore(data: LiveScoreData) {
+    if (this.game !== "2004") return;
+
     const fadeInDuration = 1;
     const delayDuration = 5;
 
