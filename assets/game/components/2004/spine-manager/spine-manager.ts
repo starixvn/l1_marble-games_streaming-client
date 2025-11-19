@@ -10,6 +10,7 @@ const { observer, render } = Observer;
 enum AnimationName {
   PreBetIn = "prebet-in",
   HaftTimeIn = "ingame-in",
+  FullTimeIn = "settle-in",
 }
 
 @ccclass("SpineManager")
@@ -21,6 +22,9 @@ export class SpineManager extends Component {
   @property(sp.Skeleton)
   haftTimeSpine: sp.Skeleton = null;
 
+  @property(sp.Skeleton)
+  fullTimeSpine: sp.Skeleton = null;
+
   @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
   protected async syncStage(stage: FeatureStage) {
     switch (stage) {
@@ -29,6 +33,9 @@ export class SpineManager extends Component {
         break;
       case FeatureStage.PhaseChange:
         this.haftTimeSpine.setAnimation(0, AnimationName.HaftTimeIn, false);
+        break;
+      case FeatureStage.Result:
+        this.fullTimeSpine.setAnimation(0, AnimationName.FullTimeIn, false);
         break;
     }
   }
