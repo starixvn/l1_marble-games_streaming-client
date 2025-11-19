@@ -68,7 +68,7 @@ export class Replay2004 extends Replay {
         this._currentStage === FeatureStage.Streaming)
     ) {
       this.handleFinalGoal(data?.final);
-      AnimationUtils.delayTime(this.durationGoalEffect);
+      await AnimationUtils.delayTime(this.durationGoalEffect);
 
       AnimationUtils.fadeInAndActivate(this.info, this.durationAnimNode);
     }
