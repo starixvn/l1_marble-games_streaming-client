@@ -44,7 +44,6 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   currentTime = 0;
-  private timeToStream = 0;
 
   @render(Store, (store) => ({
     operator: store.operator,
@@ -71,23 +70,15 @@ export class BackgroundVideoPlayer extends Component {
     status: store.data.isPlaying,
     timeToPlay: store.data.timeToPlay,
   }))
-  playIntro({
-    currentTime,
-    status,
-    timeToPlay,
-  }: {
-    currentTime: number;
-    status: boolean;
-    timeToPlay: number;
-  }) {
+  playIntro({ currentTime, status }: { currentTime: number; status: boolean }) {
     if (!this._introUrl || this._introUrl === "" || !status) {
       return;
     }
 
-    this.timeToStream = timeToPlay;
     this.hlsPlayer.load(this._introUrl);
     this.syncCurrentTime();
     this.currentTime = currentTime;
+
     this.play();
   }
 
@@ -101,25 +92,21 @@ export class BackgroundVideoPlayer extends Component {
   @render(VideoStreamingStore, (store) => ({
     videoLink: store.data.videoLink,
     currentTime: store.data.currentTime,
-    timeToStream: store.data.timeToStream,
   }))
   playVideo({
     videoLink,
     currentTime,
-    timeToStream,
   }: {
     videoLink: string;
     currentTime: number;
-    timeToStream: number;
     videoLengthMs: number;
   }) {
     if (videoLink && videoLink !== "") {
       this.hlsPlayer.load(videoLink);
+      this.currentTime = currentTime;
       this.play();
       this.syncCurrentTime();
-      this.currentTime = currentTime;
     }
-    this.timeToStream = timeToStream;
   }
 
   pause() {
@@ -130,6 +117,7 @@ export class BackgroundVideoPlayer extends Component {
 
   play() {
     if (this.initialized) {
+      this.hlsPlayer.currentTime = this.currentTime;
       this.hlsPlayer.play();
       this.playSfx(SoundUtils.getCommentPath() + SoundName.WHISTLE_START);
       this.showBackground(true);
@@ -144,8 +132,10 @@ export class BackgroundVideoPlayer extends Component {
     return this.hlsPlayer?.currentLevel ?? 0;
   }
 
-  protected lateUpdate(dt: number): void {
-    this.currentTime += dt;
+  protected update(dt: number): void {
+    if (this.initialized) {
+      this.currentTime += dt;
+    }
   }
 
   onLoad() {
@@ -169,8 +159,8 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   private syncCurrentTime() {
-    this.currentTime = (Date.now() - this.timeToStream) / 1000;
     this.node.emit("syncNativeCurrentTime", this.hlsPlayer.currentTime);
+
     const needSync =
       this.currentTime >= 0 &&
       Math.abs(this.currentTime - this.hlsPlayer.currentTime) > 1;
