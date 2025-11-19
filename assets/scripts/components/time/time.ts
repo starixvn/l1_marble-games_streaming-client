@@ -15,11 +15,16 @@ import {
   CurrentEventStore,
 } from "../../features/current-event/current-event-store";
 import {
+  type STopTimerData,
+  StopTimerStore,
+} from "../../features/stop-timer/stop-timer-store";
+import { gameSettings } from "../../game-settings";
+import { Store } from "../../store";
+import { AnimationUtils } from "../../common/utils";
+import {
   type LiveScoreData,
   LiveScoreStore,
 } from "../../features/live-score/live-score-store";
-import { gameSettings } from "../../game-settings";
-import { Store } from "../../store";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
@@ -62,12 +67,36 @@ export class Time extends Component {
 
   @render(GameFlowStore, (store) => store.data)
   syncPaused(data: GameFlowData) {
-    this.paused = data.state !== GameFlowState.Streaming;
+    if (data.state === GameFlowState.Streaming) {
+      this.paused = false;
+      AnimationUtils.fadeIn(this.node, 0);
+    } else {
+      this.paused = true;
+    }
+  }
+
+  @render(StopTimerStore, (store) => store.data)
+  syncStopTimer(data: STopTimerData) {
+    const fadeOutDuration = 3;
+
+    if (data.stopTimer) {
+      this.paused = true;
+      AnimationUtils.fadeOut(this.node, fadeOutDuration);
+    }
   }
 
   @render(LiveScoreStore, (store) => store.data)
-  syncPausedWithLiveScore(data: LiveScoreData) {
-    this.paused = data.final !== true;
+  syncLiveScore(data: LiveScoreData) {
+    const fadeInDuration = 1;
+    const delayDuration = 5;
+
+    if (data.final) {
+      this.scheduleOnce(() => {
+        this._streamingPhaseTime += delayDuration;
+        this.paused = false;
+        AnimationUtils.fadeIn(this.node, fadeInDuration);
+      }, delayDuration);
+    }
   }
 
   @render(VideoStreamingStore, (store) => store.data)
@@ -84,7 +113,6 @@ export class Time extends Component {
 
   private updateSecondTimer() {
     if (this.paused) {
-      this.seconds = 0;
       this.ensureMatchTimeValid();
       this.updateDisplayUI();
       return;
