@@ -1,30 +1,30 @@
 import { _decorator, Component, Label } from "cc";
-import Observer from "observer";
 import { t } from "db://i18n/LanguageData";
+import Observer from "observer";
+import { AnimationUtils } from "../../common/utils";
+import {
+  type CurrentEventData,
+  CurrentEventStore,
+} from "../../features/current-event/current-event-store";
 import {
   type GameFlowData,
   GameFlowState,
   GameFlowStore,
 } from "../../features/game-flow/game-flow-store";
 import {
-  type VideoStreamingData,
-  VideoStreamingStore,
-} from "../../features/video-streaming/video-streaming-store";
-import {
-  type CurrentEventData,
-  CurrentEventStore,
-} from "../../features/current-event/current-event-store";
+  type LiveScoreData,
+  LiveScoreStore,
+} from "../../features/live-score/live-score-store";
 import {
   type STopTimerData,
   StopTimerStore,
 } from "../../features/stop-timer/stop-timer-store";
+import {
+  type VideoStreamingData,
+  VideoStreamingStore,
+} from "../../features/video-streaming/video-streaming-store";
 import { gameSettings } from "../../game-settings";
 import { Store } from "../../store";
-import { AnimationUtils } from "../../common/utils";
-import {
-  type LiveScoreData,
-  LiveScoreStore,
-} from "../../features/live-score/live-score-store";
 
 const { ccclass, property, menu } = _decorator;
 const { render, observer } = Observer;
@@ -77,7 +77,9 @@ export class Time extends Component {
 
   @render(StopTimerStore, (store) => store.data)
   syncStopTimer(data: STopTimerData) {
-    if (this.game !== "2004") return;
+    if (this.game !== "2004") {
+      return;
+    }
 
     const fadeOutDuration = 3;
 
@@ -89,7 +91,9 @@ export class Time extends Component {
 
   @render(LiveScoreStore, (store) => store.data)
   syncLiveScore(data: LiveScoreData) {
-    if (this.game !== "2004") return;
+    if (this.game !== "2004") {
+      return;
+    }
 
     const fadeInDuration = 1;
     const delayDuration = 5;

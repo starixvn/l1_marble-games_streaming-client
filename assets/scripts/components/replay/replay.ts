@@ -15,7 +15,7 @@ export class Replay extends Component {
   info: Node = null;
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
-  protected gameId: string = "";
+  protected gameId = "";
 
   @render(GameStore, (store) => store.data?.gameId)
   setGameId(gameId: string) {
