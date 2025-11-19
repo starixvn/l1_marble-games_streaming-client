@@ -1,11 +1,12 @@
 import { _decorator, Component, find, log, Node } from "cc";
 import Observer from "observer";
 import { AnimationUtils } from "../../common/utils";
+import { GameStore } from "../../local-stores/game/game-store";
 import { SfxStore } from "../../local-stores/sfx/sfx-store";
 import { BackgroundVideoPlayer } from "../video-player/background-video-player";
 const { ccclass, property } = _decorator;
 
-const { observer, handle } = Observer;
+const { observer, handle, render } = Observer;
 
 @ccclass("Replay")
 @observer
@@ -14,6 +15,12 @@ export class Replay extends Component {
   info: Node = null;
 
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
+  protected gameId: string = "";
+
+  @render(GameStore, (store) => store.data?.gameId)
+  setGameId(gameId: string) {
+    this.gameId = gameId;
+  }
 
   async onLoad() {
     AnimationUtils.delayTime(0.2);

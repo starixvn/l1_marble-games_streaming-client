@@ -1,5 +1,5 @@
 import { _decorator, Node, sp } from "cc";
-import { AnimationUtils } from "db://assets/scripts/common/utils";
+import { AnimationUtils, SoundUtils } from "db://assets/scripts/common/utils";
 import { Replay } from "db://assets/scripts/components/replay/replay";
 import {
   type LiveScoreData,
@@ -18,6 +18,10 @@ enum AnimationName {
   AfterGoal = "aftergoal-in",
   AfterGoalEffect = "show",
   TransitionIn = "transition3s",
+}
+
+enum SoundName {
+  AfterGoal = "after-goal",
 }
 
 @ccclass("Replay2004")
@@ -89,6 +93,12 @@ export class Replay2004 extends Replay {
 
     if (stage === FeatureStage.Streaming) {
       AnimationUtils.fadeOutAndDeactivate(this.info, 0);
+    }
+
+    if (stage === FeatureStage.EventDetailChange) {
+      this.playSfx(
+        `${SoundUtils.getAudioGamePath(this.gameId)}${SoundName.AfterGoal}`
+      );
     }
   }
 

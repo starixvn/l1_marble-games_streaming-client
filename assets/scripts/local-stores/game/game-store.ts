@@ -1,22 +1,21 @@
-import { store } from "../../store-decorator";
 import mobx from "mobx";
+import { store } from "../../store-decorator";
 
 export type GameData = {
-    gameId: string;
-}
+  gameId: string;
+};
 
 @store("GameStore")
 export class GameStore {
+  constructor() {
+    mobx.makeAutoObservable(this);
+  }
 
-    constructor() {
-        mobx.makeAutoObservable(this);
-    }
+  data: GameData = {
+    gameId: "",
+  };
 
-    data: GameData = {
-        gameId: "",
-    }
-
-    update(data: GameData) {
-        this.data = data;
-    }
+  update(data: GameData) {
+    this.data = data;
+  }
 }

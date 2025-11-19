@@ -71,7 +71,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "brandname_bg",
+    "_name": "brandname",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -487,7 +487,7 @@
     "value": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -31,
+      "y": -37.952,
       "z": 0
     }
   },
@@ -562,7 +562,12 @@
     "__prefab": {
       "__id__": 27
     },
-    "liveNode": null,
+    "liveNode": {
+      "__id__": 16
+    },
+    "brandName": {
+      "__id__": 2
+    },
     "_id": ""
   },
   {

@@ -1,79 +1,93 @@
-import { _decorator, Component, Node } from "cc";
-import Observer  from "observer";
-import { type ResultData, ResultStore } from "../../features/result/result-store";
-import { type CurrentEventData, CurrentEventStore } from "../../features/current-event/current-event-store";
+import { _decorator, CCInteger, Component, Node } from "cc";
+import Observer from "observer";
+import {
+  type CurrentEventData,
+  CurrentEventStore,
+} from "../../features/current-event/current-event-store";
+import {
+  type ResultData,
+  ResultStore,
+} from "../../features/result/result-store";
 
 const { ccclass, property, menu } = _decorator;
 
 const { render, observer } = Observer;
 
 export enum FullTimeDisplayStatus {
-    Fulltime,
-    Result,
-    Draw
+  Fulltime,
+  Result,
+  Draw,
 }
-
-const TIME_TO_DISPLAY_RESULT = 5;
 
 @ccclass
 @menu("FulltimeManager")
 @observer
 export class FulltimeManager extends Component {
-    private status: FullTimeDisplayStatus = FullTimeDisplayStatus.Fulltime;
+  private status: FullTimeDisplayStatus = FullTimeDisplayStatus.Fulltime;
 
-    @property(Node)
-    fulltime: Node = null;
+  @property(Node)
+  fulltime: Node = null;
 
-    @property(Node)
-    result: Node = null;
-    
-    @property(Node)
-    draw: Node = null;
+  @property(Node)
+  result: Node = null;
 
-    isDraw = false;
+  @property(Node)
+  draw: Node = null;
 
-    currentPhase = 0;
+  @property(CCInteger)
+  timeToDisplayResult = 5;
 
-    @render(CurrentEventStore, (store) => store.data)
-    syncCurrentPhase(data: CurrentEventData) {
-        this.currentPhase = data.phase;
-    }
+  isDraw = false;
 
-    @render(ResultStore, (store) => store.data)
-    syncResult(data: ResultData) {
-        const homeScore = Object.values(data.result).reduce((acc, curr) => acc + curr.homeScore, 0);
-        const awayScore = Object.values(data.result).reduce((acc, curr) => acc + curr.awayScore, 0);
-        this.isDraw = homeScore === awayScore;
-    }
+  currentPhase = 0;
 
+  @render(CurrentEventStore, (store) => store.data)
+  syncCurrentPhase(data: CurrentEventData) {
+    this.currentPhase = data.phase;
+  }
 
-    protected onEnable(): void {
-        this.status = FullTimeDisplayStatus.Fulltime;
-        this.updateUI();
-        this.scheduleOnce(this.displayResult.bind(this), TIME_TO_DISPLAY_RESULT);
-    }
+  @render(ResultStore, (store) => store.data)
+  syncResult(data: ResultData) {
+    const homeScore = Object.values(data.result).reduce(
+      (acc, curr) => acc + curr.homeScore,
+      0
+    );
+    const awayScore = Object.values(data.result).reduce(
+      (acc, curr) => acc + curr.awayScore,
+      0
+    );
+    this.isDraw = homeScore === awayScore;
+  }
 
-    displayResult() {
-        this.status = this.isDraw ? FullTimeDisplayStatus.Draw : FullTimeDisplayStatus.Result;
-        this.updateUI();
-    }
+  protected onEnable(): void {
+    this.status = FullTimeDisplayStatus.Fulltime;
+    this.updateUI();
+    this.scheduleOnce(this.displayResult.bind(this), this.timeToDisplayResult);
+  }
 
-    protected onDisable(): void {
-        this.cleanup();
-    }
+  displayResult() {
+    this.status = this.isDraw
+      ? FullTimeDisplayStatus.Draw
+      : FullTimeDisplayStatus.Result;
+    this.updateUI();
+  }
 
-    protected onDestroy(): void {
-        super.onDestroy();
-        this.cleanup();
-    }
+  protected onDisable(): void {
+    this.cleanup();
+  }
 
-    updateUI() {
-        this.fulltime.active = this.status === FullTimeDisplayStatus.Fulltime;
-        this.result.active = this.status === FullTimeDisplayStatus.Result;
-        this.draw.active = this.status === FullTimeDisplayStatus.Draw;
-    }
+  protected onDestroy(): void {
+    super.onDestroy();
+    this.cleanup();
+  }
 
-    private cleanup() {
-        this.unschedule(this.displayResult);
-    }
+  updateUI() {
+    this.fulltime.active = this.status === FullTimeDisplayStatus.Fulltime;
+    this.result.active = this.status === FullTimeDisplayStatus.Result;
+    this.draw.active = this.status === FullTimeDisplayStatus.Draw;
+  }
+
+  private cleanup() {
+    this.unschedule(this.displayResult);
+  }
 }

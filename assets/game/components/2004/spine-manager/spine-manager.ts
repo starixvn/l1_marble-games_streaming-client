@@ -11,6 +11,7 @@ enum AnimationName {
   PreBetIn = "prebet-in",
   HaftTimeIn = "ingame-in",
   FullTimeIn = "settle-in",
+  DrawIn = "draw",
 }
 
 @ccclass("SpineManager")
@@ -25,17 +26,21 @@ export class SpineManager extends Component {
   @property(sp.Skeleton)
   fullTimeSpine: sp.Skeleton = null;
 
+  @property(sp.Skeleton)
+  drawSpine: sp.Skeleton = null;
+
   @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
   protected async syncStage(stage: FeatureStage) {
     switch (stage) {
       case FeatureStage.Prebet:
-        this.preBetSpine.setAnimation(0, AnimationName.PreBetIn, false);
+        this.preBetSpine?.setAnimation(0, AnimationName.PreBetIn, false);
         break;
       case FeatureStage.PhaseChange:
-        this.haftTimeSpine.setAnimation(0, AnimationName.HaftTimeIn, false);
+        this.haftTimeSpine?.setAnimation(0, AnimationName.HaftTimeIn, false);
         break;
       case FeatureStage.Result:
-        this.fullTimeSpine.setAnimation(0, AnimationName.FullTimeIn, false);
+        this.fullTimeSpine?.setAnimation(0, AnimationName.FullTimeIn, false);
+        this.drawSpine?.setAnimation(0, AnimationName.DrawIn, false);
         break;
     }
   }

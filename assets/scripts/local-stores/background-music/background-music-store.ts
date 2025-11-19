@@ -62,7 +62,6 @@ export class BackgroundMusicStore {
       GameFlowState.Prebet,
       GameFlowState.Result,
       GameFlowState.PhaseChange,
-      GameFlowState.EventDetailChange,
     ].includes(state);
   }
 }
