@@ -1,7 +1,6 @@
 const win = window || {} as any;
 export const languages = {
     "Common": {
-        "halftime": "HALFTIME",
         "1st_half": "1st Half",
         "2nd_half": "2nd Half",
         "clb_ars": "Arsenal",
@@ -25,6 +24,7 @@ export const languages = {
         "clb_rma": "Unreal Madrid",
         "draw": "Draw",
         "fulltime": "FULL TIME",
+        "halftime": "HALFTIME",
         "nt_arg": "Argentina",
         "nt_bra": "Brazil",
         "nt_eng": "England",
