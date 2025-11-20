@@ -110,6 +110,10 @@ export class HLSPreloadedVideoPlayer {
     this._onHlsPlayed = value;
   }
 
+  stopPreload() {
+    this._preloadPlayer.stopLoad();
+  }
+
   preload(url: string) {
     this._preloadPlayer.load(url, { play: true });
   }

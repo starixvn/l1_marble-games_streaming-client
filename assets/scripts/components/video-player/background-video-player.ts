@@ -102,6 +102,7 @@ export class BackgroundVideoPlayer extends Component {
     videoLengthMs: number;
   }) {
     if (videoLink && videoLink !== "") {
+      this.hlsPlayer.stopPreload();
       this.hlsPlayer.load(videoLink);
       this.currentTime = currentTime;
       this.play();

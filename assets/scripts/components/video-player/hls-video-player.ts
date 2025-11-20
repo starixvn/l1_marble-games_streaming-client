@@ -115,6 +115,13 @@ export class HLSVideoPlayer {
     this.playWithRetry(0, 3);
   }
 
+  stopLoad() {
+    if (this.initialized) {
+      this._hls.stopLoad();
+      this._video.pause();
+    }
+  }
+
   pause() {
     if (this.initialized) {
       this._video.pause();
