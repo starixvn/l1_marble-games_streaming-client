@@ -7,44 +7,29 @@ import {
   GameFlowStore,
   GameFlowState,
 } from "../../../../assets/scripts/features/game-flow/game-flow-store";
-import { IntroStore } from "../../../../assets/scripts/features/intro/intro-store";
 
 describe("StageWatcher", () => {
   let watcher: StageWatcher;
   let mockGameFlowStore: GameFlowStore;
-  let mockIntroStore: IntroStore;
 
   beforeEach(() => {
     // Arrange
     mockGameFlowStore = new GameFlowStore();
-    mockIntroStore = new IntroStore();
 
     // Inject mocks
     watcher = new StageWatcher() as any;
     (watcher as any).gameFlowStore = mockGameFlowStore;
-    (watcher as any).introStore = mockIntroStore;
   });
 
   describe("stage", () => {
-    it("returns Intro when intro is playing", () => {
-      // Arrange
-      mockIntroStore.data.isPlaying = true;
-      mockGameFlowStore.data.state = GameFlowState.Streaming;
-
-      // Act
-      const result = watcher.stage;
-
-      // Assert
-      expect(result).toBe(FeatureStage.Intro);
-    });
-
-    it("maps game flow states to feature stages when intro not playing", () => {
-      // Arrange
-      mockIntroStore.data.isPlaying = false;
-
+    it("maps game flow states to feature stages", () => {
       const cases: Array<{ state: GameFlowState; expected: FeatureStage }> = [
         { state: GameFlowState.Prebet, expected: FeatureStage.Prebet },
         { state: GameFlowState.Streaming, expected: FeatureStage.Streaming },
+        {
+          state: GameFlowState.EventDetailChange,
+          expected: FeatureStage.EventDetailChange,
+        },
         {
           state: GameFlowState.PhaseChange,
           expected: FeatureStage.PhaseChange,
@@ -63,20 +48,8 @@ describe("StageWatcher", () => {
   });
 
   describe("isVideoPlaying", () => {
-    it("is true for Intro", () => {
-      // Arrange
-      mockIntroStore.data.isPlaying = true;
-
-      // Act
-      const result = watcher.isVideoPlaying;
-
-      // Assert
-      expect(result).toBe(true);
-    });
-
     it("is true for Streaming", () => {
       // Arrange
-      mockIntroStore.data.isPlaying = false;
       mockGameFlowStore.data.state = GameFlowState.Streaming;
 
       // Act
@@ -87,11 +60,9 @@ describe("StageWatcher", () => {
     });
 
     it("is false for non-video stages", () => {
-      // Arrange
-      mockIntroStore.data.isPlaying = false;
-
       const nonVideoStates: GameFlowState[] = [
         GameFlowState.Prebet,
+        GameFlowState.EventDetailChange,
         GameFlowState.PhaseChange,
         GameFlowState.Result,
         GameFlowState.Unknown,

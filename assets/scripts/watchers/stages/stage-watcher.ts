@@ -3,7 +3,6 @@ import {
   GameFlowState,
   GameFlowStore,
 } from "../../features/game-flow/game-flow-store";
-import { IntroStore } from "../../features/intro/intro-store";
 
 export enum FeatureStage {
   Unknown,
@@ -18,7 +17,6 @@ export enum FeatureStage {
 @injectable()
 export class StageWatcher {
   private _gameFlowStore: GameFlowStore;
-  private _introStore: IntroStore;
 
   @inject(GameFlowStore)
   set gameFlowStore(store: GameFlowStore) {
@@ -27,15 +25,6 @@ export class StageWatcher {
 
   get gameFlowStore(): GameFlowStore {
     return this._gameFlowStore;
-  }
-
-  @inject(IntroStore)
-  set introStore(store: IntroStore) {
-    this._introStore = store;
-  }
-
-  get introStore(): IntroStore {
-    return this._introStore;
   }
 
   private readonly stageMapper = new Map<GameFlowState, FeatureStage>([
@@ -48,10 +37,6 @@ export class StageWatcher {
   ]);
 
   get stage() {
-    if (this.introStore.data.isPlaying) {
-      return FeatureStage.Intro;
-    }
-
     return (
       this.stageMapper.get(this.gameFlowStore.data.state) ??
       FeatureStage.Unknown

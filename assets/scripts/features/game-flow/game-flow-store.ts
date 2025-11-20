@@ -14,6 +14,7 @@ export enum GameFlowState {
 export interface GameFlowData {
   state: GameFlowState;
   durationMs?: number;
+  currentStateTimeMs?: number;
 }
 
 @injectable()

@@ -2,7 +2,6 @@ import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { SoundUtils } from "../../common/utils";
-import { IntroStore } from "../../features/intro/intro-store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
 import { BackgroundStore } from "../../local-stores/background/background-store";
@@ -55,31 +54,6 @@ export class BackgroundVideoPlayer extends Component {
   @render(GameStore, (store) => store.data.gameId)
   setGameId(gameId: string) {
     this._game = gameId;
-  }
-
-  @render(IntroStore, (store) => store.data.resourceServer)
-  setIntroUrl(url: string) {
-    if (!url || url === "") {
-      return;
-    }
-    this._introUrl = `${url}${this._operator}_${this._game}_intro.m3u8`;
-  }
-
-  @render(IntroStore, (store) => ({
-    currentTime: store.data.introTime,
-    status: store.data.isPlaying,
-    timeToPlay: store.data.timeToPlay,
-  }))
-  playIntro({ currentTime, status }: { currentTime: number; status: boolean }) {
-    if (!this._introUrl || this._introUrl === "" || !status) {
-      return;
-    }
-
-    this.hlsPlayer.load(this._introUrl);
-    this.syncCurrentTime();
-    this.currentTime = currentTime;
-
-    this.play();
   }
 
   @render(PreloadVideoStore, (store) => store.data.videoLink)

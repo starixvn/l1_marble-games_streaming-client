@@ -65,6 +65,7 @@ describe("BackgroundVideoPlayer", () => {
       initialized: true,
       load: jest.fn(),
       preload: jest.fn(),
+      stopPreload: jest.fn(),
       play: jest.fn(),
       pause: jest.fn(),
       currentTime: 0,
@@ -146,49 +147,6 @@ describe("BackgroundVideoPlayer", () => {
 
       // Assert
       expect((comp as any)._game).toBe("game-123");
-    });
-  });
-
-  describe("setIntroUrl", () => {
-    it("builds intro url using operator and game", () => {
-      // Arrange
-      (comp as any)._operator = "op";
-      (comp as any)._game = "gm";
-
-      // Act
-      (comp as any).setIntroUrl("http://host/");
-
-      // Assert
-      expect((comp as any)._introUrl).toBe("http://host/op_gm_intro.m3u8");
-    });
-  });
-
-  describe("playIntro", () => {
-    it("loads and plays when status true and url set", () => {
-      // Arrange
-      (comp as any)._introUrl = "http://u";
-      const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
-      const playSpy = jest.spyOn(comp, "play");
-
-      // Act
-      (comp as any).playIntro({ currentTime: 10, status: true, timeToPlay: 0 });
-
-      // Assert
-      expect(hls.load).toHaveBeenCalledWith("http://u");
-      expect(playSpy).toHaveBeenCalled();
-      expect(syncSpy).toHaveBeenCalled();
-      expect(comp.currentTime).toBe(10);
-    });
-
-    it("returns early when url is empty", () => {
-      // Arrange
-      (comp as any)._introUrl = "";
-
-      // Act
-      (comp as any).playIntro({ currentTime: 1, status: true, timeToPlay: 0 });
-
-      // Assert
-      expect(hls.load).not.toHaveBeenCalled();
     });
   });
 
@@ -286,6 +244,7 @@ describe("BackgroundVideoPlayer", () => {
       (comp as any).playVideo({ videoLink: "v", currentTime: 33 });
 
       // Assert
+      expect(hls.stopPreload).toHaveBeenCalled();
       expect(hls.load).toHaveBeenCalledWith("v");
       expect(playSpy).toHaveBeenCalled();
       expect(syncSpy).toHaveBeenCalled();
@@ -301,6 +260,7 @@ describe("BackgroundVideoPlayer", () => {
       (comp as any).playVideo({ videoLink: "", currentTime: 33 });
 
       // Assert
+      expect(hls.stopPreload).not.toHaveBeenCalled();
       expect(hls.load).not.toHaveBeenCalled();
       expect(playSpy).not.toHaveBeenCalled();
       expect(syncSpy).not.toHaveBeenCalled();
@@ -316,6 +276,7 @@ describe("BackgroundVideoPlayer", () => {
       (comp as any).playVideo({ videoLink: null, currentTime: 33 });
 
       // Assert
+      expect(hls.stopPreload).not.toHaveBeenCalled();
       expect(hls.load).not.toHaveBeenCalled();
       expect(playSpy).not.toHaveBeenCalled();
       expect(syncSpy).not.toHaveBeenCalled();
