@@ -30,7 +30,7 @@ export class BackgroundVideoPlayer extends Component {
     return !!this.hlsPlayer?.initialized;
   }
 
-  private _introUrl = "";
+  private readonly _introUrl = "";
   private _operator = "";
   private _game = "";
 

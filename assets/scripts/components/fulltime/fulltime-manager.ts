@@ -137,6 +137,9 @@ export class FulltimeManager extends Component {
         return this.result;
       case FullTimeDisplayStatus.Draw:
         return this.draw;
+
+      default:
+        return null;
     }
   }
 }
