@@ -28,7 +28,7 @@ enum SoundName {
 @ccclass("BackgroundVideoPlayer")
 @observer
 export class BackgroundVideoPlayer extends Component {
-  private currentTime = 0;
+  public currentTime = 0;
   private hlsPlayer: HLSPreloadedVideoPlayer = null;
   private introData: IntroData = {
     prebet: "",

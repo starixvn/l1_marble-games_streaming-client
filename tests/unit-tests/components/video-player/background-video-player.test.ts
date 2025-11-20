@@ -128,25 +128,19 @@ describe("BackgroundVideoPlayer", () => {
     });
   });
 
-  describe("setStoreInfo", () => {
-    it("stores operator", () => {
+  describe("setIntroData", () => {
+    it("stores intro data", () => {
       // Arrange
+      const introData = {
+        prebet: "https://example.com/prebet.m3u8",
+        halftime: "https://example.com/halftime.m3u8",
+      };
+
       // Act
-      comp.setStoreInfo({ operator: "op" });
+      (comp as any).setIntroData(introData);
 
       // Assert
-      expect((comp as any)._operator).toBe("op");
-    });
-  });
-
-  describe("setGameId", () => {
-    it("stores game id from GameStore", () => {
-      // Arrange
-      // Act
-      (comp as any).setGameId("game-123");
-
-      // Assert
-      expect((comp as any)._game).toBe("game-123");
+      expect((comp as any).introData).toEqual(introData);
     });
   });
 
@@ -185,6 +179,162 @@ describe("BackgroundVideoPlayer", () => {
 
       // Assert
       expect(hls.preload).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("preloadAndPlayIntro", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("preloads and plays prebet intro when state is Prebet", () => {
+      // Arrange
+      (comp as any).introData = {
+        prebet: "https://example.com/prebet.m3u8",
+        halftime: "",
+      };
+      const showSpy = jest.spyOn(comp as any, "showBackground");
+      const playIntroSpy = jest.spyOn(comp as any, "playIntro");
+
+      // Act
+      (comp as any).preloadAndPlayIntro({
+        state: "Prebet",
+        currentStateTimeMs: 5000,
+      });
+
+      // Assert - preload called immediately
+      expect(hls.preload).toHaveBeenCalledWith(
+        "https://example.com/prebet.m3u8"
+      );
+
+      // Fast-forward timers
+      jest.runAllTimers();
+
+      // Assert - playIntro called after timeout
+      expect(showSpy).toHaveBeenCalledWith(false);
+      expect(playIntroSpy).toHaveBeenCalledWith({
+        videoLink: "https://example.com/prebet.m3u8",
+        currentTime: 2000, // 5000 - 3000
+      });
+    });
+
+    it("preloads and plays halftime intro when state is PhaseChange", () => {
+      // Arrange
+      (comp as any).introData = {
+        prebet: "",
+        halftime: "https://example.com/halftime.m3u8",
+      };
+      const showSpy = jest.spyOn(comp as any, "showBackground");
+      const playIntroSpy = jest.spyOn(comp as any, "playIntro");
+
+      // Act
+      (comp as any).preloadAndPlayIntro({
+        state: "PhaseChange",
+        currentStateTimeMs: 4000,
+      });
+
+      // Assert - preload called immediately
+      expect(hls.preload).toHaveBeenCalledWith(
+        "https://example.com/halftime.m3u8"
+      );
+
+      // Fast-forward timers
+      jest.runAllTimers();
+
+      // Assert - playIntro called after timeout
+      expect(showSpy).toHaveBeenCalledWith(false);
+      expect(playIntroSpy).toHaveBeenCalledWith({
+        videoLink: "https://example.com/halftime.m3u8",
+        currentTime: 1000, // 4000 - 3000
+      });
+    });
+
+    it("does not preload when prebet intro URL is empty", () => {
+      // Arrange
+      (comp as any).introData = {
+        prebet: "",
+        halftime: "",
+      };
+
+      // Act
+      (comp as any).preloadAndPlayIntro({
+        state: "Prebet",
+        currentStateTimeMs: 5000,
+      });
+
+      // Assert
+      expect(hls.preload).not.toHaveBeenCalled();
+    });
+
+    it("does not preload when halftime intro URL is empty", () => {
+      // Arrange
+      (comp as any).introData = {
+        prebet: "",
+        halftime: "",
+      };
+
+      // Act
+      (comp as any).preloadAndPlayIntro({
+        state: "PhaseChange",
+        currentStateTimeMs: 5000,
+      });
+
+      // Assert
+      expect(hls.preload).not.toHaveBeenCalled();
+    });
+
+    it("waits before playing intro when currentStateTimeMs is less than delayShowIntro", () => {
+      // Arrange
+      (comp as any).introData = {
+        prebet: "https://example.com/prebet.m3u8",
+        halftime: "",
+      };
+      const playIntroSpy = jest.spyOn(comp as any, "playIntro");
+
+      // Act - currentStateTimeMs (1000) < delayShowIntro (3000)
+      (comp as any).preloadAndPlayIntro({
+        state: "Prebet",
+        currentStateTimeMs: 1000,
+      });
+
+      // Assert - preload called immediately
+      expect(hls.preload).toHaveBeenCalledWith(
+        "https://example.com/prebet.m3u8"
+      );
+
+      // Fast-forward timers by waiting time (2000ms)
+      jest.advanceTimersByTime(2000);
+
+      // Assert - playIntro called with adjusted time
+      expect(playIntroSpy).toHaveBeenCalledWith({
+        videoLink: "https://example.com/prebet.m3u8",
+        currentTime: 0, // (1000 - 3000) + 2000 = 0
+      });
+    });
+  });
+
+  describe("playIntro", () => {
+    it("stops preload, loads video, and plays", () => {
+      // Arrange
+      const playSpy = jest.spyOn(comp, "play");
+      const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
+
+      // Act
+      (comp as any).playIntro({
+        videoLink: "https://example.com/intro.m3u8",
+        currentTime: 5,
+      });
+
+      // Assert
+      expect(hls.stopPreload).toHaveBeenCalled();
+      expect(hls.load).toHaveBeenCalledWith("https://example.com/intro.m3u8");
+      expect(comp.currentTime).toBe(5);
+      expect(playSpy).toHaveBeenCalled();
+      expect(syncSpy).toHaveBeenCalled();
     });
   });
 
@@ -544,7 +694,6 @@ describe("BackgroundVideoPlayer", () => {
         init: jest.fn(),
         addEventListener: jest.fn(),
         onPlayStateChanged: undefined as any,
-        preload: jest.fn(),
       };
       jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
       const ctorSpy = jest
@@ -554,7 +703,6 @@ describe("BackgroundVideoPlayer", () => {
         )
         .mockImplementation(() => initInstance as any);
       const showSpy = jest.spyOn(comp as any, "showBackground");
-      (comp as any)._introUrl = "intro.m3u8";
 
       // Act
       (comp as any)["initialize"]();
@@ -567,18 +715,16 @@ describe("BackgroundVideoPlayer", () => {
       );
       // invoke play state changed
       initInstance.onPlayStateChanged(true);
-      expect(showSpy).toHaveBeenCalled();
-      expect(initInstance.preload).toHaveBeenCalledWith("intro.m3u8");
+      expect(showSpy).toHaveBeenCalledWith(false); // showBackground(!play) = showBackground(false)
       ctorSpy.mockRestore();
     });
 
-    it("onPlayStateChanged does not preload when play is false", () => {
+    it("onPlayStateChanged shows background when play is false", () => {
       // Arrange
       const initInstance = {
         init: jest.fn(),
         addEventListener: jest.fn(),
         onPlayStateChanged: undefined as any,
-        preload: jest.fn(),
       };
       jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
       const ctorSpy = jest
@@ -588,7 +734,6 @@ describe("BackgroundVideoPlayer", () => {
         )
         .mockImplementation(() => initInstance as any);
       const showSpy = jest.spyOn(comp as any, "showBackground");
-      (comp as any)._introUrl = "intro.m3u8";
 
       // Act
       (comp as any)["initialize"]();
@@ -596,63 +741,6 @@ describe("BackgroundVideoPlayer", () => {
 
       // Assert
       expect(showSpy).toHaveBeenCalledWith(true); // showBackground(!play) = showBackground(true)
-      expect(initInstance.preload).not.toHaveBeenCalled();
-      ctorSpy.mockRestore();
-    });
-
-    it("onPlayStateChanged does not preload when _introUrl is empty", () => {
-      // Arrange
-      const initInstance = {
-        init: jest.fn(),
-        addEventListener: jest.fn(),
-        onPlayStateChanged: undefined as any,
-        preload: jest.fn(),
-      };
-      jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
-      const ctorSpy = jest
-        .spyOn(
-          require("../../../../assets/scripts/components/video-player/preloaded-hls-player"),
-          "HLSPreloadedVideoPlayer"
-        )
-        .mockImplementation(() => initInstance as any);
-      const showSpy = jest.spyOn(comp as any, "showBackground");
-      (comp as any)._introUrl = ""; // Empty intro URL
-
-      // Act
-      (comp as any)["initialize"]();
-      initInstance.onPlayStateChanged(true);
-
-      // Assert
-      expect(showSpy).toHaveBeenCalledWith(false); // showBackground(!play) = showBackground(false)
-      expect(initInstance.preload).not.toHaveBeenCalled();
-      ctorSpy.mockRestore();
-    });
-
-    it("onPlayStateChanged does not preload when _introUrl is null", () => {
-      // Arrange
-      const initInstance = {
-        init: jest.fn(),
-        addEventListener: jest.fn(),
-        onPlayStateChanged: undefined as any,
-        preload: jest.fn(),
-      };
-      jest.spyOn<any, any>(comp as any, "initialize").mockRestore();
-      const ctorSpy = jest
-        .spyOn(
-          require("../../../../assets/scripts/components/video-player/preloaded-hls-player"),
-          "HLSPreloadedVideoPlayer"
-        )
-        .mockImplementation(() => initInstance as any);
-      const showSpy = jest.spyOn(comp as any, "showBackground");
-      (comp as any)._introUrl = null; // Null intro URL
-
-      // Act
-      (comp as any)["initialize"]();
-      initInstance.onPlayStateChanged(true);
-
-      // Assert
-      expect(showSpy).toHaveBeenCalledWith(false); // showBackground(!play) = showBackground(false)
-      expect(initInstance.preload).not.toHaveBeenCalled();
       ctorSpy.mockRestore();
     });
   });
