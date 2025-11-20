@@ -1,9 +1,15 @@
 import { _decorator, CCInteger, Component, Node } from "cc";
 import Observer from "observer";
+import { AnimationUtils } from "../../common/utils";
 import {
   type CurrentEventData,
   CurrentEventStore,
 } from "../../features/current-event/current-event-store";
+import {
+  type GameFlowData,
+  GameFlowState,
+  GameFlowStore,
+} from "../../features/game-flow/game-flow-store";
 import {
   type ResultData,
   ResultStore,
@@ -38,12 +44,27 @@ export class FulltimeManager extends Component {
   timeToDisplayResult = 5;
 
   isDraw = false;
-
-  currentPhase = 0;
+  protected currentPhase = 0;
+  protected durationAppear = 0.5;
 
   @render(CurrentEventStore, (store) => store.data)
   syncCurrentPhase(data: CurrentEventData) {
     this.currentPhase = data.phase;
+  }
+
+  @render(GameFlowStore, (store) => store.data)
+  protected syncStage(data: GameFlowData | null | undefined) {
+    if (!data) {
+      return;
+    }
+
+    if (
+      data.state === GameFlowState.Result &&
+      data.durationMs != null &&
+      data.durationMs > 0
+    ) {
+      this.scheduleAutoHideActiveNode(data.durationMs / 1000);
+    }
   }
 
   @render(ResultStore, (store) => store.data)
@@ -82,12 +103,40 @@ export class FulltimeManager extends Component {
   }
 
   updateUI() {
-    this.fulltime.active = this.status === FullTimeDisplayStatus.Fulltime;
-    this.result.active = this.status === FullTimeDisplayStatus.Result;
-    this.draw.active = this.status === FullTimeDisplayStatus.Draw;
+    const statusNodePairs: Array<[FullTimeDisplayStatus, Node]> = [
+      [FullTimeDisplayStatus.Fulltime, this.fulltime],
+      [FullTimeDisplayStatus.Result, this.result],
+      [FullTimeDisplayStatus.Draw, this.draw],
+    ];
+
+    for (const [status, node] of statusNodePairs) {
+      const isActive = status === this.status;
+      if (isActive) {
+        AnimationUtils.fadeInAndActivate(node, this.durationAppear);
+      } else {
+        AnimationUtils.fadeOutAndDeactivate(node, 0);
+      }
+    }
   }
 
   private cleanup() {
     this.unschedule(this.displayResult);
+  }
+
+  protected scheduleAutoHideActiveNode(duration: number) {
+    this.scheduleOnce(() => {
+      AnimationUtils.fadeOutAndDeactivate(this.getNodeActive(), 1);
+    }, duration - 1);
+  }
+
+  protected getNodeActive() {
+    switch (this.status) {
+      case FullTimeDisplayStatus.Fulltime:
+        return this.fulltime;
+      case FullTimeDisplayStatus.Result:
+        return this.result;
+      case FullTimeDisplayStatus.Draw:
+        return this.draw;
+    }
   }
 }
