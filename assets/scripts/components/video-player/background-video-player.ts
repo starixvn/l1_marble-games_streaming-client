@@ -5,14 +5,18 @@ import { SoundUtils } from "../../common/utils";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
 import { BackgroundStore } from "../../local-stores/background/background-store";
-import { GameStore } from "../../local-stores/game/game-store";
 import { SfxStore } from "../../local-stores/sfx/sfx-store";
-import { Store } from "../../store";
 import {
   FeatureStage,
   StageWatcher,
 } from "../../watchers/stages/stage-watcher";
 import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
+import { type IntroData, IntroStore } from "../../features/intro/intro-store";
+import {
+  type GameFlowData,
+  GameFlowState,
+  GameFlowStore,
+} from "../../features/game-flow/game-flow-store";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
@@ -24,15 +28,17 @@ enum SoundName {
 @ccclass("BackgroundVideoPlayer")
 @observer
 export class BackgroundVideoPlayer extends Component {
+  private currentTime = 0;
   private hlsPlayer: HLSPreloadedVideoPlayer = null;
+  private introData: IntroData = {
+    prebet: "",
+    halftime: "",
+  };
+  private delayShowIntro = 3000;
 
   private get initialized() {
     return !!this.hlsPlayer?.initialized;
   }
-
-  private readonly _introUrl = "";
-  private _operator = "";
-  private _game = "";
 
   @render(StageWatcher, (watcher) => watcher.stage)
   syncPlayVideo(stage: FeatureStage) {
@@ -42,18 +48,63 @@ export class BackgroundVideoPlayer extends Component {
     }
   }
 
-  currentTime = 0;
+  @render(GameFlowStore, (store) => store.data)
+  preloadAndPlayIntro(gameFlowData: GameFlowData) {
+    const state = gameFlowData.state;
+    const currentIntroTimeMs =
+      gameFlowData.currentStateTimeMs - this.delayShowIntro;
 
-  @render(Store, (store) => ({
-    operator: store.operator,
-  }))
-  setStoreInfo({ operator }: { operator: string }) {
-    this._operator = operator;
+    const waitingTimeToPlayIntro =
+      currentIntroTimeMs < 0 ? Math.abs(currentIntroTimeMs) : 0;
+
+    if (
+      state === GameFlowState.Prebet &&
+      this.introData.prebet &&
+      this.introData.prebet !== ""
+    ) {
+      this.hlsPlayer.preload(this.introData.prebet);
+
+      setTimeout(() => {
+        this.showBackground(false);
+        this.playIntro({
+          videoLink: this.introData.prebet,
+          currentTime: currentIntroTimeMs + waitingTimeToPlayIntro,
+        });
+      }, waitingTimeToPlayIntro);
+
+      return;
+    }
+
+    if (
+      state === GameFlowState.PhaseChange &&
+      this.introData.halftime &&
+      this.introData.halftime !== ""
+    ) {
+      this.hlsPlayer.preload(this.introData.halftime);
+      setTimeout(() => {
+        this.showBackground(false);
+        this.playIntro({
+          videoLink: this.introData.halftime,
+          currentTime: currentIntroTimeMs + waitingTimeToPlayIntro,
+        });
+      }, waitingTimeToPlayIntro);
+      return;
+    }
   }
 
-  @render(GameStore, (store) => store.data.gameId)
-  setGameId(gameId: string) {
-    this._game = gameId;
+  playIntro({
+    videoLink,
+    currentTime,
+  }: {
+    videoLink: string;
+    currentTime: number;
+  }) {
+    console.log("playIntro", videoLink, currentTime);
+    this.hlsPlayer.stopPreload();
+    this.hlsPlayer.load(videoLink);
+    this.currentTime = currentTime;
+    this.play();
+    this.syncCurrentTime();
   }
 
   @render(PreloadVideoStore, (store) => store.data.videoLink)
@@ -61,6 +112,11 @@ export class BackgroundVideoPlayer extends Component {
     if (videoLink) {
       this.hlsPlayer.preload(videoLink);
     }
+  }
+
+  @render(IntroStore, (store) => store.data)
+  setIntroData(introData: IntroData) {
+    this.introData = introData;
   }
 
   @render(VideoStreamingStore, (store) => ({
@@ -151,10 +207,6 @@ export class BackgroundVideoPlayer extends Component {
 
     this.hlsPlayer.onPlayStateChanged = (play: boolean) => {
       this.showBackground(!play);
-      if (play && this._introUrl && this._introUrl !== "") {
-        this.showBackground(false);
-        this.hlsPlayer.preload(this._introUrl);
-      }
     };
 
     this.hlsPlayer.addEventListener(
@@ -168,8 +220,8 @@ export class BackgroundVideoPlayer extends Component {
   }
 
   @handle(BackgroundStore, (store, data: boolean) => store.showBackground(data))
-  showBackground(play: boolean) {
-    return play;
+  showBackground(isShown: boolean) {
+    return isShown;
   }
 
   @handle(SfxStore, (store, sfx: string) => store.playSfx(sfx))
