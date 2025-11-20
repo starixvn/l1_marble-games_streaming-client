@@ -2,6 +2,12 @@ import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { SoundUtils } from "../../common/utils";
+import {
+  type GameFlowData,
+  GameFlowState,
+  GameFlowStore,
+} from "../../features/game-flow/game-flow-store";
+import { type IntroData, IntroStore } from "../../features/intro/intro-store";
 import { PreloadVideoStore } from "../../features/preload-video/preload-video-store";
 import { VideoStreamingStore } from "../../features/video-streaming/video-streaming-store";
 import { BackgroundStore } from "../../local-stores/background/background-store";
@@ -11,12 +17,6 @@ import {
   StageWatcher,
 } from "../../watchers/stages/stage-watcher";
 import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
-import { type IntroData, IntroStore } from "../../features/intro/intro-store";
-import {
-  type GameFlowData,
-  GameFlowState,
-  GameFlowStore,
-} from "../../features/game-flow/game-flow-store";
 
 const { ccclass } = _decorator;
 const { observer, render, handle } = Observer;
@@ -34,7 +34,7 @@ export class BackgroundVideoPlayer extends Component {
     prebet: "",
     halftime: "",
   };
-  private delayShowIntro = 3000;
+  private readonly delayShowIntro = 3000;
 
   private get initialized() {
     return !!this.hlsPlayer?.initialized;
@@ -88,7 +88,6 @@ export class BackgroundVideoPlayer extends Component {
           currentTime: currentIntroTimeMs + waitingTimeToPlayIntro,
         });
       }, waitingTimeToPlayIntro);
-      return;
     }
   }
 
