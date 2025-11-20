@@ -75,38 +75,68 @@ describe("CommentatorVoice", () => {
     jest.clearAllMocks();
   });
 
-  describe("syncLanguageAndOperator", () => {
-    it("updates languagePath with provided language", () => {
+  describe("syncLanguageSupport", () => {
+    beforeEach(() => {
+      // Reset to default state
+      (comp as any).languagePath = "en-US/";
+    });
+
+    it("updates languagePath with supported language en-US", () => {
+      // Arrange
+      const language = "en-US";
+
+      // Act
+      comp.syncLanguageSupport(language);
+
+      // Assert
+      expect((comp as any).languagePath).toBe("en-US/");
+    });
+
+    it("updates languagePath with supported language vi-VN", () => {
+      // Arrange
+      const language = "vi-VN";
+
+      // Act
+      comp.syncLanguageSupport(language);
+
+      // Assert
+      expect((comp as any).languagePath).toBe("vi-VN/");
+    });
+
+    it("does not update languagePath when language is not supported", () => {
       // Arrange
       const language = "fr-FR";
+      const initialPath = (comp as any).languagePath;
 
       // Act
-      comp.syncLanguageAndOperator(language);
+      comp.syncLanguageSupport(language);
 
       // Assert
-      expect((comp as any).languagePath).toBe("fr-FR/");
+      expect((comp as any).languagePath).toBe(initialPath);
     });
 
-    it("handles empty language", () => {
+    it("does not update languagePath when language is empty string", () => {
       // Arrange
       const language = "";
+      const initialPath = (comp as any).languagePath;
 
       // Act
-      comp.syncLanguageAndOperator(language);
+      comp.syncLanguageSupport(language);
 
       // Assert
-      expect((comp as any).languagePath).toBe("/");
+      expect((comp as any).languagePath).toBe(initialPath);
     });
 
-    it("handles special characters in language", () => {
+    it("does not update languagePath when language is not in languagesSupport", () => {
       // Arrange
       const language = "zh-CN";
+      const initialPath = (comp as any).languagePath;
 
       // Act
-      comp.syncLanguageAndOperator(language);
+      comp.syncLanguageSupport(language);
 
       // Assert
-      expect((comp as any).languagePath).toBe("zh-CN/");
+      expect((comp as any).languagePath).toBe(initialPath);
     });
   });
 
@@ -179,8 +209,8 @@ describe("CommentatorVoice", () => {
     it("uses updated languagePath in full path", () => {
       // Arrange
       const fileName = "goal_scored";
-      comp.syncLanguageAndOperator("es-ES");
-      const expectedPath = "audios/commentator-voices/es-ES/goal/goal_scored";
+      comp.syncLanguageSupport("vi-VN");
+      const expectedPath = "audios/commentator-voices/vi-VN/goal/goal_scored";
 
       // Act
       comp.syncPlayingVoice({ fileName });

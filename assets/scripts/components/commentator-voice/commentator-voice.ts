@@ -1,20 +1,36 @@
-import { _decorator, Component } from "cc";
+import { _decorator, Component, Enum } from "cc";
 import Observer from "observer";
 import { CommentatorVoiceStore } from "../../features/commentator-voice/commentator-voice-store";
 import { SfxStore } from "../../local-stores/sfx/sfx-store";
 import { Store } from "../../store";
 
-const { ccclass } = _decorator;
+const { ccclass, property } = _decorator;
 const { observer, render, handle } = Observer;
+
+enum SupportedLanguage {
+  EN_US = "en-US",
+  VI_VN = "vi-VN",
+}
+
+Enum(SupportedLanguage);
 
 @ccclass("CommentatorVoice")
 @observer
 export class CommentatorVoice extends Component {
+  @property({ type: [Enum(SupportedLanguage)] })
+  languagesSupport: SupportedLanguage[] = [
+    SupportedLanguage.EN_US,
+    SupportedLanguage.VI_VN,
+  ];
+
   private readonly basePath = "audios/commentator-voices/";
   private languagePath = "en-US/";
 
   @render(Store, (store) => store.language)
-  syncLanguageAndOperator(language: string) {
+  syncLanguageSupport(language: string) {
+    if (!this.languagesSupport.includes(language as SupportedLanguage)) {
+      return;
+    }
     this.languagePath = `${language}/`;
   }
 
