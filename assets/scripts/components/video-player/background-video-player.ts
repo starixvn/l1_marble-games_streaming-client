@@ -1,7 +1,7 @@
 import { _decorator, Component } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
-import { SoundUtils } from "../../common/utils";
+import { FunctionUtils, SoundUtils } from "../../common/utils";
 import {
   type GameFlowData,
   GameFlowState,
@@ -23,6 +23,11 @@ const { observer, render, handle } = Observer;
 
 enum SoundName {
   WHISTLE_START = "whistle_start",
+}
+
+export enum BackgroundVideoPlayerEvent {
+  VIDEO_ENDED = "videoEnded",
+  SYNC_NATIVE_CURRENT_TIME = "syncNativeCurrentTime",
 }
 
 @ccclass("BackgroundVideoPlayer")
@@ -51,44 +56,72 @@ export class BackgroundVideoPlayer extends Component {
   @render(GameFlowStore, (store) => store.data)
   preloadAndPlayIntro(gameFlowData: GameFlowData) {
     const state = gameFlowData.state;
-    const currentIntroTimeMs =
-      gameFlowData.currentStateTimeMs - this.delayShowIntro;
-
-    const waitingTimeToPlayIntro =
-      currentIntroTimeMs < 0 ? Math.abs(currentIntroTimeMs) : 0;
-
-    if (
-      state === GameFlowState.Prebet &&
-      this.introData.prebet &&
-      this.introData.prebet !== ""
-    ) {
-      this.hlsPlayer.preload(this.introData.prebet);
-
-      setTimeout(() => {
-        this.showBackground(false);
-        this.playIntro({
-          videoLink: this.introData.prebet,
-          currentTime: currentIntroTimeMs + waitingTimeToPlayIntro,
-        });
-      }, waitingTimeToPlayIntro);
-
+    if (!this.isValidIntroState(state)) {
+      console.log("preloadAndPlayIntro-------return-----", state);
       return;
     }
 
-    if (
-      state === GameFlowState.PhaseChange &&
-      this.introData.halftime &&
-      this.introData.halftime !== ""
-    ) {
-      this.hlsPlayer.preload(this.introData.halftime);
-      setTimeout(() => {
-        this.showBackground(false);
-        this.playIntro({
-          videoLink: this.introData.halftime,
-          currentTime: currentIntroTimeMs + waitingTimeToPlayIntro,
-        });
-      }, waitingTimeToPlayIntro);
+    const videoLink = this.getIntroVideoLink(state);
+    if (!this.isValidVideoLink(videoLink)) {
+      return;
     }
+
+    const currentStateTimeMs = gameFlowData?.currentStateTimeMs ?? 0;
+    const waitingTimeToPlayIntro =
+      FunctionUtils.calculateWaitingTimeMilliseconds(
+        currentStateTimeMs,
+        this.delayShowIntro
+      );
+
+    console.log("preloadAndPlayIntro-------", state, waitingTimeToPlayIntro);
+
+    this.handleIntroPlayback(
+      videoLink,
+      currentStateTimeMs,
+      waitingTimeToPlayIntro
+    );
+  }
+
+  private isValidIntroState(state: GameFlowState | undefined): boolean {
+    return (
+      state === GameFlowState.PhaseChange || state === GameFlowState.Prebet
+    );
+  }
+
+  private getIntroVideoLink(state: GameFlowState): string {
+    if (state === GameFlowState.Prebet) {
+      return this.introData.prebet ?? "";
+    }
+    if (state === GameFlowState.PhaseChange) {
+      return this.introData.halftime ?? "";
+    }
+
+    return "";
+  }
+
+  private isValidVideoLink(videoLink: string): boolean {
+    return videoLink && videoLink !== "";
+  }
+
+  private handleIntroPlayback(
+    videoLink: string,
+    currentStateTimeMs: number,
+    waitingTimeToPlayIntro: number
+  ): void {
+    this.hlsPlayer.preload(videoLink);
+
+    this.scheduleOnce(() => {
+      console.log(
+        "playIntro-------",
+        videoLink,
+        currentStateTimeMs + waitingTimeToPlayIntro
+      );
+      this.showBackground(false);
+      this.playIntro({
+        videoLink,
+        currentTime: currentStateTimeMs + waitingTimeToPlayIntro,
+      });
+    }, waitingTimeToPlayIntro / 1000);
   }
 
   playIntro({
@@ -101,7 +134,7 @@ export class BackgroundVideoPlayer extends Component {
     console.log("playIntro", videoLink, currentTime);
     this.hlsPlayer.stopPreload();
     this.hlsPlayer.load(videoLink);
-    this.currentTime = currentTime;
+    this.currentTime = currentTime / 1000;
     this.play();
     this.syncCurrentTime();
   }
@@ -174,6 +207,7 @@ export class BackgroundVideoPlayer extends Component {
 
   protected onDestroy(): void {
     this.stop();
+    this.unscheduleAllCallbacks;
   }
 
   stop() {
@@ -183,13 +217,18 @@ export class BackgroundVideoPlayer extends Component {
         this.syncCurrentTime.bind(this)
       );
 
+      this.hlsPlayer.removeEventListener("ended", this.onVideoEnded.bind(this));
+
       this.hlsPlayer.off(Hls.Events.ERROR);
       this.hlsPlayer.destroy();
     }
   }
 
   private syncCurrentTime() {
-    this.node.emit("syncNativeCurrentTime", this.hlsPlayer.currentTime);
+    this.node.emit(
+      BackgroundVideoPlayerEvent.SYNC_NATIVE_CURRENT_TIME,
+      this.hlsPlayer.currentTime
+    );
 
     const needSync =
       this.currentTime >= 0 &&
@@ -198,6 +237,10 @@ export class BackgroundVideoPlayer extends Component {
     if (this.initialized && needSync) {
       this.hlsPlayer.currentTime = this.currentTime;
     }
+  }
+
+  private onVideoEnded() {
+    this.node.emit(BackgroundVideoPlayerEvent.VIDEO_ENDED);
   }
 
   private initialize() {
@@ -212,6 +255,8 @@ export class BackgroundVideoPlayer extends Component {
       "timeupdate",
       this.syncCurrentTime.bind(this)
     );
+
+    this.hlsPlayer.addEventListener("ended", this.onVideoEnded.bind(this));
 
     Object.values(Hls.Events).forEach((event) => {
       this.hlsPlayer.addEventListener(event, this.node.emit.bind(this.node));

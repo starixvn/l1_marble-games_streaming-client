@@ -11,4 +11,15 @@ export namespace FunctionUtils {
 
     return `${operator}.${key}`;
   }
+
+  export function calculateWaitingTimeMilliseconds(
+    currentStateTimeMilliseconds: number,
+    delayMilliseconds: number
+  ): number {
+    const currentIntroTimeMilliseconds =
+      currentStateTimeMilliseconds - delayMilliseconds;
+    return currentIntroTimeMilliseconds < 0
+      ? Math.abs(currentIntroTimeMilliseconds)
+      : 0;
+  }
 }
