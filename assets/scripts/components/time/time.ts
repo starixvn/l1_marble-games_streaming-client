@@ -100,7 +100,6 @@ export class Time extends Component {
 
     if (data.final) {
       this.scheduleOnce(() => {
-        this._streamingPhaseTime += delayDuration;
         this.paused = false;
         AnimationUtils.fadeIn(this.node, fadeInDuration);
       }, delayDuration);
