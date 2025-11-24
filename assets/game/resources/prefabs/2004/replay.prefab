@@ -135,7 +135,7 @@
       "__id__": 2
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 4
@@ -309,7 +309,7 @@
         "__id__": 66
       }
     ],
-    "_active": false,
+    "_active": true,
     "_components": [
       {
         "__id__": 78
@@ -552,7 +552,7 @@
       "__expectedType__": "sp.SkeletonData"
     },
     "defaultSkin": "default",
-    "defaultAnimation": "<None>",
+    "defaultAnimation": "aftergoal-in",
     "_premultipliedAlpha": true,
     "_timeScale": 1,
     "_preCacheMode": 0,

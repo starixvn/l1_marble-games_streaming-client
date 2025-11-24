@@ -12,11 +12,15 @@ enum AnimationName {
   HaftTimeIn = "ingame-in",
   FullTimeIn = "settle-in",
   DrawIn = "draw",
+  AfterGoalIn = "aftergoal-in",
 }
 
 @ccclass("SpineManager")
 @observer
 export class SpineManager extends Component {
+  @property(sp.Skeleton)
+  afterGoalSpine: sp.Skeleton = null;
+
   @property(sp.Skeleton)
   fullTimeSpine: sp.Skeleton = null;
 
@@ -25,11 +29,16 @@ export class SpineManager extends Component {
 
   @render(StageWatcher, (stageWatcher) => stageWatcher.stage)
   protected async syncStage(stage: FeatureStage) {
-    if (!FeatureStage.Result) {
-      return;
+    switch (stage) {
+      case FeatureStage.EventDetailChange:
+        this.afterGoalSpine?.setAnimation(0, AnimationName.AfterGoalIn, false);
+        break;
+      case FeatureStage.Result:
+        this.fullTimeSpine?.setAnimation(0, AnimationName.FullTimeIn, false);
+        this.drawSpine?.setAnimation(0, AnimationName.DrawIn, false);
+        break;
+      default:
+        break;
     }
-
-    this.fullTimeSpine?.setAnimation(0, AnimationName.FullTimeIn, false);
-    this.drawSpine?.setAnimation(0, AnimationName.DrawIn, false);
   }
 }
