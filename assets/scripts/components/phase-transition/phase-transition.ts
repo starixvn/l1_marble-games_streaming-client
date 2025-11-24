@@ -1,4 +1,4 @@
-import { _decorator, CCInteger, Component, Enum, find, Node } from "cc";
+import { _decorator, CCInteger, Component, Enum, find, log, Node } from "cc";
 import {
   AnimationUtils,
   FunctionUtils,
@@ -31,12 +31,16 @@ export class PhaseTransition extends Component {
   @property(CCInteger)
   durationMillisecondsAnimation = 3000;
 
-  protected readonly durationAnimation = 0.2;
+  @property(CCInteger)
+  durationVideoMs = 24000;
+
+  protected readonly durationAnimation = 0.3;
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected currentState = GameFlowState.Unknown;
-  protected durationStateTimeMs = 0;
+  protected durationMs = 0;
   protected currentNodes: Node[] = [];
   protected isHandlingVideoEnded = false;
+  protected lastGameFlowData: GameFlowData | null = null;
 
   onLoad() {
     this.currentNodes = [this.backgroundImage, this.containerAnimation];
@@ -56,6 +60,15 @@ export class PhaseTransition extends Component {
     return this.currentState === this.gameFlowState;
   }
 
+  protected syncDurationVideo(duration: number) {
+    log(
+      "syncDurationVideo-----------",
+      this.durationVideoMs,
+      this.currentState
+    );
+    this.durationVideoMs = duration * 1000;
+  }
+
   initBackgroundImage() {
     const canvas = find("Canvas");
     const backgroundVideoPlayer = canvas?.getComponentInChildren(
@@ -67,13 +80,19 @@ export class PhaseTransition extends Component {
       this.handleVideoEnded,
       this
     );
+    this.backgroundVideoPlayer.node.on(
+      BackgroundVideoPlayerEvent.SYNC_DURATION,
+      this.syncDurationVideo,
+      this
+    );
   }
 
   @render(GameFlowStore, (store) => store.data)
   async preloadAndPlayIntro(gameFlowData: GameFlowData) {
     this.updateState(gameFlowData);
+    this.lastGameFlowData = gameFlowData;
 
-    if (!this.isPrebetState(gameFlowData)) {
+    if (!this.isPresentTeamPhase(gameFlowData)) {
       return Promise.resolve();
     }
 
@@ -83,20 +102,30 @@ export class PhaseTransition extends Component {
       return this.handleInitialPhase();
     }
 
-    if (this.isStaticSpinePhase(currentStateTimeMs)) {
+    if (this.isStaticPresentTeamPhase(currentStateTimeMs)) {
       return this.shouldHandleSpine()
         ? this.handleStaticSpine()
         : Promise.resolve();
     }
 
-    if (this.isFadeOutPhase(currentStateTimeMs)) {
-      return this.fadeNodes(true);
+    if (this.isHideStaticPresentTeamPhase(currentStateTimeMs)) {
+      return this.fadeNodes(true, 0);
     }
 
-    if (this.isEndPhase(currentStateTimeMs)) {
+    return Promise.resolve();
+  }
+
+  protected async recalculatePhases(gameFlowData: GameFlowData) {
+    const currentStateTimeMs = gameFlowData?.currentStateTimeMs ?? 0;
+
+    if (this.isStaticPresentTeamPhase(currentStateTimeMs)) {
       return this.shouldHandleSpine()
         ? this.handleStaticSpine()
         : Promise.resolve();
+    }
+
+    if (this.isHideStaticPresentTeamPhase(currentStateTimeMs)) {
+      return this.fadeNodes(true, 0);
     }
 
     return Promise.resolve();
@@ -104,10 +133,10 @@ export class PhaseTransition extends Component {
 
   protected updateState(gameFlowData: GameFlowData) {
     this.currentState = gameFlowData?.state ?? GameFlowState.Unknown;
-    this.durationStateTimeMs = gameFlowData?.currentStateTimeMs ?? 0;
+    this.durationMs = gameFlowData?.durationMs ?? 0;
   }
 
-  protected isPrebetState(gameFlowData: GameFlowData): boolean {
+  protected isPresentTeamPhase(gameFlowData: GameFlowData): boolean {
     return (
       gameFlowData?.state === GameFlowState.Prebet ||
       gameFlowData?.state === GameFlowState.PhaseChange
@@ -118,27 +147,22 @@ export class PhaseTransition extends Component {
     return currentStateTimeMs === 0;
   }
 
-  protected isStaticSpinePhase(currentStateTimeMs: number): boolean {
+  protected isStaticPresentTeamPhase(currentStateTimeMs: number): boolean {
     return (
-      currentStateTimeMs > 0 &&
-      currentStateTimeMs < this.durationMillisecondsAnimation
+      (currentStateTimeMs > 0 &&
+        currentStateTimeMs < this.durationMillisecondsAnimation) ||
+      (currentStateTimeMs >
+        this.durationVideoMs + this.durationMillisecondsAnimation &&
+        currentStateTimeMs < this.durationMs)
     );
   }
 
-  protected isFadeOutPhase(currentStateTimeMs: number): boolean {
-    const fadeOutStartTime = this.durationMillisecondsAnimation;
-    const fadeOutEndTime =
-      this.durationStateTimeMs - this.durationMillisecondsAnimation;
+  protected isHideStaticPresentTeamPhase(currentStateTimeMs: number): boolean {
     return (
-      currentStateTimeMs >= fadeOutStartTime &&
-      currentStateTimeMs > fadeOutEndTime
+      currentStateTimeMs > this.durationMillisecondsAnimation &&
+      currentStateTimeMs <
+        this.durationVideoMs + this.durationMillisecondsAnimation
     );
-  }
-
-  protected isEndPhase(currentStateTimeMs: number): boolean {
-    const endPhaseStartTime =
-      this.durationStateTimeMs - this.durationMillisecondsAnimation;
-    return currentStateTimeMs > endPhaseStartTime;
   }
 
   protected async handleInitialPhase() {
@@ -150,19 +174,19 @@ export class PhaseTransition extends Component {
       this.containerAnimation,
       this.durationAnimation
     );
-    return this.shouldHandleSpine()
-      ? this.handleDynamicSpine()
-      : Promise.resolve();
   }
 
-  protected async fadeNodes(isFadeOut = false) {
+  protected async fadeNodes(
+    isFadeOut = false,
+    duration = this.durationAnimation
+  ) {
     const promises: Promise<any>[] = [];
     this.currentNodes?.forEach((node) => {
       node &&
         promises.push(
           isFadeOut
-            ? AnimationUtils.fadeOutAndDeactivate(node, this.durationAnimation)
-            : AnimationUtils.fadeInAndActivate(node, this.durationAnimation)
+            ? AnimationUtils.fadeOutAndDeactivate(node, duration)
+            : AnimationUtils.fadeInAndActivate(node, duration)
         );
     });
 
@@ -178,6 +202,7 @@ export class PhaseTransition extends Component {
       this.currentState === GameFlowState.Prebet ||
       this.currentState === GameFlowState.PhaseChange
     ) {
+      await this.fadeNodes(true, 0);
       this.isHandlingVideoEnded = true;
       await this.fadeNodes(false);
 
@@ -190,6 +215,8 @@ export class PhaseTransition extends Component {
     }
   }
 
-  protected async handleStaticSpine() {}
+  protected async handleStaticSpine() {
+    this.fadeNodes(false, 0);
+  }
   protected async handleDynamicSpine() {}
 }

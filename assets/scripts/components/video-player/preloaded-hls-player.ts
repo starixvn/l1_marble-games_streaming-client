@@ -41,6 +41,10 @@ export class HLSPreloadedVideoPlayer {
     return this._videoPlayer.currentTime;
   }
 
+  get duration() {
+    return this._videoPlayer.duration;
+  }
+
   set muted(value: boolean) {
     this._videoPlayer.muted = value;
   }

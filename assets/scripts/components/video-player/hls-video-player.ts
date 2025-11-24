@@ -53,6 +53,13 @@ export class HLSVideoPlayer {
     return this._video.currentTime;
   }
 
+  get duration() {
+    if (this.initialized && this._video.duration) {
+      return this._video.duration;
+    }
+    return 0;
+  }
+
   get url() {
     return this._url;
   }

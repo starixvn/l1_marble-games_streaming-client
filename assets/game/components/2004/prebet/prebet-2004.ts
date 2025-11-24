@@ -17,6 +17,7 @@ export class PreBet2004 extends PhaseTransition {
   }
 
   override async handleStaticSpine() {
+    super.handleStaticSpine();
     this.presentTeam?.playSpineStatic(AnimationPresentTeamName.PrebetIn);
   }
 

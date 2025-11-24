@@ -28,6 +28,7 @@ enum SoundName {
 export enum BackgroundVideoPlayerEvent {
   VIDEO_ENDED = "videoEnded",
   SYNC_NATIVE_CURRENT_TIME = "syncNativeCurrentTime",
+  SYNC_DURATION = "syncDuration",
 }
 
 @ccclass("BackgroundVideoPlayer")
@@ -188,6 +189,10 @@ export class BackgroundVideoPlayer extends Component {
     return this.hlsPlayer?.currentLevel ?? 0;
   }
 
+  get duration() {
+    return this.hlsPlayer?.duration ?? 0;
+  }
+
   protected update(dt: number): void {
     if (this.initialized) {
       this.currentTime += dt;
@@ -211,6 +216,11 @@ export class BackgroundVideoPlayer extends Component {
       );
 
       this.hlsPlayer.removeEventListener("ended", this.onVideoEnded.bind(this));
+
+      this.hlsPlayer.removeEventListener(
+        "loadedmetadata",
+        this.onLoadMetadata.bind(this)
+      );
 
       this.hlsPlayer.off(Hls.Events.ERROR);
       this.hlsPlayer.destroy();
@@ -236,6 +246,13 @@ export class BackgroundVideoPlayer extends Component {
     this.node.emit(BackgroundVideoPlayerEvent.VIDEO_ENDED);
   }
 
+  private onLoadMetadata() {
+    this.node.emit(
+      BackgroundVideoPlayerEvent.SYNC_DURATION,
+      this.hlsPlayer.duration
+    );
+  }
+
   private initialize() {
     this.hlsPlayer = new HLSPreloadedVideoPlayer();
     this.hlsPlayer.init();
@@ -250,6 +267,11 @@ export class BackgroundVideoPlayer extends Component {
     );
 
     this.hlsPlayer.addEventListener("ended", this.onVideoEnded.bind(this));
+
+    this.hlsPlayer.addEventListener(
+      "loadedmetadata",
+      this.onLoadMetadata.bind(this)
+    );
 
     Object.values(Hls.Events).forEach((event) => {
       this.hlsPlayer.addEventListener(event, this.node.emit.bind(this.node));
