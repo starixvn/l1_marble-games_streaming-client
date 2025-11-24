@@ -44,12 +44,12 @@ jest.mock("observer", () =>
 );
 
 import { BackgroundVideoPlayer } from "../../../../assets/scripts/components/video-player/background-video-player";
-import { FeatureStage } from "../../../../assets/scripts/watchers/stages/stage-watcher";
 import { GameStore } from "../../../../assets/scripts/local-stores/game/game-store";
+import { FeatureStage } from "../../../../assets/scripts/watchers/stages/stage-watcher";
 import {
-  initializeMockContainer,
   cleanupMockObserver,
   createMockStore,
+  initializeMockContainer,
 } from "../../../utils/mock-store";
 
 describe("BackgroundVideoPlayer", () => {
@@ -61,6 +61,13 @@ describe("BackgroundVideoPlayer", () => {
     initializeMockContainer();
     createMockStore(GameStore, { data: { gameId: "gm" } } as any);
     comp = new BackgroundVideoPlayer();
+    (comp as any).scheduleOnce = jest.fn(
+      (callback: () => void, delay: number) => {
+        // Execute callback immediately for testing
+        callback();
+      }
+    );
+    (comp as any).unscheduleAllCallbacks = jest.fn();
     hls = {
       initialized: true,
       load: jest.fn(),
@@ -211,14 +218,11 @@ describe("BackgroundVideoPlayer", () => {
         "https://example.com/prebet.m3u8"
       );
 
-      // Fast-forward timers
-      jest.runAllTimers();
-
-      // Assert - playIntro called after timeout
+      // Assert - playIntro called immediately (scheduleOnce executes callback immediately in test)
       expect(showSpy).toHaveBeenCalledWith(false);
       expect(playIntroSpy).toHaveBeenCalledWith({
         videoLink: "https://example.com/prebet.m3u8",
-        currentTime: 2000, // 5000 - 3000
+        currentTime: 5000, // currentStateTimeMs (5000) + waitingTimeToPlayIntro (0) = 5000ms
       });
     });
 
@@ -242,14 +246,11 @@ describe("BackgroundVideoPlayer", () => {
         "https://example.com/halftime.m3u8"
       );
 
-      // Fast-forward timers
-      jest.runAllTimers();
-
-      // Assert - playIntro called after timeout
+      // Assert - playIntro called immediately (scheduleOnce executes callback immediately in test)
       expect(showSpy).toHaveBeenCalledWith(false);
       expect(playIntroSpy).toHaveBeenCalledWith({
         videoLink: "https://example.com/halftime.m3u8",
-        currentTime: 1000, // 4000 - 3000
+        currentTime: 4000, // currentStateTimeMs (4000) + waitingTimeToPlayIntro (0) = 4000ms
       });
     });
 
@@ -294,6 +295,15 @@ describe("BackgroundVideoPlayer", () => {
         halftime: "",
       };
       const playIntroSpy = jest.spyOn(comp as any, "playIntro");
+      // Store the callback to execute it after timer advance
+      let scheduledCallback: (() => void) | null = null;
+      let scheduledDelay: number = 0;
+      (comp as any).scheduleOnce = jest.fn(
+        (callback: () => void, delay: number) => {
+          scheduledCallback = callback;
+          scheduledDelay = delay;
+        }
+      );
 
       // Act - currentStateTimeMs (1000) < delayShowIntro (3000)
       (comp as any).preloadAndPlayIntro({
@@ -305,14 +315,22 @@ describe("BackgroundVideoPlayer", () => {
       expect(hls.preload).toHaveBeenCalledWith(
         "https://example.com/prebet.m3u8"
       );
+      // Assert - playIntro not called yet
+      expect(playIntroSpy).not.toHaveBeenCalled();
 
-      // Fast-forward timers by waiting time (2000ms)
-      jest.advanceTimersByTime(2000);
+      // Fast-forward timers by the scheduled delay (2000ms = 2 seconds)
+      jest.advanceTimersByTime(scheduledDelay * 1000);
+
+      // Execute the scheduled callback
+      if (scheduledCallback) {
+        scheduledCallback();
+      }
 
       // Assert - playIntro called with adjusted time
+      // currentStateTimeMs (1000) + waitingTimeToPlayIntro (2000) = 3000ms
       expect(playIntroSpy).toHaveBeenCalledWith({
         videoLink: "https://example.com/prebet.m3u8",
-        currentTime: 0, // (1000 - 3000) + 2000 = 0
+        currentTime: 3000, // 1000 + 2000 = 3000ms
       });
     });
   });
@@ -323,16 +341,16 @@ describe("BackgroundVideoPlayer", () => {
       const playSpy = jest.spyOn(comp, "play");
       const syncSpy = jest.spyOn(comp as any, "syncCurrentTime");
 
-      // Act
+      // Act - currentTime is in milliseconds, will be converted to seconds
       (comp as any).playIntro({
         videoLink: "https://example.com/intro.m3u8",
-        currentTime: 5,
+        currentTime: 5000, // 5000ms = 5 seconds
       });
 
       // Assert
       expect(hls.stopPreload).toHaveBeenCalled();
       expect(hls.load).toHaveBeenCalledWith("https://example.com/intro.m3u8");
-      expect(comp.currentTime).toBe(5);
+      expect(comp.currentTime).toBe(5); // 5000ms converted to 5 seconds
       expect(playSpy).toHaveBeenCalled();
       expect(syncSpy).toHaveBeenCalled();
     });

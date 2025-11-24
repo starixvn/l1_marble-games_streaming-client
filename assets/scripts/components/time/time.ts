@@ -1,7 +1,7 @@
 import { _decorator, Component, Label } from "cc";
 import { t } from "db://i18n/LanguageData";
 import Observer from "observer";
-import { AnimationUtils } from "../../common/utils";
+import { AnimationUtils, FunctionUtils } from "../../common/utils";
 import {
   type CurrentEventData,
   CurrentEventStore,
@@ -108,7 +108,9 @@ export class Time extends Component {
 
   @render(VideoStreamingStore, (store) => store.data)
   syncMatchLiveTime(data: VideoStreamingData) {
-    this._streamingPhaseTime = data.streamingPhaseTime / 1000;
+    this._streamingPhaseTime = FunctionUtils.msToSeconds(
+      data.streamingPhaseTime
+    );
   }
 
   @render(CurrentEventStore, (store) => store.data)

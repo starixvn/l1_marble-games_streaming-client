@@ -1854,12 +1854,13 @@
     "backgroundImage": {
       "__id__": 2
     },
+    "gameFlowState": "Prebet",
     "durationMillisecondsAnimation": 3000,
     "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "67yexKb3NOOazeITryUjQG"
+    "fileId": "dfxseq8UBP0ZePjLHkxHbB"
   },
   {
     "__type__": "cc.PrefabInfo",

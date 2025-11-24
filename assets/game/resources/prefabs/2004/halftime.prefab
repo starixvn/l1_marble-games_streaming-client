@@ -2365,7 +2365,7 @@
     "fileId": "bfKG1/UF1CdY7plfV4rkot"
   },
   {
-    "__type__": "c1878C8U8JAwZ+xj/fNfgXD",
+    "__type__": "39334lxtupPCJBi3HRsbO6B",
     "_name": "",
     "_objFlags": 0,
     "__editorExtras__": {},
@@ -2382,12 +2382,13 @@
     "backgroundImage": {
       "__id__": 2
     },
+    "gameFlowState": "PhaseChange",
     "durationMillisecondsAnimation": 3000,
     "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "4aH+ri8IVPQL+Mkf28SrP8"
+    "fileId": "55SFm83NpCHYgbJr+3VUy/"
   },
   {
     "__type__": "cc.PrefabInfo",

@@ -1,5 +1,8 @@
-import { _decorator, CCInteger, Component, find, Node } from "cc";
-import { AnimationUtils } from "db://assets/scripts/common/utils";
+import { _decorator, CCInteger, Component, Enum, find, Node } from "cc";
+import {
+  AnimationUtils,
+  FunctionUtils,
+} from "db://assets/scripts/common/utils";
 import {
   BackgroundVideoPlayer,
   BackgroundVideoPlayerEvent,
@@ -13,14 +16,17 @@ import Observer from "observer";
 const { ccclass, property } = _decorator;
 const { observer, render } = Observer;
 
-@ccclass("PreBet")
+@ccclass("PhaseTransition")
 @observer
-export class PreBet extends Component {
+export class PhaseTransition extends Component {
   @property(Node)
   containerAnimation: Node = null;
 
   @property(Node)
   backgroundImage: Node = null;
+
+  @property({ type: Enum(GameFlowState) })
+  gameFlowState: GameFlowState = GameFlowState.Unknown;
 
   @property(CCInteger)
   durationMillisecondsAnimation = 3000;
@@ -30,9 +36,24 @@ export class PreBet extends Component {
   protected currentState = GameFlowState.Unknown;
   protected durationStateTimeMs = 0;
   protected currentNodes: Node[] = [];
+  protected isHandlingVideoEnded = false;
 
   onLoad() {
     this.currentNodes = [this.backgroundImage, this.containerAnimation];
+    this.initBackgroundImage();
+  }
+
+  onDestroy() {
+    this.backgroundVideoPlayer.node.off(
+      BackgroundVideoPlayerEvent.VIDEO_ENDED,
+      this.handleVideoEnded,
+      this
+    );
+    this.unscheduleAllCallbacks();
+  }
+
+  protected shouldHandleSpine(): boolean {
+    return this.currentState === this.gameFlowState;
   }
 
   initBackgroundImage() {
@@ -53,29 +74,32 @@ export class PreBet extends Component {
     this.updateState(gameFlowData);
 
     if (!this.isPrebetState(gameFlowData)) {
-      return;
+      return Promise.resolve();
     }
 
     const currentStateTimeMs = gameFlowData?.currentStateTimeMs ?? 0;
 
     if (this.isInitialPhase(currentStateTimeMs)) {
-      await this.handleInitialPhase();
-      return;
+      return this.handleInitialPhase();
     }
 
     if (this.isStaticSpinePhase(currentStateTimeMs)) {
-      this.handleStaticSpine();
-      return;
+      return this.shouldHandleSpine()
+        ? this.handleStaticSpine()
+        : Promise.resolve();
     }
 
     if (this.isFadeOutPhase(currentStateTimeMs)) {
-      this.fadeNodes(true);
-      return;
+      return this.fadeNodes(true);
     }
 
     if (this.isEndPhase(currentStateTimeMs)) {
-      this.handleStaticSpine();
+      return this.shouldHandleSpine()
+        ? this.handleStaticSpine()
+        : Promise.resolve();
     }
+
+    return Promise.resolve();
   }
 
   protected updateState(gameFlowData: GameFlowData) {
@@ -120,13 +144,15 @@ export class PreBet extends Component {
   protected async handleInitialPhase() {
     this.scheduleOnce(() => {
       this.fadeNodes(true);
-    }, this.durationMillisecondsAnimation / 1000);
+    }, FunctionUtils.msToSeconds(this.durationMillisecondsAnimation));
 
     await AnimationUtils.fadeInAndActivate(
       this.containerAnimation,
       this.durationAnimation
     );
-    await this.handleDynamicSpine();
+    return this.shouldHandleSpine()
+      ? this.handleDynamicSpine()
+      : Promise.resolve();
   }
 
   protected async fadeNodes(isFadeOut = false) {
@@ -144,11 +170,23 @@ export class PreBet extends Component {
   }
 
   async handleVideoEnded() {
-    console.log("handleVideoEnded----", this.currentState);
-    if (this.currentState === GameFlowState.Prebet) {
+    if (this.isHandlingVideoEnded) {
+      return;
+    }
+
+    if (
+      this.currentState === GameFlowState.Prebet ||
+      this.currentState === GameFlowState.PhaseChange
+    ) {
+      this.isHandlingVideoEnded = true;
       await this.fadeNodes(false);
 
-      await this.handleDynamicSpine();
+      const result = this.shouldHandleSpine()
+        ? this.handleDynamicSpine()
+        : Promise.resolve();
+
+      await result;
+      this.isHandlingVideoEnded = false;
     }
   }
 

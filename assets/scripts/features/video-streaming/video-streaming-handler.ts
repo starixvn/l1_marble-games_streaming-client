@@ -1,6 +1,7 @@
-import { BaseHandlerImpl } from "../base/base-handler";
-import { featureHandler } from "../../handler-registry";
+import { FunctionUtils } from "db://assets/scripts/common/utils";
 import { inject } from "inversify";
+import { featureHandler } from "../../handler-registry";
+import { BaseHandlerImpl } from "../base/base-handler";
 import {
   VideoStreamingData,
   VideoStreamingStore,
@@ -16,7 +17,7 @@ export class VideoStreamingHandler extends BaseHandlerImpl<VideoStreamingData> {
   }
 
   public override update(data: VideoStreamingData) {
-    const currentTime = data.currentTime / 1000;
+    const currentTime = FunctionUtils.msToSeconds(data.currentTime);
     super.update({
       ...data,
       currentTime: currentTime,

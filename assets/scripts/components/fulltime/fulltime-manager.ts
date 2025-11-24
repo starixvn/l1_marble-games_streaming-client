@@ -1,6 +1,6 @@
 import { _decorator, CCInteger, Component, Node } from "cc";
 import Observer from "observer";
-import { AnimationUtils } from "../../common/utils";
+import { AnimationUtils, FunctionUtils } from "../../common/utils";
 import {
   type CurrentEventData,
   CurrentEventStore,
@@ -63,7 +63,9 @@ export class FulltimeManager extends Component {
       data.durationMs != null &&
       data.durationMs > 0
     ) {
-      this.scheduleAutoHideActiveNode(data.durationMs / 1000);
+      this.scheduleAutoHideActiveNode(
+        FunctionUtils.msToSeconds(data.durationMs)
+      );
     }
   }
 

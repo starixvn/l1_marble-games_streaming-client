@@ -1,4 +1,4 @@
-import { _decorator, Component } from "cc";
+import { _decorator, Component, log } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { FunctionUtils, SoundUtils } from "../../common/utils";
@@ -57,7 +57,6 @@ export class BackgroundVideoPlayer extends Component {
   preloadAndPlayIntro(gameFlowData: GameFlowData) {
     const state = gameFlowData.state;
     if (!this.isValidIntroState(state)) {
-      console.log("preloadAndPlayIntro-------return-----", state);
       return;
     }
 
@@ -73,7 +72,7 @@ export class BackgroundVideoPlayer extends Component {
         this.delayShowIntro
       );
 
-    console.log("preloadAndPlayIntro-------", state, waitingTimeToPlayIntro);
+    log("preloadAndPlayIntro-------", state, waitingTimeToPlayIntro);
 
     this.handleIntroPlayback(
       videoLink,
@@ -111,17 +110,12 @@ export class BackgroundVideoPlayer extends Component {
     this.hlsPlayer.preload(videoLink);
 
     this.scheduleOnce(() => {
-      console.log(
-        "playIntro-------",
-        videoLink,
-        currentStateTimeMs + waitingTimeToPlayIntro
-      );
       this.showBackground(false);
       this.playIntro({
         videoLink,
         currentTime: currentStateTimeMs + waitingTimeToPlayIntro,
       });
-    }, waitingTimeToPlayIntro / 1000);
+    }, FunctionUtils.msToSeconds(waitingTimeToPlayIntro));
   }
 
   playIntro({
@@ -131,10 +125,9 @@ export class BackgroundVideoPlayer extends Component {
     videoLink: string;
     currentTime: number;
   }) {
-    console.log("playIntro", videoLink, currentTime);
     this.hlsPlayer.stopPreload();
     this.hlsPlayer.load(videoLink);
-    this.currentTime = currentTime / 1000;
+    this.currentTime = FunctionUtils.msToSeconds(currentTime);
     this.play();
     this.syncCurrentTime();
   }
@@ -207,7 +200,7 @@ export class BackgroundVideoPlayer extends Component {
 
   protected onDestroy(): void {
     this.stop();
-    this.unscheduleAllCallbacks;
+    this.unscheduleAllCallbacks();
   }
 
   stop() {

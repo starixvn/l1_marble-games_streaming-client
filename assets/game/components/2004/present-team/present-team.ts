@@ -4,7 +4,7 @@ const { ccclass, property } = _decorator;
 
 export enum AnimationPresentTeamName {
   AfterGoalIn = "aftergoal-in",
-  IngameIn = "ingame-in",
+  HaftTime = "ingame-in",
   PrebetIn = "prebet-in",
   SettleIn = "settle-in",
 }

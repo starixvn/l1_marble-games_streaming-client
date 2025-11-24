@@ -22,4 +22,8 @@ export namespace FunctionUtils {
       ? Math.abs(currentIntroTimeMilliseconds)
       : 0;
   }
+
+  export function msToSeconds(milliseconds: number): number {
+    return milliseconds / 1000;
+  }
 }
