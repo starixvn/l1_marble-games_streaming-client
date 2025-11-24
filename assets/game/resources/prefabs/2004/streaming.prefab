@@ -1399,6 +1399,7 @@
     },
     "prefix": "",
     "isPreviousScore": false,
+    "delayUpdateScore": 0.5,
     "_id": ""
   },
   {
