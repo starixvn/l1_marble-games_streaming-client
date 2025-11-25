@@ -7,7 +7,7 @@ import {
 } from "db://assets/scripts/features/live-score/live-score-store";
 import Observer from "observer";
 
-const { render, observer } = Observer;
+const { render } = Observer;
 
 const { ccclass, property } = _decorator;
 
@@ -30,11 +30,18 @@ export class ScoreSpine extends Score {
     const newHome = data?.homeScore ?? 0;
     const newAway = data?.awayScore ?? 0;
 
+    this.updateHomeScore(newHome);
+    this.updateAwayScore(newAway);
+  }
+
+  private updateHomeScore(newHome: number) {
     if (this.home !== newHome) {
       this.home = newHome;
       this.setHome(this.home);
     }
+  }
 
+  private updateAwayScore(newAway: number) {
     if (this.away !== newAway) {
       this.away = newAway;
       this.setAway(this.away);
