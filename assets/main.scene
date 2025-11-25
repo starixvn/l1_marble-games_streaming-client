@@ -283,6 +283,7 @@
     },
     "_enabled": true,
     "__prefab": null,
+    "delayShowIntroMs": 3000,
     "_id": "f1wuKDiTxLSa9mmuZsf8wh"
   },
   {

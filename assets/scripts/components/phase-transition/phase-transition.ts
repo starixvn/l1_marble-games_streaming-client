@@ -25,6 +25,9 @@ export class PhaseTransition extends Component {
   @property(Node)
   backgroundImage: Node = null;
 
+  @property(Node)
+  info: Node = null;
+
   @property({ type: Enum(GameFlowState) })
   gameFlowState: GameFlowState = GameFlowState.Unknown;
 
@@ -113,7 +116,10 @@ export class PhaseTransition extends Component {
     }
 
     if (this.isHideStaticPhase(currentStateTimeMs)) {
-      return this.fadeNodes(true, 0);
+      return Promise.all([
+        this.fadeAnimNodes(true, 0),
+        AnimationUtils.fadeOutAndDeactivate(this.info, 0),
+      ]);
     }
 
     return Promise.resolve();
@@ -154,17 +160,18 @@ export class PhaseTransition extends Component {
   }
 
   protected async handleInitialPhase() {
-    this.scheduleOnce(() => {
-      this.fadeNodes(true);
+    this.scheduleOnce(async () => {
+      await this.fadeAnimNodes(true);
+      await AnimationUtils.fadeInAndActivate(this.info, this.durationFade);
     }, FunctionUtils.msToSeconds(this.durationMillisecondsAnimation));
 
-    await AnimationUtils.fadeInAndActivate(
-      this.containerAnimation,
-      this.durationFade
-    );
+    await this.fadeAnimNodes(false, this.durationFade);
   }
 
-  protected async fadeNodes(isFadeOut = false, duration = this.durationFade) {
+  protected async fadeAnimNodes(
+    isFadeOut = false,
+    duration = this.durationFade
+  ) {
     const promises: Promise<any>[] = [];
     this.currentNodes?.forEach((node) => {
       node &&
@@ -200,9 +207,12 @@ export class PhaseTransition extends Component {
   }
 
   protected async processVideoEndTransition() {
-    await this.fadeNodes(true, 0);
+    await this.fadeAnimNodes(true, 0);
 
-    const promises: Promise<void>[] = [this.fadeNodes(false)];
+    const promises: Promise<void>[] = [
+      this.fadeAnimNodes(false),
+      AnimationUtils.fadeOutAndDeactivate(this.info, this.durationFade),
+    ];
 
     if (this.shouldHandleSpine()) {
       promises.push(this.handleDynamic());
@@ -212,10 +222,10 @@ export class PhaseTransition extends Component {
   }
 
   protected async handleStatic() {
-    this.fadeNodes(false, 0);
+    this.fadeAnimNodes(false, 0);
   }
 
   protected async handleDynamic() {
-    this.fadeNodes(false, this.durationFadeIn);
+    this.fadeAnimNodes(false, this.durationFadeIn);
   }
 }
