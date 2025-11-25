@@ -1,6 +1,5 @@
 import mobx from "mobx";
 import { store } from "./store-decorator";
-import { log } from "cc";
 
 @store("Store")
 export class Store {
@@ -53,12 +52,12 @@ export class Store {
       const features = Object.assign(
         {},
         operators.features.common,
-        operators.features[this.operator],
+        operators.features[this.operator]
       );
 
       this.features = features;
     } catch (error) {
-      log(error);
+      console.log("loadFeature error---", error);
     }
   }
 

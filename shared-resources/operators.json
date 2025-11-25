@@ -1,10 +1,12 @@
 {
   "features": {
     "common": {
-      "AUDIO_INDICATOR": true
+      "AUDIO_INDICATOR": true,
+      "ENABLE_RELOAD_GAME": true
     },
     "vgaming": {
-      "AUDIO_INDICATOR": false
+      "AUDIO_INDICATOR": false,
+      "ENABLE_RELOAD_GAME": false
     }
   }
 }
