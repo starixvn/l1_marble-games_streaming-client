@@ -49,6 +49,10 @@ export class FulltimeManager extends Component {
 
   @render(CurrentEventStore, (store) => store.data)
   syncCurrentPhase(data: CurrentEventData) {
+    if (!data) {
+      return;
+    }
+
     this.currentPhase = data.phase;
   }
 
