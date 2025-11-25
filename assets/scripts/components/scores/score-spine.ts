@@ -27,10 +27,18 @@ export class ScoreSpine extends Score {
     this.delayUpdateScore > 0 &&
       (await AnimationUtils.delayTime(this.delayUpdateScore));
 
-    this.home = data?.homeScore ?? 0;
-    this.away = data?.awayScore ?? 0;
-    this.setHome(this.home);
-    this.setAway(this.away);
+    const newHome = data?.homeScore ?? 0;
+    const newAway = data?.awayScore ?? 0;
+
+    if (this.home !== newHome) {
+      this.home = newHome;
+      this.setHome(this.home);
+    }
+
+    if (this.away !== newAway) {
+      this.away = newAway;
+      this.setAway(this.away);
+    }
   }
 
   setHome(home: number) {

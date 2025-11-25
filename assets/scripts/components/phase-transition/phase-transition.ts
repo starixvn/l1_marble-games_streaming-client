@@ -201,11 +201,14 @@ export class PhaseTransition extends Component {
 
   protected async processVideoEndTransition() {
     await this.fadeNodes(true, 0);
-    await this.fadeNodes(false);
+
+    const promises: Promise<void>[] = [this.fadeNodes(false)];
 
     if (this.shouldHandleSpine()) {
-      await this.handleDynamic();
+      promises.push(this.handleDynamic());
     }
+
+    await Promise.all(promises);
   }
 
   protected async handleStatic() {
