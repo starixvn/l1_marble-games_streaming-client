@@ -34,7 +34,8 @@ export class PhaseTransition extends Component {
   @property(CCInteger)
   durationVideoMs = 24000;
 
-  protected readonly durationAnimation = 0.3;
+  protected readonly durationFade = 0.5;
+  protected readonly durationFadeIn = 1;
   protected backgroundVideoPlayer: BackgroundVideoPlayer = null;
   protected currentState = GameFlowState.Unknown;
   protected durationMs = 0;
@@ -49,8 +50,13 @@ export class PhaseTransition extends Component {
 
   onDestroy() {
     this.backgroundVideoPlayer.node.off(
-      BackgroundVideoPlayerEvent.VIDEO_ENDED,
+      BackgroundVideoPlayerEvent.VIDEO_ABOUT_TO_END,
       this.handleVideoEnded,
+      this
+    );
+    this.backgroundVideoPlayer.node.off(
+      BackgroundVideoPlayerEvent.SYNC_DURATION,
+      this.syncDurationVideo,
       this
     );
     this.unscheduleAllCallbacks();
@@ -76,13 +82,13 @@ export class PhaseTransition extends Component {
     );
     this.backgroundVideoPlayer = backgroundVideoPlayer;
     this.backgroundVideoPlayer.node.on(
-      BackgroundVideoPlayerEvent.VIDEO_ENDED,
-      this.handleVideoEnded,
+      BackgroundVideoPlayerEvent.SYNC_DURATION,
+      this.syncDurationVideo,
       this
     );
     this.backgroundVideoPlayer.node.on(
-      BackgroundVideoPlayerEvent.SYNC_DURATION,
-      this.syncDurationVideo,
+      BackgroundVideoPlayerEvent.VIDEO_ABOUT_TO_END,
+      this.handleVideoEnded,
       this
     );
   }
@@ -103,9 +109,7 @@ export class PhaseTransition extends Component {
     }
 
     if (this.isStaticPhase(currentStateTimeMs)) {
-      return this.shouldHandleSpine()
-        ? this.handleStaticSpine()
-        : Promise.resolve();
+      return this.shouldHandleSpine() ? this.handleStatic() : Promise.resolve();
     }
 
     if (this.isHideStaticPhase(currentStateTimeMs)) {
@@ -156,14 +160,11 @@ export class PhaseTransition extends Component {
 
     await AnimationUtils.fadeInAndActivate(
       this.containerAnimation,
-      this.durationAnimation
+      this.durationFade
     );
   }
 
-  protected async fadeNodes(
-    isFadeOut = false,
-    duration = this.durationAnimation
-  ) {
+  protected async fadeNodes(isFadeOut = false, duration = this.durationFade) {
     const promises: Promise<any>[] = [];
     this.currentNodes?.forEach((node) => {
       node &&
@@ -178,30 +179,40 @@ export class PhaseTransition extends Component {
   }
 
   async handleVideoEnded() {
-    if (this.isHandlingVideoEnded) {
+    if (this.isHandlingVideoEnded || !this.shouldHandleVideoEnded()) {
       return;
     }
 
-    if (
-      this.currentState === GameFlowState.Prebet ||
-      this.currentState === GameFlowState.PhaseChange
-    ) {
-      await this.fadeNodes(true, 0);
-      this.isHandlingVideoEnded = true;
-      await this.fadeNodes(false);
+    this.isHandlingVideoEnded = true;
 
-      const result = this.shouldHandleSpine()
-        ? this.handleDynamicSpine()
-        : Promise.resolve();
-
-      await result;
+    try {
+      await this.processVideoEndTransition();
+    } finally {
       this.isHandlingVideoEnded = false;
     }
   }
 
-  protected async handleStaticSpine() {
+  protected shouldHandleVideoEnded(): boolean {
+    return (
+      this.currentState === GameFlowState.Prebet ||
+      this.currentState === GameFlowState.PhaseChange
+    );
+  }
+
+  protected async processVideoEndTransition() {
+    await this.fadeNodes(true, 0);
+    await this.fadeNodes(false);
+
+    if (this.shouldHandleSpine()) {
+      await this.handleDynamic();
+    }
+  }
+
+  protected async handleStatic() {
     this.fadeNodes(false, 0);
   }
 
-  protected async handleDynamicSpine() {}
+  protected async handleDynamic() {
+    this.fadeNodes(false, this.durationFadeIn);
+  }
 }

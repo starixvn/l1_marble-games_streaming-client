@@ -1,4 +1,4 @@
-import { _decorator, Component, log } from "cc";
+import { _decorator, CCInteger, Component, log } from "cc";
 import Hls from "hls.js";
 import Observer from "observer";
 import { FunctionUtils, SoundUtils } from "../../common/utils";
@@ -18,7 +18,7 @@ import {
 } from "../../watchers/stages/stage-watcher";
 import { HLSPreloadedVideoPlayer } from "./preloaded-hls-player";
 
-const { ccclass } = _decorator;
+const { ccclass, property } = _decorator;
 const { observer, render, handle } = Observer;
 
 enum SoundName {
@@ -27,6 +27,7 @@ enum SoundName {
 
 export enum BackgroundVideoPlayerEvent {
   VIDEO_ENDED = "videoEnded",
+  VIDEO_ABOUT_TO_END = "videoAboutToEnd",
   SYNC_NATIVE_CURRENT_TIME = "syncNativeCurrentTime",
   SYNC_DURATION = "syncDuration",
 }
@@ -34,13 +35,16 @@ export enum BackgroundVideoPlayerEvent {
 @ccclass("BackgroundVideoPlayer")
 @observer
 export class BackgroundVideoPlayer extends Component {
+  @property(CCInteger)
+  delayShowIntroMs = 3000;
+
   public currentTime = 0;
   private hlsPlayer: HLSPreloadedVideoPlayer = null;
   private introData: IntroData = {
     prebet: "",
     halftime: "",
   };
-  private readonly delayShowIntro = 3000;
+  private hasFiredAboutToEnd = false;
 
   private get initialized() {
     return !!this.hlsPlayer?.initialized;
@@ -70,7 +74,7 @@ export class BackgroundVideoPlayer extends Component {
     const waitingTimeToPlayIntro =
       FunctionUtils.calculateWaitingTimeMilliseconds(
         currentStateTimeMs,
-        this.delayShowIntro
+        this.delayShowIntroMs
       );
 
     log("preloadAndPlayIntro-------", state, waitingTimeToPlayIntro);
@@ -129,6 +133,7 @@ export class BackgroundVideoPlayer extends Component {
     this.hlsPlayer.stopPreload();
     this.hlsPlayer.load(videoLink);
     this.currentTime = FunctionUtils.msToSeconds(currentTime);
+    this.hasFiredAboutToEnd = false;
     this.play();
     this.syncCurrentTime();
   }
@@ -161,6 +166,7 @@ export class BackgroundVideoPlayer extends Component {
       this.hlsPlayer.stopPreload();
       this.hlsPlayer.load(videoLink);
       this.currentTime = currentTime;
+      this.hasFiredAboutToEnd = false;
       this.play();
       this.syncCurrentTime();
     }
@@ -239,6 +245,20 @@ export class BackgroundVideoPlayer extends Component {
 
     if (this.initialized && needSync) {
       this.hlsPlayer.currentTime = this.currentTime;
+    }
+
+    // Check if video is about to end (0.5s before end)
+    if (
+      this.initialized &&
+      !this.hasFiredAboutToEnd &&
+      this.hlsPlayer.duration > 0
+    ) {
+      const timeRemaining =
+        this.hlsPlayer.duration - this.hlsPlayer.currentTime;
+      if (timeRemaining <= 0.6 && timeRemaining > 0) {
+        this.hasFiredAboutToEnd = true;
+        this.node.emit(BackgroundVideoPlayerEvent.VIDEO_ABOUT_TO_END);
+      }
     }
   }
 

@@ -16,12 +16,12 @@ export class HalfTime2004 extends PhaseTransition {
     this.presentTeam = this.containerAnimation.getComponent(PresentTeam);
   }
 
-  override async handleStaticSpine() {
-    super.handleStaticSpine();
+  override async handleStatic() {
+    super.handleStatic();
     this.presentTeam?.playSpineStatic(AnimationPresentTeamName.HaftTime);
   }
 
-  override async handleDynamicSpine() {
+  override async handleDynamic() {
     this.presentTeam?.playSpine(
       AnimationPresentTeamName.HaftTime,
       FunctionUtils.msToSeconds(this.durationMillisecondsAnimation)
