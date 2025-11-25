@@ -100,9 +100,11 @@ export class LocalizedFont extends Component {
     const overrideFonts = this.overrideFonts.find(
       (data) => data.language === lang
     );
+
     const overrideFont =
       overrideFonts === undefined ? this.fontBases[lang] : overrideFonts;
-    return overrideFont || this.fontBases["en"];
+
+    return overrideFont || this.fontBases["en-US"];
   }
 
   loadFont(name: string) {
