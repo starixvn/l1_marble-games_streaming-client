@@ -320,7 +320,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -558,7 +558,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -3729,7 +3729,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -466.5,
+      "x": -466.5000000000001,
       "y": 338.25,
       "z": 0
     },
@@ -4901,6 +4901,7 @@
     },
     "prefix": "",
     "isPreviousScore": false,
+    "delayUpdateScore": 0,
     "_id": ""
   },
   {
@@ -6085,7 +6086,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -9469,7 +9470,7 @@
     "__prefab": {
       "__id__": 429
     },
-    "stageName": 3,
+    "stageName": 4,
     "_id": ""
   },
   {
@@ -9648,7 +9649,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -16215,7 +16216,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -16277,7 +16278,7 @@
     "__prefab": {
       "__id__": 735
     },
-    "stageName": 4,
+    "stageName": 5,
     "_id": ""
   },
   {
@@ -16454,7 +16455,7 @@
     "__prefab": {
       "__id__": 745
     },
-    "stageName": 5,
+    "stageName": 1,
     "_id": ""
   },
   {
@@ -16488,7 +16489,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
@@ -16605,7 +16606,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 1398,
+      "width": 1398.0000000000002,
       "height": 786
     },
     "_anchorPoint": {
