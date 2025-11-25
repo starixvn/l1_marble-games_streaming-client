@@ -92,7 +92,7 @@ export class PhaseTransition extends Component {
     this.updateState(gameFlowData);
     this.lastGameFlowData = gameFlowData;
 
-    if (!this.isPresentTeamPhase(gameFlowData)) {
+    if (!this.shouldHandlePhase(gameFlowData)) {
       return Promise.resolve();
     }
 
@@ -102,29 +102,13 @@ export class PhaseTransition extends Component {
       return this.handleInitialPhase();
     }
 
-    if (this.isStaticPresentTeamPhase(currentStateTimeMs)) {
+    if (this.isStaticPhase(currentStateTimeMs)) {
       return this.shouldHandleSpine()
         ? this.handleStaticSpine()
         : Promise.resolve();
     }
 
-    if (this.isHideStaticPresentTeamPhase(currentStateTimeMs)) {
-      return this.fadeNodes(true, 0);
-    }
-
-    return Promise.resolve();
-  }
-
-  protected async recalculatePhases(gameFlowData: GameFlowData) {
-    const currentStateTimeMs = gameFlowData?.currentStateTimeMs ?? 0;
-
-    if (this.isStaticPresentTeamPhase(currentStateTimeMs)) {
-      return this.shouldHandleSpine()
-        ? this.handleStaticSpine()
-        : Promise.resolve();
-    }
-
-    if (this.isHideStaticPresentTeamPhase(currentStateTimeMs)) {
+    if (this.isHideStaticPhase(currentStateTimeMs)) {
       return this.fadeNodes(true, 0);
     }
 
@@ -136,7 +120,7 @@ export class PhaseTransition extends Component {
     this.durationMs = gameFlowData?.durationMs ?? 0;
   }
 
-  protected isPresentTeamPhase(gameFlowData: GameFlowData): boolean {
+  protected shouldHandlePhase(gameFlowData: GameFlowData): boolean {
     return (
       gameFlowData?.state === GameFlowState.Prebet ||
       gameFlowData?.state === GameFlowState.PhaseChange
@@ -147,7 +131,7 @@ export class PhaseTransition extends Component {
     return currentStateTimeMs === 0;
   }
 
-  protected isStaticPresentTeamPhase(currentStateTimeMs: number): boolean {
+  protected isStaticPhase(currentStateTimeMs: number): boolean {
     return (
       (currentStateTimeMs > 0 &&
         currentStateTimeMs < this.durationMillisecondsAnimation) ||
@@ -157,7 +141,7 @@ export class PhaseTransition extends Component {
     );
   }
 
-  protected isHideStaticPresentTeamPhase(currentStateTimeMs: number): boolean {
+  protected isHideStaticPhase(currentStateTimeMs: number): boolean {
     return (
       currentStateTimeMs > this.durationMillisecondsAnimation &&
       currentStateTimeMs <
@@ -218,5 +202,6 @@ export class PhaseTransition extends Component {
   protected async handleStaticSpine() {
     this.fadeNodes(false, 0);
   }
+
   protected async handleDynamicSpine() {}
 }

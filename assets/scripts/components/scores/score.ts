@@ -18,26 +18,24 @@ const { render, observer } = Observer;
 @menu("Scores/Score")
 @observer
 export class Score extends Component {
-  private previousHome = 0;
-  private previousAway = 0;
-  private home = 0;
-  private away = 0;
-
   @property(Label)
-  private label: Label = null;
+  protected label: Label = null;
 
   @property(CCString)
-  private readonly prefix = "";
+  protected readonly prefix = "";
 
   @property(CCBoolean)
-  private readonly isPreviousScore = false;
+  protected readonly isPreviousScore = false;
 
   @property(CCFloat)
   delayUpdateScore = 0;
 
-  private score = "";
-
-  private previousScore = "";
+  protected previousHome = 0;
+  protected previousAway = 0;
+  protected home = 0;
+  protected away = 0;
+  protected score = "";
+  protected previousScore = "";
 
   @render(ResultStore, (store) => store.data)
   syncResult(data: ResultData) {
