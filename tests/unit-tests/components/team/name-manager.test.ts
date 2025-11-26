@@ -4,7 +4,7 @@ import { NameManager } from "../../../../assets/scripts/components/team/name-man
 import { Team } from "../../../../assets/scripts/components/team/team";
 
 jest.mock("db://i18n/LanguageData", () => ({
-  t: (key: string) => (key.startsWith("Common.") ? "" : key),
+  t: (key: string) => (key.startsWith("common.") ? "" : key),
 }));
 
 class MockLocalizedLabel {

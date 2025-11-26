@@ -1166,7 +1166,7 @@
     "__prefab": {
       "__id__": 50
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -1624,7 +1624,7 @@
     "__prefab": {
       "__id__": 76
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -2135,7 +2135,7 @@
     "__prefab": {
       "__id__": 104
     },
-    "key": "Common.fulltime",
+    "key": "common.fulltime",
     "_id": ""
   },
   {
@@ -2350,7 +2350,7 @@
     "scoreLabel": {
       "__id__": 111
     },
-    "prefix": "Common.1st_half",
+    "prefix": "common.1st_half",
     "resultType": 0,
     "_id": ""
   },
@@ -5303,7 +5303,7 @@
     "__prefab": {
       "__id__": 266
     },
-    "key": "Common.draw",
+    "key": "common.draw",
     "_id": ""
   },
   {

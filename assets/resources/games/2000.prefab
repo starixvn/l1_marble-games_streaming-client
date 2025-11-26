@@ -3860,7 +3860,7 @@
     "__prefab": {
       "__id__": 177
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -4828,7 +4828,7 @@
     "__prefab": {
       "__id__": 221
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -6263,7 +6263,7 @@
     "scoreLabel": {
       "__id__": 281
     },
-    "prefix": "Common.1st_half",
+    "prefix": "common.1st_half",
     "resultType": 0,
     "_id": ""
   },
@@ -7687,7 +7687,7 @@
     "__prefab": {
       "__id__": 348
     },
-    "key": "Common.draw",
+    "key": "common.draw",
     "_id": ""
   },
   {
@@ -11352,7 +11352,7 @@
     "__prefab": {
       "__id__": 519
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -12069,7 +12069,7 @@
     "__prefab": {
       "__id__": 555
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -13765,7 +13765,7 @@
     "__prefab": {
       "__id__": 631
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -14762,7 +14762,7 @@
     "__prefab": {
       "__id__": 676
     },
-    "key": "Common.halftime",
+    "key": "common.halftime",
     "_id": ""
   },
   {
@@ -15296,7 +15296,7 @@
     "__prefab": {
       "__id__": 703
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {

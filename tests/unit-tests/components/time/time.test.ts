@@ -1,10 +1,10 @@
-import { Time } from "../../../../assets/scripts/components/time/time";
 import { Label } from "cc";
+import { Time } from "../../../../assets/scripts/components/time/time";
 
 jest.mock("db://i18n/LanguageData", () => ({
   t: (key: string) => {
-    if (key === "Common.1st_half") return "1st Half";
-    if (key === "Common.2nd_half") return "2nd Half";
+    if (key === "common.1st_half") return "1st Half";
+    if (key === "common.2nd_half") return "2nd Half";
     return key;
   },
 }));

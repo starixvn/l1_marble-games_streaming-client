@@ -1428,7 +1428,7 @@
     "__prefab": {
       "__id__": 63
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -2396,7 +2396,7 @@
     "__prefab": {
       "__id__": 107
     },
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": ""
   },
   {
@@ -3393,7 +3393,7 @@
     "__prefab": {
       "__id__": 152
     },
-    "key": "Common.halftime",
+    "key": "common.halftime",
     "_id": ""
   },
   {

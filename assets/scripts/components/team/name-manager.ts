@@ -58,7 +58,7 @@ export class NameManager extends Component {
       const key = `${this.operator}.${value}`;
 
       if (t(key) === "") {
-        label.key = `Common.${value}`;
+        label.key = `common.${value}`;
       } else {
         label.key = key;
       }

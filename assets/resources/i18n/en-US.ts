@@ -1,6 +1,6 @@
 const win = window || {} as any;
 export const languages = {
-    "Common": {
+    "common": {
         "1st_half": "1st Half",
         "2nd_half": "2nd Half",
         "clb_ars": "Arsenal",
@@ -37,7 +37,7 @@ export const languages = {
     "testing": {
         "clb_atm": "ATM"
     },
-    "Vgaming": {
+    "vgaming": {
         "clb_ars": "Arsonist",
         "clb_bar": "FC Barna",
         "clb_che": "Chelsee",

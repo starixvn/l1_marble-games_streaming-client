@@ -6,7 +6,7 @@ export namespace FunctionUtils {
     key: string | undefined | null
   ): string {
     if (key == null || t(key) === "") {
-      return `Common.${key}`;
+      return `common.${key}`;
     }
 
     return `${operator}.${key}`;

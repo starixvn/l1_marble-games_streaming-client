@@ -4075,7 +4075,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": "c8CMzucIlLN5hf89+d28ME"
   },
   {
@@ -4405,7 +4405,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "key": "Common.clb_atm",
+    "key": "common.clb_atm",
     "_id": "027NnbyGJF7aTP0BikYjn9"
   },
   {

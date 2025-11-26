@@ -25,7 +25,7 @@ async function fetchAvailableLanguages() {
           "X-API-Key": CONFIG.tolgee.apiKey,
           "Content-Type": "application/json",
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -38,7 +38,7 @@ async function fetchAvailableLanguages() {
     console.log(
       `✅ Found ${
         languageCodes.length
-      } available languages: ${languageCodes.join(", ")}`,
+      } available languages: ${languageCodes.join(", ")}`
     );
     return languageCodes;
   } catch (error) {
@@ -59,7 +59,7 @@ async function fetchNamespaces() {
           "X-API-Key": CONFIG.tolgee.apiKey,
           "Content-Type": "application/json",
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -71,8 +71,8 @@ async function fetchNamespaces() {
 
     console.log(
       `✅ Found ${namespaces.length} available namespaces: ${namespaces.join(
-        ", ",
-      )}`,
+        ", "
+      )}`
     );
 
     return namespaces;
@@ -127,13 +127,14 @@ async function processLanguage(tg, languageId, namespaces) {
   namespaces.forEach((namespace) => {
     const translations = extractNamespaceTranslations(
       tg.getAllRecords(),
-      namespace,
+      namespace
     );
-    languageData[namespace] = translations;
+    const lowerNamespace = namespace.toLowerCase();
+    languageData[lowerNamespace] = translations;
     console.log(
       `   📝 Found ${
         Object.keys(translations).length
-      } translations for namespace: ${namespace}`,
+      } translations for namespace: ${lowerNamespace}`
     );
   });
 
@@ -175,7 +176,7 @@ async function generateLanguages() {
           const languageData = await processLanguage(
             tg,
             languageId,
-            namespaces,
+            namespaces
           );
           allLanguages[languageId] = languageData;
         }

@@ -117,7 +117,7 @@ export class Time extends Component {
   syncHalf(data: CurrentEventData) {
     this._phaseIndex = data.phase;
     this.halfLabel.string =
-      this._phaseIndex === 0 ? t("Common.1st_half") : t("Common.2nd_half");
+      this._phaseIndex === 0 ? t("common.1st_half") : t("common.2nd_half");
   }
 
   private updateSecondTimer() {

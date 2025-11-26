@@ -1,6 +1,6 @@
 const win = window || {} as any;
 export const languages = {
-    "Common": {
+    "common": {
         "1st_half": "Hiệp 1",
         "2nd_half": "Hiệp 2",
         "clb_ars": "Arsenal",
@@ -24,7 +24,7 @@ export const languages = {
         "clb_rma": "Real Madrid",
         "draw": "Draw",
         "fulltime": "TOÀN TRẬN",
-        "halftime": "GIỮA HIỆP",
+        "halftime": "Hết Hiệp 1",
         "nt_arg": "Argentina",
         "nt_bra": "Brazil",
         "nt_eng": "Anh",
@@ -37,7 +37,7 @@ export const languages = {
     "testing": {
         "clb_atm": "ATM"
     },
-    "Vgaming": {
+    "vgaming": {
         "clb_ars": "Arsonist",
         "clb_bar": "FC Barna",
         "clb_che": "Chelsee",
