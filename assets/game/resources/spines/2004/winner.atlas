@@ -11,7 +11,7 @@ bg-name-blue
   orig: 580, 108
   offset: 0, 0
   index: -1
-bg-name-general
+bg-name-draw
   rotate: false
   xy: 874, 67
   size: 579, 108
