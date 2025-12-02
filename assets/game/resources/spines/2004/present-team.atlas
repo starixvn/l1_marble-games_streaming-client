@@ -13,7 +13,7 @@ Score-bg
   index: -1
 Score-bg-sub
   rotate: false
-  xy: 293, 9
+  xy: 295, 9
   size: 280, 52
   orig: 280, 52
   offset: 0, 0
@@ -34,9 +34,9 @@ VS-text
   index: -1
 bg-infotext
   rotate: false
-  xy: 2, 14
-  size: 289, 47
-  orig: 289, 47
+  xy: 2, 12
+  size: 291, 49
+  orig: 291, 49
   offset: 0, 0
   index: -1
 bg-name-blue
