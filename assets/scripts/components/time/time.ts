@@ -91,7 +91,7 @@ export class Time extends Component {
 
   @render(LiveScoreStore, (store) => store.data)
   syncLiveScore(data: LiveScoreData) {
-    if (this.game !== "2004") {
+    if (this.game !== "2004" || !data) {
       return;
     }
 
@@ -115,6 +115,10 @@ export class Time extends Component {
 
   @render(CurrentEventStore, (store) => store.data)
   syncHalf(data: CurrentEventData) {
+    if (!data) {
+      return;
+    }
+
     this._phaseIndex = data.phase;
     this.halfLabel.string =
       this._phaseIndex === 0 ? t("common.1st_half") : t("common.2nd_half");

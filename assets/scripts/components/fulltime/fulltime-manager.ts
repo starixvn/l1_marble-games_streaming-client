@@ -75,6 +75,10 @@ export class FulltimeManager extends Component {
 
   @render(ResultStore, (store) => store.data)
   syncResult(data: ResultData) {
+    if (!data?.result) {
+      return;
+    }
+
     const homeScore = Object.values(data.result).reduce(
       (acc, curr) => acc + curr.homeScore,
       0

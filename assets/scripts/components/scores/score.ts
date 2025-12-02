@@ -39,6 +39,10 @@ export class Score extends Component {
 
   @render(ResultStore, (store) => store.data)
   syncResult(data: ResultData) {
+    if (!data?.result) {
+      return;
+    }
+
     this.previousHome = data?.result[0]?.homeScore ?? 0;
     this.previousAway = data?.result[0]?.awayScore ?? 0;
 

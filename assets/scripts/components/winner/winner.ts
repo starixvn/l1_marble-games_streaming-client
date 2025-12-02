@@ -51,6 +51,10 @@ export class Winner extends Component {
 
   @render(ResultStore, (store) => store.data)
   updateWinner(data: ResultData) {
+    if (!data?.result) {
+      return;
+    }
+
     const homeScore = Object.values(data.result).reduce(
       (acc, curr) => acc + curr.homeScore,
       0
