@@ -36,6 +36,10 @@ export class Winner extends Component {
 
   @render(TeamNameStore, (store) => store.data)
   syncTeamName(data: TeamNameData) {
+    if (!data) {
+      return;
+    }
+
     this.homeCode = data.homeTeamName;
     this.awayCode = data.awayTeamName;
 

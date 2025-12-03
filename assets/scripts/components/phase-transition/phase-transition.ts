@@ -98,6 +98,10 @@ export class PhaseTransition extends Component {
 
   @render(GameFlowStore, (store) => store.data)
   async preloadAndPlayIntro(gameFlowData: GameFlowData) {
+    if (!gameFlowData) {
+      return Promise.resolve();
+    }
+
     this.updateState(gameFlowData);
     this.lastGameFlowData = gameFlowData;
 

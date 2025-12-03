@@ -51,6 +51,10 @@ export class Score extends Component {
 
   @render(LiveScoreStore, (store) => store.data)
   async syncScore(data: LiveScoreData) {
+    if (!data) {
+      return;
+    }
+
     this.home = data.homeScore;
     this.away = data.awayScore;
     this.score = `${this.home} - ${this.away}`;

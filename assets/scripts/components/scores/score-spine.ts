@@ -24,6 +24,10 @@ export class ScoreSpine extends Score {
 
   @render(LiveScoreStore, (store) => store.data)
   override async syncScore(data: LiveScoreData) {
+    if (!data) {
+      return;
+    }
+
     this.delayUpdateScore > 0 &&
       (await AnimationUtils.delayTime(this.delayUpdateScore));
 

@@ -38,6 +38,10 @@ export class IconManager extends Component {
 
   @render(TeamNameStore, (store) => store.data)
   syncTeamName(data: TeamNameData) {
+    if (!data) {
+      return;
+    }
+
     if (this.team === Team.HOME && data.homeTeamName) {
       this.name = data.homeTeamName;
     } else if (this.team === Team.AWAY && data.awayTeamName) {
