@@ -2974,7 +2974,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "data",
+    "_name": "result",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -7827,7 +7827,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "result",
+    "_name": "winner",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -9512,10 +9512,10 @@
     "__prefab": {
       "__id__": 437
     },
-    "fulltime": {
+    "result": {
       "__id__": 142
     },
-    "result": {
+    "winner": {
       "__id__": 358
     },
     "draw": {

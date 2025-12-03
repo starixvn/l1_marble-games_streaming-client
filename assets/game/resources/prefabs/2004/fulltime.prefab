@@ -458,7 +458,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "fulltime",
+    "_name": "result",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -2569,7 +2569,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "result",
+    "_name": "winner",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -5605,7 +5605,7 @@
     "fileId": "eeZ5SoWqlP66MhOgwdo8rI"
   },
   {
-    "__type__": "f0665+PlDBDAq+O2QVVqqJu",
+    "__type__": "fd1c6MlDKpNSqeEWUmjmq+p",
     "_name": "",
     "_objFlags": 0,
     "__editorExtras__": {},
@@ -5616,10 +5616,10 @@
     "__prefab": {
       "__id__": 291
     },
-    "fulltime": {
+    "result": {
       "__id__": 20
     },
-    "result": {
+    "winner": {
       "__id__": 132
     },
     "draw": {
@@ -5630,7 +5630,7 @@
   },
   {
     "__type__": "cc.CompPrefabInfo",
-    "fileId": "1dReAtF2lLB4qXz/B4KDca"
+    "fileId": "cdHl2WpktBcKrE9Rk7xjr9"
   },
   {
     "__type__": "cc.UIOpacity",

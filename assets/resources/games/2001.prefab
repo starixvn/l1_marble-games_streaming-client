@@ -4901,6 +4901,7 @@
     },
     "prefix": "",
     "isPreviousScore": false,
+    "delayUpdateScore": 0,
     "_id": ""
   },
   {
@@ -9758,7 +9759,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "data",
+    "_name": "result",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -14611,7 +14612,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "result",
+    "_name": "winner",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -16296,10 +16297,10 @@
     "__prefab": {
       "__id__": 737
     },
-    "fulltime": {
+    "result": {
       "__id__": 442
     },
-    "result": {
+    "winner": {
       "__id__": 658
     },
     "draw": {

@@ -4,6 +4,10 @@ import { LocalizedLabel } from "db://i18n/LocalizedLabel";
 
 const { ccclass, property } = _decorator;
 
+enum SoundName {
+  Winner = "winner",
+}
+
 @ccclass
 export class Winner2004 extends Winner {
   @property({ type: LocalizedLabel, override: true, visible: false })

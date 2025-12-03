@@ -14,28 +14,30 @@ import {
   type ResultData,
   ResultStore,
 } from "../../features/result/result-store";
+import { SfxStore } from "../../local-stores/sfx/sfx-store";
 
 const { ccclass, property, menu } = _decorator;
 
-const { render, observer } = Observer;
+const { render, observer, handle } = Observer;
 
 export enum FullTimeDisplayStatus {
-  Fulltime,
   Result,
+  Winner,
   Draw,
+  None,
 }
 
 @ccclass
 @menu("FulltimeManager")
 @observer
 export class FulltimeManager extends Component {
-  private status: FullTimeDisplayStatus = FullTimeDisplayStatus.Fulltime;
-
-  @property(Node)
-  fulltime: Node = null;
+  protected status: FullTimeDisplayStatus = FullTimeDisplayStatus.None;
 
   @property(Node)
   result: Node = null;
+
+  @property(Node)
+  winner: Node = null;
 
   @property(Node)
   draw: Node = null;
@@ -46,6 +48,8 @@ export class FulltimeManager extends Component {
   isDraw = false;
   protected currentPhase = 0;
   protected durationAppear = 0.5;
+  protected gameId = "";
+  protected gameFlowData: GameFlowData | null = null;
 
   @render(CurrentEventStore, (store) => store.data)
   syncCurrentPhase(data: CurrentEventData) {
@@ -67,9 +71,8 @@ export class FulltimeManager extends Component {
       data.durationMs != null &&
       data.durationMs > 0
     ) {
-      this.scheduleAutoHideActiveNode(
-        FunctionUtils.msToSeconds(data.durationMs)
-      );
+      this.scheduleAutoHideNode(FunctionUtils.msToSeconds(data.durationMs));
+      this.status = FullTimeDisplayStatus.Result;
     }
   }
 
@@ -91,7 +94,7 @@ export class FulltimeManager extends Component {
   }
 
   protected onEnable(): void {
-    this.status = FullTimeDisplayStatus.Fulltime;
+    this.status = FullTimeDisplayStatus.Result;
     this.updateUI();
     this.scheduleOnce(this.displayResult.bind(this), this.timeToDisplayResult);
   }
@@ -99,7 +102,7 @@ export class FulltimeManager extends Component {
   displayResult() {
     this.status = this.isDraw
       ? FullTimeDisplayStatus.Draw
-      : FullTimeDisplayStatus.Result;
+      : FullTimeDisplayStatus.Winner;
     this.updateUI();
   }
 
@@ -114,8 +117,8 @@ export class FulltimeManager extends Component {
 
   updateUI() {
     const statusNodePairs: Array<[FullTimeDisplayStatus, Node]> = [
-      [FullTimeDisplayStatus.Fulltime, this.fulltime],
       [FullTimeDisplayStatus.Result, this.result],
+      [FullTimeDisplayStatus.Winner, this.winner],
       [FullTimeDisplayStatus.Draw, this.draw],
     ];
 
@@ -123,6 +126,8 @@ export class FulltimeManager extends Component {
       const isActive = status === this.status;
       if (isActive) {
         AnimationUtils.fadeInAndActivate(node, this.durationAppear);
+        this.gameFlowData?.state === GameFlowState.Result &&
+          this.handlePlaySfx();
       } else {
         AnimationUtils.fadeOutAndDeactivate(node, 0);
       }
@@ -133,7 +138,7 @@ export class FulltimeManager extends Component {
     this.unschedule(this.displayResult);
   }
 
-  protected scheduleAutoHideActiveNode(duration: number) {
+  protected scheduleAutoHideNode(duration: number) {
     this.scheduleOnce(() => {
       AnimationUtils.fadeOutAndDeactivate(this.getNodeActive(), 1);
     }, duration - 1);
@@ -141,15 +146,30 @@ export class FulltimeManager extends Component {
 
   protected getNodeActive() {
     switch (this.status) {
-      case FullTimeDisplayStatus.Fulltime:
-        return this.fulltime;
       case FullTimeDisplayStatus.Result:
         return this.result;
+      case FullTimeDisplayStatus.Winner:
+        return this.winner;
       case FullTimeDisplayStatus.Draw:
         return this.draw;
 
       default:
         return null;
     }
+  }
+
+  protected handlePlaySfx() {}
+
+  @handle(SfxStore, (store, sfx: string) => store.playSfx(sfx))
+  protected playSfx(sfx: string) {
+    return sfx;
+  }
+
+  @render(GameFlowStore, (store) => store.data)
+  preloadAndPlayIntro(gameFlowData: GameFlowData) {
+    if (!gameFlowData) {
+      return;
+    }
+    this.gameFlowData = gameFlowData;
   }
 }

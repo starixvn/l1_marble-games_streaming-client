@@ -31,8 +31,8 @@ describe("FulltimeManager", () => {
     comp = new FulltimeManager();
     (comp as any).unschedule = jest.fn();
     (comp as any).scheduleOnce = jest.fn();
-    comp.fulltime = new Node();
     comp.result = new Node();
+    comp.winner = new Node();
     comp.draw = new Node();
     (comp as any).durationMinutes = 0;
   });
@@ -109,7 +109,7 @@ describe("FulltimeManager", () => {
       (comp as any).onEnable();
 
       // Assert
-      expect((comp as any).status).toBe(FullTimeDisplayStatus.Fulltime);
+      expect((comp as any).status).toBe(FullTimeDisplayStatus.Result);
       expect(updateUISpy).toHaveBeenCalled();
       expect((comp as any).scheduleOnce).toHaveBeenCalledWith(
         expect.any(Function),
@@ -132,7 +132,7 @@ describe("FulltimeManager", () => {
       expect(updateUISpy).toHaveBeenCalled();
     });
 
-    it("sets status to Result when isDraw is false and updates UI", () => {
+    it("sets status to Winner when isDraw is false and updates UI", () => {
       // Arrange
       (comp as any).isDraw = false;
       const updateUISpy = jest.spyOn(comp, "updateUI");
@@ -141,7 +141,7 @@ describe("FulltimeManager", () => {
       comp.displayResult();
 
       // Assert
-      expect((comp as any).status).toBe(FullTimeDisplayStatus.Result);
+      expect((comp as any).status).toBe(FullTimeDisplayStatus.Winner);
       expect(updateUISpy).toHaveBeenCalled();
     });
   });
@@ -177,32 +177,7 @@ describe("FulltimeManager", () => {
       jest.clearAllMocks();
     });
 
-    it("calls fadeInAndActivate for fulltime node and fadeOutAndDeactivate for others when status is Fulltime", () => {
-      // Arrange
-      (comp as any).status = FullTimeDisplayStatus.Fulltime;
-
-      // Act
-      comp.updateUI();
-
-      // Assert
-      expect(AnimationUtils.fadeInAndActivate).toHaveBeenCalledWith(
-        comp.fulltime,
-        comp["durationAppear"]
-      );
-      expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
-        comp.result,
-        0
-      );
-      expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
-        comp.draw,
-        0
-      );
-      expect(comp.fulltime.active).toBe(true);
-      expect(comp.result.active).toBe(false);
-      expect(comp.draw.active).toBe(false);
-    });
-
-    it("calls fadeInAndActivate for result node and fadeOutAndDeactivate for others when status is Result", () => {
+    it("calls fadeInAndActivate for fulltime node and fadeOutAndDeactivate for others when status is Result", () => {
       // Arrange
       (comp as any).status = FullTimeDisplayStatus.Result;
 
@@ -210,20 +185,45 @@ describe("FulltimeManager", () => {
       comp.updateUI();
 
       // Assert
+      expect(AnimationUtils.fadeInAndActivate).toHaveBeenCalledWith(
+        comp.result,
+        comp["durationAppear"]
+      );
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
-        comp.fulltime,
+        comp.winner,
+        0
+      );
+      expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
+        comp.draw,
+        0
+      );
+      expect(comp.result.active).toBe(true);
+      expect(comp.winner.active).toBe(false);
+      expect(comp.draw.active).toBe(false);
+    });
+
+    it("calls fadeInAndActivate for winner node and fadeOutAndDeactivate for others when status is Winner", () => {
+      // Arrange
+      (comp as any).status = FullTimeDisplayStatus.Winner;
+
+      // Act
+      comp.updateUI();
+
+      // Assert
+      expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
+        comp.result,
         0
       );
       expect(AnimationUtils.fadeInAndActivate).toHaveBeenCalledWith(
-        comp.result,
+        comp.winner,
         comp["durationAppear"]
       );
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
         comp.draw,
         0
       );
-      expect(comp.fulltime.active).toBe(false);
-      expect(comp.result.active).toBe(true);
+      expect(comp.result.active).toBe(false);
+      expect(comp.winner.active).toBe(true);
       expect(comp.draw.active).toBe(false);
     });
 
@@ -236,19 +236,19 @@ describe("FulltimeManager", () => {
 
       // Assert
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
-        comp.fulltime,
+        comp.result,
         0
       );
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
-        comp.result,
+        comp.winner,
         0
       );
       expect(AnimationUtils.fadeInAndActivate).toHaveBeenCalledWith(
         comp.draw,
         comp["durationAppear"]
       );
-      expect(comp.fulltime.active).toBe(false);
       expect(comp.result.active).toBe(false);
+      expect(comp.winner.active).toBe(false);
       expect(comp.draw.active).toBe(true);
     });
   });
