@@ -17,6 +17,7 @@ import Observer from "observer";
 
 import { init } from "db://i18n/LanguageData";
 import { handlerRegistry } from "./handler-registry";
+import { AudioStore } from "./local-stores/audio/audio-store";
 import { GameStore } from "./local-stores/game/game-store";
 import { ReplayMatchHandler } from "./local-stores/replay-match/replay-match-handler";
 import { ServerSentEventHandler } from "./server-sent-event/server-sent-event-handler";
@@ -133,5 +134,15 @@ export class Startup extends Component {
       this.infoLayer.removeAllChildren();
       this.infoLayer.addChild(info);
     };
+  }
+
+  @render(AudioStore, (store) => store.browserBlocked)
+  public renderBrowserBlocked(browserBlocked: boolean) {
+    console.log("Marble TV renderBrowserBlocked---", browserBlocked);
+  }
+
+  @render(AudioStore, (store) => store.muted)
+  public renderMuted(muted: boolean) {
+    console.log("Marble TV renderMuted---", muted);
   }
 }
