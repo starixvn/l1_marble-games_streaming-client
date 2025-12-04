@@ -12,7 +12,7 @@ import {
 } from "../../features/team-name/team-name-store";
 import { Store } from "../../store";
 
-const { render, observer, handle } = Observer;
+const { render, observer } = Observer;
 
 const { ccclass, property, menu } = _decorator;
 
@@ -33,7 +33,6 @@ export class Winner extends Component {
   protected awayCode = "";
   protected operator = "Common";
   protected winner = "";
-  protected gameId = "";
 
   @render(TeamNameStore, (store) => store.data)
   syncTeamName(data: TeamNameData) {

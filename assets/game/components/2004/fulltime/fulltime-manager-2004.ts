@@ -20,17 +20,17 @@ enum SoundName {
 @observer
 export class FulltimeManager2004 extends FulltimeManager {
   protected gameId = "2004";
-  handlePlaySfx() {
-    if (this.status === FullTimeDisplayStatus.Result) {
-      this.playSfx(
-        `${SoundUtils.getAudioGamePath(this.gameId)}${SoundName.Result}`
-      );
-    }
 
-    if (this.status === FullTimeDisplayStatus.Winner) {
-      this.playSfx(
-        `${SoundUtils.getAudioGamePath(this.gameId)}${SoundName.Winner}`
-      );
+  protected getSfxForStatus(status: FullTimeDisplayStatus): string | null {
+    const basePath = SoundUtils.getAudioGamePath(this.gameId);
+
+    switch (status) {
+      case FullTimeDisplayStatus.Result:
+        return `${basePath}${SoundName.Result}`;
+      case FullTimeDisplayStatus.Winner:
+        return `${basePath}${SoundName.Winner}`;
+      default:
+        return null;
     }
   }
 }

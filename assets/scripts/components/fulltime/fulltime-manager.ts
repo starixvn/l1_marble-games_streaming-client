@@ -72,7 +72,15 @@ export class FulltimeManager extends Component {
       data.durationMs > 0
     ) {
       this.scheduleAutoHideNode(FunctionUtils.msToSeconds(data.durationMs));
+      const previousStatus = this.status;
       this.status = FullTimeDisplayStatus.Result;
+      if (previousStatus !== this.status) {
+        this.updateUI();
+        this.handlePlaySfx();
+        this.scheduleOnce(() => {
+          this.transitionToWinnerOrDraw();
+        }, this.timeToDisplayResult);
+      }
     }
   }
 
@@ -93,17 +101,12 @@ export class FulltimeManager extends Component {
     this.isDraw = homeScore === awayScore;
   }
 
-  protected onEnable(): void {
-    this.status = FullTimeDisplayStatus.Result;
-    this.updateUI();
-    this.scheduleOnce(this.displayResult.bind(this), this.timeToDisplayResult);
-  }
-
-  displayResult() {
+  protected transitionToWinnerOrDraw() {
     this.status = this.isDraw
       ? FullTimeDisplayStatus.Draw
       : FullTimeDisplayStatus.Winner;
     this.updateUI();
+    this.handlePlaySfx();
   }
 
   protected onDisable(): void {
@@ -111,11 +114,10 @@ export class FulltimeManager extends Component {
   }
 
   protected onDestroy(): void {
-    super.onDestroy();
     this.cleanup();
   }
 
-  updateUI() {
+  protected updateUI() {
     const statusNodePairs: Array<[FullTimeDisplayStatus, Node]> = [
       [FullTimeDisplayStatus.Result, this.result],
       [FullTimeDisplayStatus.Winner, this.winner],
@@ -126,8 +128,6 @@ export class FulltimeManager extends Component {
       const isActive = status === this.status;
       if (isActive) {
         AnimationUtils.fadeInAndActivate(node, this.durationAppear);
-        this.gameFlowData?.state === GameFlowState.Result &&
-          this.handlePlaySfx();
       } else {
         AnimationUtils.fadeOutAndDeactivate(node, 0);
       }
@@ -135,7 +135,7 @@ export class FulltimeManager extends Component {
   }
 
   private cleanup() {
-    this.unschedule(this.displayResult);
+    this.unschedule(this.transitionToWinnerOrDraw);
   }
 
   protected scheduleAutoHideNode(duration: number) {
@@ -158,7 +158,16 @@ export class FulltimeManager extends Component {
     }
   }
 
-  protected handlePlaySfx() {}
+  protected getSfxForStatus(status: FullTimeDisplayStatus): string | null {
+    return null;
+  }
+
+  protected handlePlaySfx() {
+    const sfx = this.getSfxForStatus(this.status);
+    if (sfx) {
+      this.playSfx(sfx);
+    }
+  }
 
   @handle(SfxStore, (store, sfx: string) => store.playSfx(sfx))
   protected playSfx(sfx: string) {

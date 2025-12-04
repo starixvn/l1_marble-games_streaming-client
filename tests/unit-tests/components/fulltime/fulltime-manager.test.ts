@@ -100,32 +100,14 @@ describe("FulltimeManager", () => {
     });
   });
 
-  describe("onEnable", () => {
-    it("sets status to Fulltime, updates UI, and schedules displayResult", () => {
-      // Arrange
-      const updateUISpy = jest.spyOn(comp, "updateUI");
-
-      // Act
-      (comp as any).onEnable();
-
-      // Assert
-      expect((comp as any).status).toBe(FullTimeDisplayStatus.Result);
-      expect(updateUISpy).toHaveBeenCalled();
-      expect((comp as any).scheduleOnce).toHaveBeenCalledWith(
-        expect.any(Function),
-        comp.timeToDisplayResult
-      );
-    });
-  });
-
-  describe("displayResult", () => {
+  describe("transitionToWinnerOrDraw", () => {
     it("sets status to Draw when isDraw is true and updates UI", () => {
       // Arrange
       (comp as any).isDraw = true;
-      const updateUISpy = jest.spyOn(comp, "updateUI");
+      const updateUISpy = jest.spyOn(comp as any, "updateUI");
 
       // Act
-      comp.displayResult();
+      comp["transitionToWinnerOrDraw"]();
 
       // Assert
       expect((comp as any).status).toBe(FullTimeDisplayStatus.Draw);
@@ -135,10 +117,10 @@ describe("FulltimeManager", () => {
     it("sets status to Winner when isDraw is false and updates UI", () => {
       // Arrange
       (comp as any).isDraw = false;
-      const updateUISpy = jest.spyOn(comp, "updateUI");
+      const updateUISpy = jest.spyOn(comp as any, "updateUI");
 
       // Act
-      comp.displayResult();
+      comp["transitionToWinnerOrDraw"]();
 
       // Assert
       expect((comp as any).status).toBe(FullTimeDisplayStatus.Winner);
@@ -182,7 +164,7 @@ describe("FulltimeManager", () => {
       (comp as any).status = FullTimeDisplayStatus.Result;
 
       // Act
-      comp.updateUI();
+      comp["updateUI"]();
 
       // Assert
       expect(AnimationUtils.fadeInAndActivate).toHaveBeenCalledWith(
@@ -207,7 +189,7 @@ describe("FulltimeManager", () => {
       (comp as any).status = FullTimeDisplayStatus.Winner;
 
       // Act
-      comp.updateUI();
+      comp["updateUI"]();
 
       // Assert
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
@@ -232,7 +214,7 @@ describe("FulltimeManager", () => {
       (comp as any).status = FullTimeDisplayStatus.Draw;
 
       // Act
-      comp.updateUI();
+      comp["updateUI"]();
 
       // Assert
       expect(AnimationUtils.fadeOutAndDeactivate).toHaveBeenCalledWith(
@@ -254,7 +236,7 @@ describe("FulltimeManager", () => {
   });
 
   describe("cleanup", () => {
-    it("unschedules displayResult", () => {
+    it("unschedules transitionToWinnerOrDraw", () => {
       // Arrange
       // Act
       (comp as any).cleanup();
