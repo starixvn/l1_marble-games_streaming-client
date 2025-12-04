@@ -60,6 +60,14 @@ export class Startup extends Component {
     this.clearEventShowHideGame();
   }
 
+  start() {
+    this.postMessageToParent();
+  }
+
+  protected postMessageToParent() {
+    window.parent?.postMessage({ marbleTvReady: true }, "*");
+  }
+
   protected registerEventShowHideGame() {
     if (!this.enableEventShowHideGame) {
       return;
