@@ -10,7 +10,7 @@ export async function loadSfx(sfx: string) {
   const audioClip = await bundleManager.loadResourcesAsset(
     sfx,
     AudioClip,
-    null,
+    null
   );
 
   if (audioClip) {
@@ -62,6 +62,8 @@ export class SfxStore {
       return;
     }
 
+    // Clear previous playing sfx
+    this.playingSfx = [];
     if (Array.isArray(sfx)) {
       this.playingSfx = await Promise.all(sfx.map(this.playOneSfx.bind(this)));
     } else {

@@ -21,7 +21,7 @@ export class SfxContainer extends Component {
     }
   )
   syncSfx({ playingSfx }: { playingSfx: AudioClip[] }) {
-    if (!playingSfx) {
+    if (!playingSfx || playingSfx.length === 0) {
       return;
     }
 
